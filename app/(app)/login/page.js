@@ -6,13 +6,16 @@ import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { createClient as createPlainClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '@/lib/supabase/config';
+import { useLang } from '@/components/LangProvider';
+import { appText } from '@/lib/content/app';
 
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const t = appText(useLang()).login;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(params.get('error') === 'link' ? 'メールのリンクが無効か、有効期限が切れています。もう一度お試しください。' : '');
+  const [error, setError] = useState(params.get('error') === 'link' ? t.linkError : '');
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
@@ -24,7 +27,7 @@ function LoginForm() {
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (err) {
-      setError('メールアドレスまたはパスワードが正しくありません。');
+      setError(t.wrong);
       return;
     }
     const next = params.get('next');
@@ -33,7 +36,7 @@ function LoginForm() {
 
   async function onReset() {
     if (!email) {
-      setError('パスワード再設定のため、メールアドレスを入力してください。');
+      setError(t.needEmail);
       return;
     }
     // Implicit-flow client: the emailed link then works in any browser or device,
@@ -43,7 +46,7 @@ function LoginForm() {
     });
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=password` });
     if (resetError && resetError.status === 429) {
-      setError('メールの送信回数が上限に達しました。1時間ほど待ってから、もう一度お試しください。');
+      setError(t.rateLimit);
       return;
     }
     setResetSent(true);
@@ -52,26 +55,26 @@ function LoginForm() {
 
   return (
     <div className="card">
-      <h1 style={{ marginTop: 0, fontSize: 24 }}>提携店舗ログイン</h1>
+      <h1 style={{ marginTop: 0, fontSize: 24 }}>{t.title}</h1>
       <form onSubmit={onSubmit} className="form">
-        <label htmlFor="email">メールアドレス</label>
+        <label htmlFor="email">{t.email}</label>
         <input id="email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        <label htmlFor="password">パスワード</label>
+        <label htmlFor="password">{t.password}</label>
         <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && (
           <p className="alert" role="alert">
             {error}
           </p>
         )}
-        {resetSent && <p className="small">パスワード再設定のメールを送信しました（登録済みの場合）。</p>}
+        {resetSent && <p className="small">{t.resetSent}</p>}
         <button className="btn btn-primary" type="submit" disabled={busy}>
-          {busy ? '確認中…' : 'ログイン'}
+          {busy ? t.checking : t.submit}
         </button>
         <button className="btn btn-line" type="button" onClick={onReset}>
-          パスワードを忘れた場合
+          {t.forgot}
         </button>
       </form>
-      <p className="small muted">ログイン後、認証アプリの確認コード（6桁）を入力します。</p>
+      <p className="small muted">{t.mfaHint}</p>
     </div>
   );
 }

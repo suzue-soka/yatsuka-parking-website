@@ -7,7 +7,7 @@ import { LANG_META, alternates } from '@/lib/i18n';
 import { noto, notoSc, inter } from '@/lib/fonts';
 
 // Shared <html> document for the Japanese, English and Chinese root layouts.
-export default function RootDocument({ lang, children }) {
+export default function RootDocument({ lang, app = false, children }) {
   const c = getContent(lang);
   const font = lang === 'zh' ? notoSc : noto;
   return (
@@ -16,7 +16,7 @@ export default function RootDocument({ lang, children }) {
         <a className="skip" href="#main">
           {c.meta.skip}
         </a>
-        <Header lang={lang} />
+        <Header lang={lang} app={app} />
         <main id="main">{children}</main>
         <Footer lang={lang} />
         <AuthLinkForwarder />

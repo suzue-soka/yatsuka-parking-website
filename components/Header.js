@@ -5,7 +5,7 @@ import { getContent } from '@/lib/content';
 import { href } from '@/lib/i18n';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-export default function Header({ lang = 'ja' }) {
+export default function Header({ lang = 'ja', app = false }) {
   const c = getContent(lang);
   const home = href(lang, '/');
   const anchor = (id) => `${home}#${id}`;
@@ -20,7 +20,7 @@ export default function Header({ lang = 'ja' }) {
 
   return (
     <>
-    <LanguageSwitcher lang={lang} label={c.nav.language} />
+    <LanguageSwitcher lang={lang} label={c.nav.language} app={app} />
     <header className="header">
       <div className="wrap header-inner">
         <Link href={home} className="brand" aria-label={`${c.name} ${c.nav.toTop}`}>
@@ -34,9 +34,9 @@ export default function Header({ lang = 'ja' }) {
             </Link>
           ))}
         </nav>
-        <Link className="login-link" href="/login">
+        <a className="login-link" href={lang === 'ja' ? '/login' : `/login?lang=${lang}`}>
           {c.nav.login}
-        </Link>
+        </a>
         <a className="tel-link" href={SITE.telHref}>
           TEL {SITE.tel}
         </a>
@@ -48,7 +48,7 @@ export default function Header({ lang = 'ja' }) {
                 {l.label}
               </Link>
             ))}
-            <Link href="/login">{c.nav.login}</Link>
+            <a href={lang === 'ja' ? '/login' : `/login?lang=${lang}`}>{c.nav.login}</a>
             <a href={SITE.telHref}>
               {c.nav.call} {SITE.tel}
             </a>

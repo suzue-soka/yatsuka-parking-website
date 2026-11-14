@@ -47,7 +47,7 @@ export default function Footer({ lang = 'ja' }) {
             <Link href={href(lang, '/partners')}>{L.partners}</Link>
           </li>
           <li>
-            <Link href="/login">{L.login}</Link>
+            <a href={lang === 'ja' ? '/login' : `/login?lang=${lang}`}>{L.login}</a>
           </li>
           <li>
             <Link href={href(lang, '/privacy')}>{L.privacy}</Link>

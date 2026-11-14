@@ -5,21 +5,25 @@ import { revalidatePath } from 'next/cache';
 import { createClient, getClaims } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { parseReport } from '@/lib/parkingweb';
+import { getAppLang } from '@/lib/app-lang';
+import { appText } from '@/lib/content/app';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
 export async function importCsv(prevState, formData) {
+  const E = appText(await getAppLang()).import.errors;
+
   // 1. Only a verified administrator may import.
   const supabase = await createClient();
   const claims = await getClaims(supabase);
-  if (!claims || claims.aal !== 'aal2') return { error: 'ログインし直してください。' };
+  if (!claims || claims.aal !== 'aal2') return { error: E.relogin };
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', claims.sub).single();
-  if (profile?.role !== 'admin') return { error: '権限がありません。' };
+  if (profile?.role !== 'admin') return { error: E.forbidden };
 
   // 2. Read and check the file.
   const file = formData.get('file');
-  if (!file || typeof file === 'string' || file.size === 0) return { error: 'CSVファイルを選択してください。' };
-  if (file.size > MAX_BYTES) return { error: 'ファイルが大きすぎます（5MBまで）。' };
+  if (!file || typeof file === 'string' || file.size === 0) return { error: E.noFile };
+  if (file.size > MAX_BYTES) return { error: E.tooBig };
   const bytes = Buffer.from(await file.arrayBuffer());
   const sha256 = createHash('sha256').update(bytes).digest('hex');
   const report = parseReport(new TextDecoder('shift_jis').decode(bytes));
@@ -30,7 +34,7 @@ export async function importCsv(prevState, formData) {
   const month = report.period?.from?.slice(0, 7) || 'unknown';
   const path = `${month}/${new Date().toISOString().replace(/[:.]/g, '-')}-${sha256.slice(0, 12)}.csv`;
   const { error: upErr } = await admin.storage.from('parkingweb').upload(path, bytes, { contentType: 'text/csv', upsert: false });
-  if (upErr) return { error: `原本の保存に失敗しました：${upErr.message}` };
+  if (upErr) return { error: E.storage(upErr.message) };
 
   // 4. Unknown 店No. are reported (their rows are stored but not billed until mapped).
   const { data: stores } = await admin.from('store_numbers').select('store_no');
@@ -51,17 +55,17 @@ export async function importCsv(prevState, formData) {
   if (report.problems.length) {
     await admin.from('import_runs').insert({ ...base, status: 'blocked', finished_at: new Date().toISOString(), message: report.problems.slice(0, 10).join(' / ') });
     revalidatePath('/admin');
-    return { error: '取込を中止しました（ファイルの内容に問題があります）。', problems: report.problems.slice(0, 20) };
+    return { error: E.blocked, problems: report.problems.slice(0, 20) };
   }
 
   const { data: run, error: runErr } = await admin.from('import_runs').insert({ ...base, status: 'running' }).select('id').single();
-  if (runErr) return { error: `取込を開始できませんでした：${runErr.message}` };
+  if (runErr) return { error: E.start(runErr.message) };
 
   // 6. Count-based import: only rows not already stored are added.
   const { data: result, error: impErr } = await admin.rpc('import_validations', { p_run_id: run.id, p_rows: report.rows });
   if (impErr) {
     await admin.from('import_runs').update({ status: 'failed', finished_at: new Date().toISOString(), message: impErr.message }).eq('id', run.id);
-    return { error: `取込に失敗しました：${impErr.message}` };
+    return { error: E.failed(impErr.message) };
   }
   const { added, already_present } = result?.[0] || { added: 0, already_present: 0 };
   const message = unknown.length ? `未登録の店No.：${unknown.join('、')}（請求対象外）` : null;

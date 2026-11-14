@@ -2,20 +2,24 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin-guard';
 import PortalHeader from '@/components/PortalHeader';
 import { monthParam, monthRange, shiftMonth, jstDateTime, yen } from '@/lib/dates';
+import { getAppLang } from '@/lib/app-lang';
+import { appText } from '@/lib/content/app';
 
-export const metadata = { title: '管理画面', robots: { index: false, follow: false } };
+export async function generateMetadata() {
+  return { title: appText(await getAppLang()).admin.metaTitle, robots: { index: false, follow: false } };
+}
 export const dynamic = 'force-dynamic';
-
-const RUN = { ok: '完了', running: '処理中', failed: '失敗', blocked: '要確認（取込中止）' };
 
 export default async function AdminHome({ searchParams }) {
   const { supabase, claims } = await requireAdmin();
+  const T = appText(await getAppLang());
+  const t = T.admin;
   const sp = await searchParams;
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
   const [{ data: partners }, { data: runs }] = await Promise.all([
-    supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(label))').order('partner_code'),
+    supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
   ]);
 
@@ -30,19 +34,19 @@ export default async function AdminHome({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title="管理画面" email={claims.email} links={[{ href: '/admin/import', label: 'ParkingWeb 取込' }]} />
+      <PortalHeader title={t.title} email={claims.email} links={[{ href: '/admin/import', label: t.importLink }]} logout={T.logout} />
 
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
           <h2 style={{ margin: 0, fontSize: 20 }}>
-            {ym.replace('-', '年')}月の提携店舗別 認証件数・請求見込み
+            {t.byPartner(T.month(ym))}
           </h2>
           <div style={{ display: 'flex', gap: 8 }}>
             <Link className="chip" href={`/admin?m=${shiftMonth(ym, -1)}`}>
-              ← 前月
+              {T.prev}
             </Link>
             <Link className="chip" href={`/admin?m=${shiftMonth(ym, 1)}`}>
-              翌月 →
+              {T.next}
             </Link>
           </div>
         </div>
@@ -50,21 +54,14 @@ export default async function AdminHome({ searchParams }) {
           <table>
             <thead>
               <tr>
-                <th scope="col">提携店舗ID</th>
-                <th scope="col">店舗名</th>
-                <th scope="col">店No.・割引</th>
-                <th scope="col" className="right">
-                  件数
-                </th>
-                <th scope="col" className="right">
-                  認証額
-                </th>
-                <th scope="col" className="right">
-                  割引率
-                </th>
-                <th scope="col" className="right">
-                  請求見込み（税込）
-                </th>
+                <th scope="col">{t.th[0]}</th>
+                <th scope="col">{t.th[1]}</th>
+                <th scope="col">{t.th[2]}</th>
+                {t.th.slice(3).map((h) => (
+                  <th key={h} scope="col" className="right">
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -74,20 +71,20 @@ export default async function AdminHome({ searchParams }) {
                   <td>{p.name}</td>
                   <td className="small">
                     {(p.store_numbers || [])
-                      .map((s) => `${s.store_no}：${s.discount_types?.label}${s.note ? `（${s.note}）` : ''}`)
+                      .map((s) => `${s.store_no}：${T.discount(s.discount_types?.hours)}${s.note ? `（${s.note}）` : ''}`)
                       .join(' / ')}
                   </td>
                   <td className="right num">{charges[i].validation_count}</td>
-                  <td className="right num">{yen(charges[i].gross_yen)}円</td>
+                  <td className="right num">{T.yen(yen(charges[i].gross_yen))}</td>
                   <td className="right num">{Math.round(Number(charges[i].volume_rate) * 100)}%</td>
                   <td className="right num">
-                    <strong>{yen(charges[i].total_yen)}円</strong>
+                    <strong>{T.yen(yen(charges[i].total_yen))}</strong>
                   </td>
                 </tr>
               ))}
               <tr>
                 <td colSpan={3}>
-                  <strong>合計</strong>
+                  <strong>{t.total}</strong>
                 </td>
                 <td className="right num">
                   <strong>{totalCount}</strong>
@@ -95,48 +92,44 @@ export default async function AdminHome({ searchParams }) {
                 <td />
                 <td />
                 <td className="right num">
-                  <strong>{yen(totalYen)}円</strong>
+                  <strong>{T.yen(yen(totalYen))}</strong>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p className="small muted">請求書の作成・承認・公開の画面は次の段階で追加します。</p>
+        <p className="small muted">{t.nextStage}</p>
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>
-        <h2 style={{ marginTop: 0, fontSize: 20 }}>最近の取込</h2>
+        <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.runs}</h2>
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">日時</th>
-                <th scope="col">結果</th>
-                <th scope="col">対象期間</th>
-                <th scope="col" className="right">
-                  ファイル行数
-                </th>
-                <th scope="col" className="right">
-                  追加
-                </th>
-                <th scope="col" className="right">
-                  取込済み
-                </th>
-                <th scope="col">メモ</th>
+                <th scope="col">{t.runTh[0]}</th>
+                <th scope="col">{t.runTh[1]}</th>
+                <th scope="col">{t.runTh[2]}</th>
+                {t.runTh.slice(3, 6).map((h) => (
+                  <th key={h} scope="col" className="right">
+                    {h}
+                  </th>
+                ))}
+                <th scope="col">{t.runTh[6]}</th>
               </tr>
             </thead>
             <tbody>
               {(runs || []).length === 0 && (
                 <tr>
                   <td colSpan={7} className="muted">
-                    まだ取込はありません。
+                    {t.noRuns}
                   </td>
                 </tr>
               )}
               {(runs || []).map((r) => (
                 <tr key={r.id}>
                   <td className="num">{jstDateTime(r.started_at)}</td>
-                  <td className={r.status === 'ok' ? 'ok' : 'warn'}>{RUN[r.status] || r.status}</td>
+                  <td className={r.status === 'ok' ? 'ok' : 'warn'}>{t.run[r.status] || r.status}</td>
                   <td className="num small">
                     {r.period_from ? `${jstDateTime(r.period_from)} 〜 ${jstDateTime(r.period_to)}` : '—'}
                   </td>

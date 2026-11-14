@@ -20,7 +20,7 @@ export default function PartnersView({ lang = 'ja' }) {
           <br />
           <span className="small muted">{p.loginDesc}</span>
         </p>
-        <a className="btn btn-primary" href="/login">
+        <a className="btn btn-primary" href={lang === 'ja' ? '/login' : `/login?lang=${lang}`}>
           {c.nav.login}
         </a>
       </div>

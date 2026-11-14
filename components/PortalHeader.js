@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function PortalHeader({ title, links = [], email }) {
+export default function PortalHeader({ title, links = [], email, logout = 'ログアウト' }) {
   return (
     <div className="band" style={{ marginBottom: 20 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
@@ -18,7 +18,7 @@ export default function PortalHeader({ title, links = [], email }) {
           ))}
           <form action="/auth/signout" method="post">
             <button className="btn btn-ghost" type="submit">
-              ログアウト
+              {logout}
             </button>
           </form>
         </div>

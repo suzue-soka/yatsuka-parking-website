@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '@/lib/supabase/config';
+import { useLang } from '@/components/LangProvider';
+import { appText } from '@/lib/content/app';
 
 // Landing page for Supabase's standard email links (invitation, password reset).
 // Handles both link styles: tokens in the #fragment, or a ?code= to exchange.
 export default function AuthCallback() {
-  const [message, setMessage] = useState('確認しています…');
+  const t = appText(useLang()).callback;
+  const [message, setMessage] = useState(t.checking);
 
   useEffect(() => {
     (async () => {
@@ -17,7 +20,7 @@ export default function AuthCallback() {
       // Remove tokens from the address bar and history straight away.
       window.history.replaceState(null, '', '/auth/callback');
 
-      const failed = () => setMessage('リンクが無効か、有効期限が切れています。ログイン画面の「パスワードを忘れた場合」から、もう一度お試しください。');
+      const failed = () => setMessage(t.failed);
       if (hash.get('error_description') || query.get('error_description')) return failed();
 
       let type = hash.get('type') || query.get('type') || query.get('next');
@@ -28,7 +31,7 @@ export default function AuthCallback() {
         const { error } = await supabase.auth.exchangeCodeForSession(query.get('code'));
         if (error) {
           if (/code verifier|code_verifier/i.test(error.message || '')) {
-            return setMessage('このリンクは、再設定を申し込んだときと同じブラウザで開く必要があります。ログイン画面の「パスワードを忘れた場合」から、もう一度お試しください。');
+            return setMessage(t.sameBrowser);
           }
           return failed();
         }

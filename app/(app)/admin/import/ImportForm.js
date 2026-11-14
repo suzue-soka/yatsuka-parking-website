@@ -2,17 +2,20 @@
 
 import { useActionState } from 'react';
 import { importCsv } from './actions';
+import { useLang } from '@/components/LangProvider';
+import { appText } from '@/lib/content/app';
 
 export default function ImportForm() {
   const [state, action, pending] = useActionState(importCsv, null);
+  const t = appText(useLang()).import;
 
   return (
     <div className="card">
       <form action={action} className="form">
-        <label htmlFor="file">ParkingWeb「掛売割引利用明細」CSV（出力形式：割引毎の精算単位）</label>
+        <label htmlFor="file">{t.file}</label>
         <input id="file" name="file" type="file" accept=".csv,text/csv" required />
         <button className="btn btn-primary" type="submit" disabled={pending}>
-          {pending ? '取込中…' : '取り込む'}
+          {pending ? t.busy : t.submit}
         </button>
       </form>
 
@@ -31,18 +34,21 @@ export default function ImportForm() {
 
       {state?.ok && (
         <div style={{ marginTop: 12 }} aria-live="polite">
-          <p className="ok">取込が完了しました。</p>
+          <p className="ok">{t.done}</p>
           <ul>
             <li>
-              対象期間：{state.period?.from?.slice(0, 16).replace('T', ' ')} 〜 {state.period?.to?.slice(0, 16).replace('T', ' ')}
+              {t.period}
+              {state.period?.from?.slice(0, 16).replace('T', ' ')} 〜 {state.period?.to?.slice(0, 16).replace('T', ' ')}
             </li>
             <li>
-              ファイルの合計：{state.totalCount}件 / {state.totalYen?.toLocaleString('ja-JP')}円（行数 {state.rows}）
+              {t.fileTotal(state.totalCount, state.totalYen?.toLocaleString('ja-JP'), state.rows)}
             </li>
             <li>
-              新しく追加：<strong>{state.added}件</strong>　既に取込済み：{state.alreadyPresent}件
+              {t.added}
+              <strong>{state.added}</strong>　{t.already}
+              {state.alreadyPresent}
             </li>
-            {state.unknown?.length > 0 && <li className="warn">未登録の店No.：{state.unknown.join('、')}（請求の対象外です。提携店舗に登録してください）</li>}
+            {state.unknown?.length > 0 && <li className="warn">{t.unknown(state.unknown.join(', '))}</li>}
           </ul>
         </div>
       )}
