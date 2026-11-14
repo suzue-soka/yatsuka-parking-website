@@ -631,3 +631,32 @@ tbody tr {
 .prose p {
   margin: 0 0 1em;
 }
+
+/* Validation machine card */
+.validator {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: center;
+  color: var(--navy);
+  margin-top: 16px;
+}
+.validator img {
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #f3f5f8;
+}
+@media (min-width: 700px) {
+  .validator {
+    grid-template-columns: 200px 1fr;
+  }
+}
+.band .card,
+.band .card p {
+  color: var(--navy);
+}
+.band .card .muted {
+  color: var(--grey);
+}

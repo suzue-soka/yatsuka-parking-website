@@ -1,3 +1,4 @@
+import ValidatorCard from '@/components/ValidatorCard';
 import { SITE, PARTNER_FEATURES } from '@/lib/site';
 
 export const metadata = {
@@ -37,6 +38,7 @@ export default function Partners() {
             </div>
           ))}
         </div>
+          <ValidatorCard />
         <p style={{ marginBottom: 0 }}>
           お問い合わせ：{SITE.owner.name} <a href={SITE.owner.telHref}>{SITE.owner.tel}</a>
         </p>

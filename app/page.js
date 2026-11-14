@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import FeeCalculator from '@/components/FeeCalculator';
+import ValidatorCard from '@/components/ValidatorCard';
 import { SITE, RATE_CARDS, PAYMENT_NOTE, AMENITIES, VEHICLES_OK, VEHICLES_NG, MONTHLY, PARTNER_FEATURES, SECURITY, FAQS } from '@/lib/site';
 import { sortedNews, formatNewsDate } from '@/lib/news';
 
@@ -308,6 +309,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <ValidatorCard />
           <p style={{ marginBottom: 0 }}>
             お問い合わせ：{SITE.owner.name} <a href={SITE.owner.telHref}>{SITE.owner.tel}</a>
           </p>
