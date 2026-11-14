@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { startTransition, useActionState, useEffect, useState } from 'react';
 import { submitApplication } from '@/lib/actions/apply';
 import { programText } from '@/lib/content/program';
 import { DISCOUNT_TYPES, CATEGORIES, USAGE, DOC_KINDS } from '@/lib/program-data';
@@ -41,7 +41,15 @@ export default function ApplyForm({ lang = 'ja' }) {
   const privacy = t.agreePrivacy(t.privacyLink);
 
   return (
-    <form action={action} className="form card apply-form">
+    <form
+      className="form card apply-form"
+      onSubmit={(e) => {
+        // Submitted by hand (not the form action prop) so the entries stay if there is an error.
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => action(fd));
+      }}
+    >
       <input type="hidden" name="started" value={started} />
       <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
         <input name="company_url" tabIndex={-1} autoComplete="off" />
