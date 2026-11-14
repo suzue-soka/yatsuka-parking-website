@@ -4,6 +4,8 @@ import PortalHeader from '@/components/PortalHeader';
 import { monthParam, monthRange, shiftMonth, jstDateTime, yen } from '@/lib/dates';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
+import { onbText } from '@/lib/content/onboarding';
+import { adminLinks } from '@/lib/admin-links';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).admin.metaTitle, robots: { index: false, follow: false } };
@@ -12,16 +14,30 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminHome({ searchParams }) {
   const { supabase, claims } = await requireAdmin();
-  const T = appText(await getAppLang());
+  const lang = await getAppLang();
+  const T = appText(lang);
   const t = T.admin;
+  const o = onbText(lang).admin;
   const sp = await searchParams;
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
-  const [{ data: partners }, { data: runs }] = await Promise.all([
+  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }] = await Promise.all([
     supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
+    supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+    supabase.from('change_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
   ]);
+  const partners = (allPartners || []).filter((p) => p.partner_code && ['active', 'suspended', 'shipped'].includes(p.status));
+  const byStatus = (st) => (allPartners || []).filter((p) => p.status === st).length;
+  const todo = [
+    { label: o.counts.applied, n: byStatus('applied'), href: '/admin/partners?status=applied' },
+    { label: o.counts.awaiting_payment, n: byStatus('awaiting_payment'), href: '/admin/partners?status=awaiting_payment' },
+    { label: o.counts.preparing, n: byStatus('preparing'), href: '/admin/partners?status=preparing' },
+    { label: o.counts.shipped, n: byStatus('shipped'), href: '/admin/partners?status=shipped' },
+    { label: o.counts.inquiries, n: openInquiries ?? 0, href: '/admin/requests' },
+    { label: o.counts.changes, n: pendingChanges ?? 0, href: '/admin/requests' },
+  ];
 
   const charges = await Promise.all(
     (partners || []).map(async (p) => {
@@ -34,7 +50,17 @@ export default async function AdminHome({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={t.title} email={claims.email} links={[{ href: '/admin/import', label: t.importLink }]} logout={T.logout} />
+      <PortalHeader title={t.title} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+
+      <h2 style={{ fontSize: 20 }}>{o.todo}</h2>
+      <div className="grid compact" style={{ marginBottom: 16 }}>
+        {todo.map((x) => (
+          <Link key={x.label} href={x.href} className={`card stat${x.n ? ' attention' : ''}`} style={{ textDecoration: 'none' }}>
+            <span className="small muted">{x.label}</span>
+            <span className="value">{x.n}</span>
+          </Link>
+        ))}
+      </div>
 
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
@@ -65,7 +91,7 @@ export default async function AdminHome({ searchParams }) {
               </tr>
             </thead>
             <tbody>
-              {(partners || []).map((p, i) => (
+              {partners.map((p, i) => (
                 <tr key={p.id}>
                   <td className="num">{p.partner_code}</td>
                   <td>{p.name}</td>

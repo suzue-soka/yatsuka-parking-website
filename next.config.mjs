@@ -30,7 +30,11 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   // One 404 page for the whole site (the site has a root layout per language).
-  experimental: { globalNotFound: true },
+  experimental: {
+    globalNotFound: true,
+    // Application documents (4 MB) and ParkingWeb CSVs are uploaded through server actions.
+    serverActions: { bodySizeLimit: '5mb' },
+  },
   reactStrictMode: true,
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { createClient, getClaims } from '@/lib/supabase/server';
 import PortalHeader from '@/components/PortalHeader';
 import { monthParam, monthRange, shiftMonth, jstDate, jstToday, yen } from '@/lib/dates';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
+import { requirePartner, portalLinks } from '@/lib/portal-guard';
+import OnboardingCard from '@/components/OnboardingCard';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).portal.metaTitle, robots: { index: false, follow: false } };
@@ -12,18 +12,12 @@ export async function generateMetadata() {
 export const dynamic = 'force-dynamic';
 
 export default async function Portal({ searchParams }) {
-  const supabase = await createClient();
-  const T = appText(await getAppLang());
+  const { supabase, claims, partner: me, T, O } = await requirePartner('/portal');
   const t = T.portal;
-  const claims = await getClaims(supabase);
-  if (!claims) redirect('/login');
-  if (claims.aal !== 'aal2') redirect('/login/mfa');
-
-  const { data: profile } = await supabase.from('profiles').select('role, partner_id').eq('id', claims.sub).single();
-  if (profile?.role === 'admin') redirect('/admin');
-  if (!profile?.partner_id) {
+  if (!me) {
     return <p className="wrap section">{t.noPartner}</p>;
   }
+  const profile = { partner_id: me.id };
 
   const sp = await searchParams;
   const ym = monthParam(sp?.m);
@@ -52,7 +46,8 @@ export default async function Portal({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} logout={T.logout} />
+      <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <OnboardingCard status={me.status} O={O} />
 
       <div className="grid">
         <div className="card stat">

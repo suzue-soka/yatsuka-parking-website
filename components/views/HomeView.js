@@ -6,6 +6,7 @@ import { SITE } from '@/lib/site';
 import { getContent } from '@/lib/content';
 import { href } from '@/lib/i18n';
 import { sortedNews, formatNewsDate } from '@/lib/news';
+import { programText } from '@/lib/content/program';
 
 function SectionHead({ kicker, title, id }) {
   return (
@@ -334,6 +335,11 @@ export default function HomeView({ lang = 'ja' }) {
             ))}
           </div>
           <ValidatorCard lang={lang} />
+          <p>
+            <a className="btn btn-primary" href={`${href(lang, '/partners')}#apply`}>
+              {programText(lang).applyCta}
+            </a>
+          </p>
           <p style={{ marginBottom: 0 }}>
             {c.partnerBand.contact}
             {c.owner.name} <a href={SITE.telHref}>{tel}</a>

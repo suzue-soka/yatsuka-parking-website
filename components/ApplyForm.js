@@ -1,0 +1,180 @@
+'use client';
+
+import { useActionState, useEffect, useState } from 'react';
+import { submitApplication } from '@/lib/actions/apply';
+import { programText } from '@/lib/content/program';
+import { DISCOUNT_TYPES, CATEGORIES, USAGE, DOC_KINDS } from '@/lib/program-data';
+import { href } from '@/lib/i18n';
+import { getContent } from '@/lib/content';
+
+function Field({ id, label, req, t, children }) {
+  return (
+    <>
+      <label htmlFor={id}>
+        {label} <span className="small muted">（{req ? t.required : t.optional}）</span>
+      </label>
+      {children}
+    </>
+  );
+}
+
+export default function ApplyForm({ lang = 'ja' }) {
+  const t = programText(lang);
+  const c = getContent(lang);
+  const yen = (n) => c.yen(n.toLocaleString('ja-JP'));
+  const [state, action, pending] = useActionState(submitApplication.bind(null, lang), null);
+  const [started, setStarted] = useState(0);
+  const [picked, setPicked] = useState([]);
+  useEffect(() => setStarted(Date.now()), []);
+
+  if (state?.ok) {
+    return (
+      <div className="card" role="status">
+        <h2 style={{ marginTop: 0 }}>{t.doneTitle}</h2>
+        <p style={{ marginBottom: 0 }}>{t.doneBody}</p>
+      </div>
+    );
+  }
+
+  const toggle = (code, on) => setPicked((p) => (on ? [...p, code] : p.filter((c) => c !== code)));
+  const terms = t.agreeTerms(t.termsLink);
+  const privacy = t.agreePrivacy(t.privacyLink);
+
+  return (
+    <form action={action} className="form card apply-form">
+      <input type="hidden" name="started" value={started} />
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
+        <input name="company_url" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      <h2>{t.sections.business}</h2>
+      <Field id="company" label={t.f.company} req t={t}>
+        <input id="company" name="company" required maxLength={200} autoComplete="organization" />
+      </Field>
+      <Field id="category" label={t.f.category} req t={t}>
+        <select id="category" name="category" required defaultValue="">
+          <option value="" disabled>
+            {t.choose}
+          </option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {t.categories[c]}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field id="representative" label={t.f.representative} req t={t}>
+        <input id="representative" name="representative" required maxLength={200} />
+      </Field>
+      <Field id="contact" label={t.f.contact} req t={t}>
+        <input id="contact" name="contact" required maxLength={200} autoComplete="name" />
+      </Field>
+      <Field id="address" label={t.f.address} req t={t}>
+        <input id="address" name="address" required maxLength={300} autoComplete="street-address" />
+      </Field>
+      <Field id="phone" label={t.f.phone} req t={t}>
+        <input id="phone" name="phone" type="tel" required maxLength={30} autoComplete="tel" />
+      </Field>
+      <Field id="email" label={t.f.email} req t={t}>
+        <input id="email" name="email" type="email" required maxLength={200} autoComplete="email" />
+      </Field>
+      <Field id="website" label={t.f.website} t={t}>
+        <input id="website" name="website" type="url" inputMode="url" maxLength={300} placeholder="https://" />
+      </Field>
+
+      <h2>{t.sections.service}</h2>
+      <Field id="usage" label={t.f.usage} req t={t}>
+        <select id="usage" name="usage" required defaultValue="">
+          <option value="" disabled>
+            {t.choose}
+          </option>
+          {USAGE.map((u) => (
+            <option key={u} value={u}>
+              {t.usage[u]}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <fieldset>
+        <legend>
+          {t.f.discounts} <span className="small muted">（{t.required}）</span>
+        </legend>
+        {DISCOUNT_TYPES.map((d) => (
+          <label key={d.code} className="check">
+            <input
+              type="checkbox"
+              name="discounts"
+              value={d.code}
+              checked={picked.includes(d.code)}
+              disabled={!picked.includes(d.code) && picked.length >= 2}
+              onChange={(e) => toggle(d.code, e.target.checked)}
+            />
+            {t.discountLabel(d.hours)}（{yen(d.yen)}）
+          </label>
+        ))}
+      </fieldset>
+
+      <h2>{t.sections.document}</h2>
+      <fieldset>
+        <legend>
+          {t.f.docKind} <span className="small muted">（{t.required}）</span>
+        </legend>
+        {DOC_KINDS.map((k) => (
+          <label key={k} className="check">
+            <input type="radio" name="doc_kind" value={k} required />
+            {t.docKinds[k]}
+          </label>
+        ))}
+      </fieldset>
+      <Field id="document" label={t.f.docFile} req t={t}>
+        <input id="document" name="document" type="file" accept="application/pdf,image/jpeg,image/png" required />
+      </Field>
+
+      <h2>{t.sections.consent}</h2>
+      <label className="check">
+        <input type="checkbox" name="terms" required />
+        <span>
+          {terms[0]}
+          <a href={href(lang, '/partners/terms')} target="_blank" rel="noopener">
+            {terms[1]}
+          </a>
+          {terms[2]}
+        </span>
+      </label>
+      <label className="check">
+        <input type="checkbox" name="privacy" required />
+        <span>
+          {privacy[0]}
+          <a href={href(lang, '/privacy')} target="_blank" rel="noopener">
+            {privacy[1]}
+          </a>
+          {privacy[2]}
+        </span>
+      </label>
+      <label className="check">
+        <input type="checkbox" name="antisocial" required />
+        <span>{t.antisocial}</span>
+      </label>
+
+      <h2>{t.sections.listing}</h2>
+      <label className="check">
+        <input type="checkbox" name="permission_a" />
+        <span>{t.permissionA}</span>
+      </label>
+      <label className="check">
+        <input type="checkbox" name="permission_b" />
+        <span>{t.permissionB}</span>
+      </label>
+      <p className="small muted">{t.listingNote}</p>
+
+      {state?.error && (
+        <p className="alert" role="alert">
+          {t.errors[state.error] || t.errors.server}
+        </p>
+      )}
+      <button className="btn btn-primary" type="submit" disabled={pending || !started}>
+        {pending ? t.sending : t.submit}
+      </button>
+    </form>
+  );
+}
