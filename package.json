@@ -1,0 +1,21 @@
+{
+  "name": "yatsuka-parking-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "谷塚駅東口共同駐車場 公式ウェブサイト（株式会社鈴江）",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "next": "16.4.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
