@@ -26,7 +26,12 @@ export default function AuthCallback() {
         if (error) return failed();
       } else if (query.get('code')) {
         const { error } = await supabase.auth.exchangeCodeForSession(query.get('code'));
-        if (error) return failed();
+        if (error) {
+          if (/code verifier|code_verifier/i.test(error.message || '')) {
+            return setMessage('このリンクは、再設定を申し込んだときと同じブラウザで開く必要があります。ログイン画面の「パスワードを忘れた場合」から、もう一度お試しください。');
+          }
+          return failed();
+        }
         type = type || 'recovery';
       } else {
         return failed();

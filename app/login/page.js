@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { createClient as createPlainClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '@/lib/supabase/config';
 
 function LoginForm() {
   const router = useRouter();
@@ -34,8 +36,16 @@ function LoginForm() {
       setError('パスワード再設定のため、メールアドレスを入力してください。');
       return;
     }
-    const supabase = createClient();
-    await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=password` });
+    // Implicit-flow client: the emailed link then works in any browser or device,
+    // not only the one where the reset was requested (PKCE needs the same browser).
+    const supabase = createPlainClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=password` });
+    if (resetError && resetError.status === 429) {
+      setError('メールの送信回数が上限に達しました。1時間ほど待ってから、もう一度お試しください。');
+      return;
+    }
     setResetSent(true);
     setError('');
   }
