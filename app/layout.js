@@ -1,6 +1,7 @@
 import { Inter, Noto_Sans_JP } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AuthLinkForwarder from '@/components/AuthLinkForwarder';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        <AuthLinkForwarder />
       </body>
     </html>
   );
