@@ -9,7 +9,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://akwzolwbwbkcogqjyzpa.supabase.co",
   'frame-src https://www.google.com https://maps.google.com',
   "frame-ancestors 'none'",
   "base-uri 'self'",

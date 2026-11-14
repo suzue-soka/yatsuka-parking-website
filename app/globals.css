@@ -660,3 +660,58 @@ tbody tr {
 .band .card .muted {
   color: var(--grey);
 }
+
+/* Forms (login, admin) */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form label {
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 6px;
+}
+.form input[type='email'],
+.form input[type='password'],
+.form input[type='text'],
+.form input:not([type]),
+.form input[type='file'],
+.form select {
+  font: inherit;
+  font-size: 16px;
+  min-height: 50px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+}
+.form input[type='file'] {
+  padding: 12px;
+}
+.form .btn {
+  margin-top: 8px;
+}
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: wait;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat .value {
+  font-family: var(--font-num);
+  font-size: 28px;
+  font-weight: 700;
+}
+.ok {
+  color: #17603a;
+  font-weight: 700;
+}
+.warn {
+  color: #8f3708;
+  font-weight: 700;
+}

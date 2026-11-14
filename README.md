@@ -33,3 +33,13 @@ Run the tests with `npm test`.
 - Google Business Profile; Search Console with the sitemap
 - English and Simplified Chinese versions
 - Stage 2: partner portal, admin, Supabase database, ParkingWeb import, invoices, Stripe
+
+## Stage 2 — partner portal & admin (in progress)
+- `/login` (email + password) → `/login/mfa` (authenticator app, required for everyone) → `/portal` (partners) or `/admin` (administrator)
+- Email links (invitation, password reset) go to `/auth/confirm` and then `/login/password`
+- `/admin/import`: upload the ParkingWeb CSV; the original file is kept in private storage, totals are checked, and only new rows are added
+- The database refuses all partner/admin data unless the session passed two-step verification (aal2)
+
+Vercel environment variables (Settings → Environment Variables):
+- `SUPABASE_SECRET_KEY` = the Supabase **secret** key (`sb_secret_…`), marked Sensitive. Never put it in code or chat.
+- Optional overrides: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (defaults are in `lib/supabase/config.js`)
