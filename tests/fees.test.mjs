@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateFee, toMinutes, formatDuration } from '../lib/fees.js';
+import { calculateFee, toMinutes, formatDuration, formatDateTime } from '../lib/fees.js';
 
 const fee = (a, b) => calculateFee(toMinutes(...a), toMinutes(...b));
 
@@ -49,4 +49,14 @@ test('duration format', () => {
   assert.equal(formatDuration(210), '3時間30分');
   assert.equal(formatDuration(2880), '2日');
   assert.equal(formatDuration(1), '1分');
+});
+
+test('durations and dates are localised', () => {
+  assert.equal(formatDuration(210, 'en'), '3 h 30 min');
+  assert.equal(formatDuration(1440, 'en'), '1 day');
+  assert.equal(formatDuration(1500, 'zh'), '1天1小时');
+  const t = toMinutes('2026-01-15', '10', '05');
+  assert.equal(formatDateTime(t), '1/15（木）10:05');
+  assert.equal(formatDateTime(t, 'en'), 'Thu 1/15 10:05');
+  assert.equal(formatDateTime(t, 'zh'), '1/15（周四）10:05');
 });

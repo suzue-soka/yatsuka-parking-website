@@ -1,56 +1,62 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { SITE } from '@/lib/site';
+import { getContent } from '@/lib/content';
+import { href } from '@/lib/i18n';
 
-export default function Footer() {
+export default function Footer({ lang = 'ja' }) {
+  const c = getContent(lang);
+  const home = href(lang, '/');
+  const L = c.footer.links;
   return (
     <footer className="footer">
       <div className="wrap footer-grid">
         <div>
-          <Image src="/images/wordmark-white.png" alt={SITE.name} width={222} height={32} />
+          <Image src="/images/wordmark-white.png" alt={c.name} width={222} height={32} />
           <p>
-            {SITE.address.full}
+            {c.addressFull}
             <br />
-            {SITE.walk}・24時間営業・収容{SITE.capacity}台
+            {c.footer.line}
           </p>
         </div>
         <div>
           <p>
-            <strong>運営</strong>
+            <strong>{c.footer.operator}</strong>
             <br />
-            {SITE.owner.name}
+            {c.owner.name}
             <br />
-            {SITE.owner.address}
+            {c.owner.address}
             <br />
-            TEL <a href={SITE.owner.telHref}>{SITE.owner.tel}</a>
+            TEL <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a>
           </p>
         </div>
         <ul>
           <li>
-            <Link href="/#rates">料金</Link>
+            <Link href={`${home}#rates`}>{L.rates}</Link>
           </li>
           <li>
-            <Link href="/#access">アクセス</Link>
+            <Link href={`${home}#access`}>{L.access}</Link>
           </li>
           <li>
-            <Link href="/#monthly">月極駐車場</Link>
+            <Link href={`${home}#monthly`}>{L.monthly}</Link>
           </li>
           <li>
-            <Link href="/news">お知らせ</Link>
+            <Link href={href(lang, '/news')}>{L.news}</Link>
           </li>
           <li>
-            <Link href="/partners">提携店舗のご案内</Link>
+            <Link href={href(lang, '/partners')}>{L.partners}</Link>
           </li>
           <li>
-            <Link href="/login">提携店舗ログイン</Link>
+            <Link href="/login">{L.login}</Link>
           </li>
           <li>
-            <Link href="/privacy">プライバシーポリシー</Link>
+            <Link href={href(lang, '/privacy')}>{L.privacy}</Link>
           </li>
         </ul>
       </div>
       <div className="wrap">
-        <p className="small">© {new Date().getFullYear()} {SITE.owner.name}</p>
+        {c.footer.official && <p className="small">{c.footer.official}</p>}
+        <p className="small">© {new Date().getFullYear()} {c.owner.name}</p>
       </div>
     </footer>
   );

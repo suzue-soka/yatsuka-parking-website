@@ -88,6 +88,43 @@ a {
   top: 0;
   z-index: 50;
 }
+/* ---------- Language bar ---------- */
+.langbar {
+  background: var(--navy);
+  color: var(--white);
+  font-size: 13px;
+}
+.langbar-inner {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+}
+.langbar svg {
+  margin-right: 4px;
+  opacity: 0.85;
+}
+.langbar a {
+  color: var(--white);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.85;
+}
+.langbar a:hover {
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 1;
+}
+.langbar a.current {
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  opacity: 1;
+}
 .header-inner {
   display: flex;
   align-items: center;
@@ -728,4 +765,19 @@ tbody tr {
 .warn {
   color: #8f3708;
   font-weight: 700;
+}
+
+/* English labels are longer: keep the compact menu until the full header fits. */
+.nav a {
+  white-space: nowrap;
+}
+@media (min-width: 900px) and (max-width: 1279px) {
+  html[lang='en'] .nav,
+  html[lang='en'] .login-link,
+  html[lang='en'] .tel-link {
+    display: none;
+  }
+  html[lang='en'] .menu {
+    display: block;
+  }
 }

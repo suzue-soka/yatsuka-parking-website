@@ -29,6 +29,8 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  // One 404 page for the whole site (the site has a root layout per language).
+  experimental: { globalNotFound: true },
   reactStrictMode: true,
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];

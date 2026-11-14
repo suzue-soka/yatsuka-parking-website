@@ -1,55 +1,66 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { SITE } from '@/lib/site';
+import { getContent } from '@/lib/content';
+import { href } from '@/lib/i18n';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-const LINKS = [
-  { href: '/#rates', label: '料金' },
-  { href: '/#calc', label: '料金を計算' },
-  { href: '/#access', label: 'アクセス' },
-  { href: '/#monthly', label: '月極契約' },
-  { href: '/#support', label: 'お困りのときは' },
-  { href: '/partners', label: '提携店舗' },
-];
+export default function Header({ lang = 'ja' }) {
+  const c = getContent(lang);
+  const home = href(lang, '/');
+  const anchor = (id) => `${home}#${id}`;
+  const links = [
+    { href: anchor('rates'), label: c.nav.rates },
+    { href: anchor('calc'), label: c.nav.calc },
+    { href: anchor('access'), label: c.nav.access },
+    { href: anchor('monthly'), label: c.nav.monthly },
+    { href: anchor('support'), label: c.nav.support },
+    { href: href(lang, '/partners'), label: c.nav.partners },
+  ];
 
-export default function Header() {
   return (
+    <>
+    <LanguageSwitcher lang={lang} label={c.nav.language} />
     <header className="header">
       <div className="wrap header-inner">
-        <Link href="/" className="brand" aria-label={`${SITE.name} トップへ`}>
+        <Link href={home} className="brand" aria-label={`${c.name} ${c.nav.toTop}`}>
           <Image className="brand-mark" src="/images/logo-navy.png" alt="" width={29} height={40} priority />
-          <Image className="brand-word" src="/images/wordmark-navy.png" alt={SITE.name} width={194} height={28} priority />
+          <Image className="brand-word" src="/images/wordmark-navy.png" alt={c.name} width={194} height={28} priority />
         </Link>
-        <nav className="nav" aria-label="メインメニュー">
-          {LINKS.map((l) => (
+        <nav className="nav" aria-label={c.nav.mainMenu}>
+          {links.map((l) => (
             <Link key={l.href} href={l.href}>
               {l.label}
             </Link>
           ))}
         </nav>
         <Link className="login-link" href="/login">
-          提携店舗ログイン
+          {c.nav.login}
         </Link>
-        <a className="tel-link" href={SITE.owner.telHref}>
-          TEL {SITE.owner.tel}
+        <a className="tel-link" href={SITE.telHref}>
+          TEL {SITE.tel}
         </a>
         <details className="menu">
-          <summary aria-label="メニューを開く">メニュー</summary>
-          <nav className="menu-panel" aria-label="メインメニュー（モバイル）">
-            {LINKS.map((l) => (
+          <summary aria-label={c.nav.menuOpen}>{c.nav.menu}</summary>
+          <nav className="menu-panel" aria-label={c.nav.mainMenuMobile}>
+            {links.map((l) => (
               <Link key={l.href} href={l.href}>
                 {l.label}
               </Link>
             ))}
-            <Link href="/login">提携店舗ログイン</Link>
-            <a href={SITE.owner.telHref}>電話する {SITE.owner.tel}</a>
+            <Link href="/login">{c.nav.login}</Link>
+            <a href={SITE.telHref}>
+              {c.nav.call} {SITE.tel}
+            </a>
           </nav>
         </details>
       </div>
-      <nav className="quick" aria-label="よく使うメニュー">
-        <a href="/#rates">料金</a>
-        <a href="/#access">アクセス</a>
-        <a href="/#monthly">月極契約</a>
+      <nav className="quick" aria-label={c.nav.quick}>
+        <a href={anchor('rates')}>{c.nav.rates}</a>
+        <a href={anchor('access')}>{c.nav.access}</a>
+        <a href={anchor('monthly')}>{c.nav.monthly}</a>
       </nav>
     </header>
+    </>
   );
 }
