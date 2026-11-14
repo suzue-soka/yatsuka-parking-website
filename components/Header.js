@@ -26,6 +26,9 @@ export default function Header() {
             </Link>
           ))}
         </nav>
+        <Link className="login-link" href="/login">
+          提携店舗ログイン
+        </Link>
         <a className="tel-link" href={SITE.owner.telHref}>
           TEL {SITE.owner.tel}
         </a>
@@ -37,6 +40,7 @@ export default function Header() {
                 {l.label}
               </Link>
             ))}
+            <Link href="/login">提携店舗ログイン</Link>
             <a href={SITE.owner.telHref}>電話する {SITE.owner.tel}</a>
           </nav>
         </details>

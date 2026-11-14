@@ -16,6 +16,16 @@ export default function Partners() {
         <p className="kicker">PARTNERS</p>
         <h1 style={{ margin: '4px 0 0', fontSize: 28 }}>提携店舗のご案内</h1>
       </div>
+      <div className="card" style={{ marginBottom: 24, display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ margin: 0 }}>
+          <strong>提携店舗の皆様</strong>
+          <br />
+          <span className="small muted">ご利用明細・請求書の確認はこちらから</span>
+        </p>
+        <a className="btn btn-primary" href="/login">
+          提携店舗ログイン
+        </a>
+      </div>
       <div className="card prose">
         <p style={{ marginTop: 0 }}>
           提携店舗をご利用のお客様は、店舗が駐車料金を負担するサービスがあります。ご利用の際は、各店舗でお申し出ください。
@@ -38,7 +48,7 @@ export default function Partners() {
             </div>
           ))}
         </div>
-          <ValidatorCard />
+        <ValidatorCard />
         <p style={{ marginBottom: 0 }}>
           お問い合わせ：{SITE.owner.name} <a href={SITE.owner.telHref}>{SITE.owner.tel}</a>
         </p>

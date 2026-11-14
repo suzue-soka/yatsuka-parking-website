@@ -42,6 +42,9 @@ export default function Footer() {
             <Link href="/partners">提携店舗のご案内</Link>
           </li>
           <li>
+            <Link href="/login">提携店舗ログイン</Link>
+          </li>
+          <li>
             <Link href="/privacy">プライバシーポリシー</Link>
           </li>
         </ul>

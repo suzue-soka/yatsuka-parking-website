@@ -123,6 +123,19 @@ a {
 .nav a:hover {
   background: var(--bg);
 }
+.login-link {
+  display: none;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--line-2);
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.login-link:hover {
+  background: var(--bg);
+}
 .tel-link {
   display: none;
   text-decoration: none;
@@ -168,6 +181,7 @@ a {
 }
 @media (min-width: 900px) {
   .nav,
+  .login-link,
   .tel-link {
     display: flex;
   }
