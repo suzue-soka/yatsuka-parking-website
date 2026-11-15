@@ -37,7 +37,6 @@ export default async function Billing({ searchParams }) {
   const lastRejected = !open && requests?.[0]?.status === 'rejected' && requests[0].kind === 'additional' ? requests[0] : null;
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const unit = price?.unit_yen ?? 40000;
-  const unpaid = (invoices || []).some((i) => i.status === 'published');
   const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
   // Machine orders not completely shipped yet (unpaid ones can be cancelled; paid ones are final).
   const openOrders = (invoices || []).filter(
@@ -52,7 +51,7 @@ export default async function Billing({ searchParams }) {
       <PortalHeader title={B.title} email={claims.email} links={portalLinks(O)} />
       <Notice sp={sp} o={O} extra={{ orderCancelled: B.orderCancelled, requested: B.requested, withdrawn: B.withdrawn }} />
 
-      <div className="grid" style={{ alignItems: 'start' }}>
+      <div>
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.machineTitle}</h2>
           {open && (
@@ -146,17 +145,6 @@ export default async function Billing({ searchParams }) {
           )}
         </div>
 
-        <div className="card">
-          <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.bankTitle}</h2>
-          <p>
-            <strong>{B.bank}</strong>
-          </p>
-          <p className="small">{B.transferName(p.partner_code)}</p>
-          <p className="small muted" style={{ marginBottom: 0 }}>
-            {B.card}
-          </p>
-          {unpaid && <p className="small warn">{B.invStatus.published}</p>}
-        </div>
       </div>
 
       {shippedList.length > 0 && (
