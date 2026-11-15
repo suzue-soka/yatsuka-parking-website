@@ -47,3 +47,4 @@ Vercel environment variables (Settings → Environment Variables):
 ## Fonts
 
 Invoice PDFs embed IPAゴシック (IPAGothic, assets/fonts/ipag.ttf) under the IPA Font License v1.0 — see assets/fonts/IPA_Font_License_v1.0.txt.
+The invoice page uses a web subset of the same font (public/fonts/ipag-web.woff, IPA Font License v1.0 — public/fonts/IPA_Font_License_v1.0.txt).

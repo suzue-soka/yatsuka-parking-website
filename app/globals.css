@@ -880,23 +880,14 @@ tbody tr {
   .skip {
     display: none !important;
   }
-  .invoice {
+  .doc {
     border: 0 !important;
     box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }
 
-/* Invoice letterhead: solid logo, on screen and on paper */
-.invoice-brand {
-  padding-bottom: 14px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
-.invoice-brand img {
-  display: block;
-  height: 44px;
-  width: auto;
-}
 
 /* ---------- Admin detail page: wide information column + action column ---------- */
 .detail-layout {
@@ -1120,4 +1111,218 @@ html {
 }
 .shipment .btn {
   margin-top: 8px;
+}
+
+/* ---------- Business documents (請求書 page): same look as the PDF invoices and 納品書 ---------- */
+@font-face {
+  font-family: 'IPAGothicWeb';
+  src: url('/fonts/ipag-web.woff') format('woff'); /* IPA Font License v1.0, /fonts/IPA_Font_License_v1.0.txt */
+  font-display: block;
+}
+.doc {
+  --doc-navy: #0b3a6e;
+  --doc-grey: #5b6472;
+  --doc-line: #e3e7ed;
+  --doc-ink: #1d2733;
+  --doc-pale: #f3f5f8;
+  font-family: 'IPAGothicWeb', 'IPAGothic', 'IPAゴシック', sans-serif;
+  font-weight: 400;
+  color: var(--doc-ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: clamp(20px, 5vw, 48px);
+  font-size: 14px;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.doc * {
+  font-weight: 400;
+}
+.doc-logo {
+  display: block;
+  height: 45px;
+  width: auto;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--doc-line);
+  box-sizing: content-box;
+  width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+.doc-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 28px 0 22px;
+}
+.doc-title {
+  margin: 0;
+  font-size: 35px;
+  line-height: 1;
+  color: var(--doc-navy);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  letter-spacing: 0;
+}
+.doc-stamp {
+  font-size: 15px;
+  line-height: 1;
+  padding: 6px 10px;
+  border: 1.6px solid var(--doc-navy);
+  color: var(--doc-navy);
+}
+.doc-meta {
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+}
+.doc-meta div {
+  display: flex;
+  justify-content: flex-end;
+}
+.doc-meta dt::after {
+  content: '：';
+}
+.doc-meta dd {
+  margin: 0;
+}
+.doc-parties {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 28px;
+}
+.doc-to {
+  flex: 1 1 260px;
+  max-width: 50%;
+}
+.doc-to-name {
+  margin: 0 0 8px;
+  font-size: 20px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--doc-ink);
+}
+.doc-from {
+  text-align: right;
+  margin-left: auto;
+}
+.doc-from-name {
+  margin: 0 0 2px;
+  font-size: 16px;
+}
+.doc-small,
+.doc-to .doc-small,
+.doc-from .doc-small {
+  margin: 0;
+  font-size: 13px;
+  color: var(--doc-grey);
+}
+.doc-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--doc-pale);
+  color: var(--doc-navy);
+  padding: 12px 16px;
+  margin-bottom: 26px;
+  font-size: 17px;
+}
+.doc-total strong {
+  font-size: 29px;
+  line-height: 1.2;
+}
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.doc-table thead,
+.doc-table tr {
+  background: none;
+}
+.doc-table th {
+  background: none;
+  color: var(--doc-grey);
+  font-size: 13px;
+  text-align: right;
+  padding: 0 4px 8px;
+  border-bottom: 1.3px solid var(--doc-navy);
+  white-space: nowrap;
+}
+.doc-table td {
+  color: var(--doc-ink);
+  background: none;
+  text-align: right;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--doc-line);
+  white-space: nowrap;
+}
+.doc-table th + th,
+.doc-table td + td {
+  padding-left: 22px;
+}
+.doc-table th:first-child,
+.doc-table td:first-child {
+  text-align: left;
+  white-space: normal;
+  width: 100%;
+}
+.doc-tax {
+  text-align: right;
+  font-size: 13px;
+  margin: 8px 0 30px;
+}
+.doc-pay {
+  font-size: 13px;
+  margin: 0;
+}
+.doc-foot {
+  text-align: center;
+  font-size: 11px;
+  color: var(--doc-grey);
+  margin: 48px 0 0;
+}
+@media (max-width: 560px) {
+  .doc-to {
+    max-width: none;
+  }
+  .doc-from {
+    text-align: left;
+    margin-left: 0;
+  }
+  .doc-meta {
+    text-align: left;
+  }
+  .doc-meta div {
+    justify-content: flex-start;
+  }
+  .doc-table th {
+    white-space: normal;
+  }
+  .doc-table th + th,
+  .doc-table td + td {
+    padding-left: 10px;
+  }
+  .doc-table {
+    font-size: 13px;
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 17mm;
+  }
+  body:has(.doc) {
+    background: #fff !important;
+  }
+  .doc-total,
+  .doc-stamp {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }
