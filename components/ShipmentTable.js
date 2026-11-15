@@ -40,7 +40,7 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
               <th scope="col" className="right">
                 {M.btnNo}
               </th>
-              <th scope="col" className="right">
+              <th scope="col" className="right" style={{ paddingRight: 32 }}>
                 {M.discounts}
               </th>
               <th scope="col">{M.serial}</th>
@@ -55,7 +55,9 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
                   <strong>{m.machine_code || '—'}</strong>
                 </td>
                 <td className="num right">{stack(buttons(m), 'no')}</td>
-                <td className="right">{stack(buttons(m), 'text')}</td>
+                <td className="right" style={{ paddingRight: 32 }}>
+                  {stack(buttons(m), 'text')}
+                </td>
                 <td className="num">{m.serial_no || '—'}</td>
                 <td className="num">{m.warranty_until || '—'}</td>
                 <td>
