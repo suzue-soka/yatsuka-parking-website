@@ -273,12 +273,17 @@ export default async function AdminPartner({ params, searchParams }) {
                   </div>
                 ))}
                 <label htmlFor="carrier">{A.carrier}</label>
-                <input id="carrier" name="carrier" type="text" maxLength={100} list="carrier-list" autoComplete="off" />
-                <datalist id="carrier-list">
+                <select id="carrier" name="carrier" defaultValue="">
+                  <option value="">{A.carrierChoose}</option>
                   {CARRIERS.map((c) => (
-                    <option key={c.ja} value={c.ja} />
+                    <option key={c.ja} value={c.ja}>
+                      {c.ja}
+                    </option>
                   ))}
-                </datalist>
+                  <option value="__other">{A.carrierOther}</option>
+                </select>
+                <label htmlFor="carrier_other">{A.carrierOtherName}</label>
+                <input id="carrier_other" name="carrier_other" type="text" maxLength={100} autoComplete="off" />
                 <label htmlFor="tracking">{A.tracking}</label>
                 <input id="tracking" name="tracking" type="text" maxLength={100} />
                 <label htmlFor="received_on">{A.receivedOn}</label>
