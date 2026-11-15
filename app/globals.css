@@ -1402,3 +1402,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 @media print {
   .doc-draft { display: none !important; }
 }
+
+/* Billed period of a monthly invoice, above the total */
+.doc-period {
+  margin: 0 0 10px;
+  color: var(--doc-navy);
+  font-size: 17px;
+  font-weight: 700;
+}

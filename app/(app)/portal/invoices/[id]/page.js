@@ -68,12 +68,6 @@ export default async function Invoice({ params }) {
               <dt>{I.no}</dt>
               <dd>{isDraft ? I.atPublish : inv.invoice_no}</dd>
             </div>
-            {inv.period_month && (
-              <div>
-                <dt>{I.period}</dt>
-                <dd>{periodRange(inv.period_month)}</dd>
-              </div>
-            )}
             <div>
               <dt>{I.issued}</dt>
               <dd>{isDraft ? I.atPublish : inv.issued_on || '—'}</dd>
@@ -106,6 +100,11 @@ export default async function Invoice({ params }) {
           </div>
         </div>
 
+        {inv.period_month && (
+          <p className="doc-period">
+            {I.periodLine(inv.period_month, periodRange(inv.period_month))}
+          </p>
+        )}
         <div className="doc-total">
           <span>{I.total}</span>
           <strong>{Y(inv.total_yen)}</strong>
