@@ -33,6 +33,8 @@ export default async function Invoice({ params }) {
   const lines = inv.invoice_lines || [];
   const Y = (n) => `${yen(n)}円`;
   const isCn = inv.kind === 'cancellation';
+  // Drafts have no number or issue date yet: view only, never printed or downloaded.
+  const isDraft = inv.status === 'draft';
   const { data: orig } = isCn && inv.cancels_invoice_id
     ? await supabase.from('invoices').select('invoice_no, issued_on').eq('id', inv.cancels_invoice_id).maybeSingle()
     : { data: null };
@@ -40,13 +42,17 @@ export default async function Invoice({ params }) {
   return (
     <section className="wrap section" style={{ maxWidth: 860 }}>
       <IdleWatch />
-      <p className="no-print">
-        <PrintButton label={L.print} />{' '}
-        <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
-          {L.pdf}
-        </a>
-      </p>
-      <article className="doc" lang="ja">
+      {isDraft ? (
+        <p className="alert no-print">{L.draftNote}</p>
+      ) : (
+        <p className="no-print">
+          <PrintButton label={L.print} />{' '}
+          <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
+            {L.pdf}
+          </a>
+        </p>
+      )}
+      <article className={`doc${isDraft ? ' doc-draft' : ''}`} lang="ja">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="doc-logo" src="/images/logo-lockup.svg" alt="谷塚駅東口共同駐車場" />
 
@@ -55,11 +61,12 @@ export default async function Invoice({ params }) {
             {isCn ? I.cnTitle : I.title}
             {!isCn && inv.status === 'paid' && <span className="doc-stamp">{I.receipt}</span>}
             {inv.status === 'cancelled' && <span className="doc-stamp">{I.cancelledStamp}</span>}
+            {isDraft && <span className="doc-stamp">{I.draftStamp}</span>}
           </h1>
           <dl className="doc-meta">
             <div>
               <dt>{I.no}</dt>
-              <dd>{inv.status === 'draft' ? I.draft : inv.invoice_no}</dd>
+              <dd>{isDraft ? I.atPublish : inv.invoice_no}</dd>
             </div>
             {inv.period_month && (
               <div>
@@ -69,11 +76,11 @@ export default async function Invoice({ params }) {
             )}
             <div>
               <dt>{I.issued}</dt>
-              <dd>{inv.issued_on || '—'}</dd>
+              <dd>{isDraft ? I.atPublish : inv.issued_on || '—'}</dd>
             </div>
             <div>
               <dt>{I.due}</dt>
-              <dd>{inv.due_on || '—'}</dd>
+              <dd>{isDraft ? I.atPublish : inv.due_on || '—'}</dd>
             </div>
           </dl>
         </div>

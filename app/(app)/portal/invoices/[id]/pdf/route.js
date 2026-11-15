@@ -21,6 +21,8 @@ export async function GET(request, { params }) {
     .eq('id', id)
     .maybeSingle();
   if (!inv) return new Response('Not found', { status: 404 });
+  // Drafts have no invoice number or issue date yet: no PDF until published.
+  if (inv.status === 'draft') return new Response('下書きの請求書はPDFにできません（公開後にご利用ください）。', { status: 403, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   const { data: orig } = inv.kind === 'cancellation' && inv.cancels_invoice_id
     ? await supabase.from('invoices').select('invoice_no, issued_on').eq('id', inv.cancels_invoice_id).maybeSingle()
     : { data: null };
