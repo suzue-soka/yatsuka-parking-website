@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { machineItems } from '@/lib/machine-items';
 import { requirePartner } from '@/lib/portal-guard';
 
 const s = (fd, k, max = 300) => String(fd.get(k) ?? '').trim().slice(0, max);
@@ -36,40 +37,42 @@ export async function requestChange(fd) {
   go('/portal/company', error ? { err: error.message } : { ok: 'sent' });
 }
 
-// Order 1–5 machines, each with its own 1–2 discount values (fields d_<machine>_<0|1>).
-export async function orderMachine(fd) {
+// Ask for extra machines (1–5, each with 1–2 discount values); the admin approves before ordering.
+export async function requestMachines(fd) {
   const { supabase } = await requirePartner('/portal/billing');
-  const count = Math.min(5, Math.max(1, Number(fd.get('count')) || 1));
-  const items = Array.from({ length: count }, (_, i) => ({
-    discounts: [String(fd.get(`d_${i}_0`) || ''), String(fd.get(`d_${i}_1`) || '')].filter(Boolean),
-  }));
-  const { data, error } = await supabase.rpc('order_validation_machines', { p_items: items });
+  const { error } = await supabase.rpc('request_more_machines', { p_items: machineItems(fd) });
+  revalidatePath('/portal');
+  go('/portal/billing', error ? { err: error.message } : { ok: 'requested' });
+}
+
+// Order the machines of an approved request (application or extra request) → invoice.
+export async function orderRequest(fd) {
+  const { supabase } = await requirePartner('/portal/billing');
+  const { data, error } = await supabase.rpc('order_machine_request', {
+    p_id: Number(fd.get('request')) || 0,
+    p_no_refund: fd.get('no_refund') === 'on',
+  });
   revalidatePath('/portal');
   if (error) go('/portal/billing', { err: error.message });
   redirect(`/portal/invoices/${data}`);
 }
 
-// Cancel an unpaid machine order (the partner's own).
+// Withdraw a request that has not been ordered yet.
+export async function withdrawRequest(fd) {
+  const { supabase } = await requirePartner('/portal/billing');
+  const { error } = await supabase.rpc('withdraw_machine_request', { p_id: Number(fd.get('request')) || 0 });
+  revalidatePath('/portal');
+  go('/portal/billing', error ? { err: error.message } : { ok: 'withdrawn' });
+}
+
+// Cancel an unpaid machine order (the partner's own). Paid orders are final.
 export async function cancelMyOrder(fd) {
   const { supabase, O } = await requirePartner('/portal/billing');
   const { error } = await supabase.rpc('cancel_my_machine_order', { p_invoice: s(fd, 'invoice', 40) });
   revalidatePath('/portal');
   // The page may have been opened before 鈴江 confirmed the payment: explain instead of showing the database message.
-  const paid = error && /only unpaid|payment has already/.test(error.message);
+  const paid = error && /only unpaid/.test(error.message);
   go('/portal/billing', error ? { err: paid ? O.billing.alreadyPaid : error.message } : { ok: 'orderCancelled' });
-}
-
-// Paid order not yet sent to Amano: ask 鈴江 to cancel it (sent as an inquiry; the refund is made by bank transfer).
-export async function requestCancel(fd) {
-  const { supabase, partner, O } = await requirePartner('/portal/billing');
-  const invoiceNo = s(fd, 'invoice_no', 40);
-  const { error } = await supabase.from('inquiries').insert({
-    partner_id: partner.id,
-    subject: O.billing.cancelRequestSubject(invoiceNo),
-    body: O.billing.cancelRequestBody(invoiceNo),
-  });
-  revalidatePath('/portal/inquiries');
-  go('/portal/billing', error ? { err: error.message } : { ok: 'cancelRequested' });
 }
 
 export async function sendInquiry(fd) {

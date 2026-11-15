@@ -8,7 +8,8 @@ import { onbText } from '@/lib/content/onboarding';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import { yen } from '@/lib/dates';
 import ShipmentInfo from '@/components/ShipmentInfo';
-import { orderMachine, cancelMyOrder, requestCancel } from '../actions';
+import { requestMachines, orderRequest, withdrawRequest, cancelMyOrder } from '../actions';
+import { DISCOUNT_TYPES } from '@/lib/program-data';
 import ConfirmButton from '@/components/ConfirmButton';
 
 export const dynamic = 'force-dynamic';
@@ -27,9 +28,14 @@ export default async function Billing({ searchParams }) {
     supabase.from('payments').select('id, paid_on, method, amount_yen, invoices(invoice_no)').order('paid_on', { ascending: false }),
     supabase.from('machines').select('*').order('id'),
   ]);
+  const { data: requests } = await supabase.from('machine_requests').select('*').order('id', { ascending: false });
+  const open = (requests || []).find((r) => ['pending', 'approved'].includes(r.status));
+  const lastRejected = !open && requests?.[0]?.status === 'rejected' && requests[0].kind === 'additional' ? requests[0] : null;
+  const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
+  const unit = price?.unit_yen ?? 40000;
   const unpaid = (invoices || []).some((i) => i.status === 'published');
   const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
-  // Machine orders not completely shipped yet (can be cancelled until sent to Amano).
+  // Machine orders not completely shipped yet (unpaid ones can be cancelled; paid ones are final).
   const openOrders = (invoices || []).filter(
     (i) =>
       i.kind === 'equipment' &&
@@ -40,19 +46,63 @@ export default async function Billing({ searchParams }) {
   return (
     <section className="wrap section">
       <PortalHeader title={B.title} email={claims.email} links={portalLinks(O)} />
-      <Notice sp={sp} o={O} extra={{ orderCancelled: B.orderCancelled, cancelRequested: B.cancelRequested }} />
+      <Notice sp={sp} o={O} extra={{ orderCancelled: B.orderCancelled, requested: B.requested, withdrawn: B.withdrawn }} />
 
       <div className="grid" style={{ alignItems: 'start' }}>
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.machineTitle}</h2>
-          {['approved', 'preparing', 'shipped', 'active'].includes(p.status) && !unpaidEquipment && (
+          {open && (
+            <div className="request-box">
+              <h3 className="shipment-title">{open.status === 'approved' ? B.approvedTitle : B.pendingTitle}</h3>
+              <p className="small">{open.status === 'approved' ? B.approvedText(T.yen(yen(unit))) : B.pendingText}</p>
+              <ul className="request-items">
+                {open.items.map((m, i) => (
+                  <li key={i}>
+                    {B.orderForm.machine.replace('{n}', i + 1)}：{m.discounts.map((c) => T.discount(hours(c))).join('・')}
+                  </li>
+                ))}
+              </ul>
+              <p className="order-total">
+                {B.estimate}：<strong>{T.yen(yen(unit * open.items.length))}</strong>
+                <span className="small muted">（{T.yen(yen(unit))} × {open.items.length}）</span>
+              </p>
+              {open.status === 'approved' && !unpaidEquipment && (
+                <form action={orderRequest} className="form">
+                  <input type="hidden" name="request" value={open.id} />
+                  <label className="check">
+                    <input type="checkbox" name="no_refund" required />
+                    <span>{B.noRefund}</span>
+                  </label>
+                  <ConfirmButton className="btn btn-primary" message={B.orderApprovedConfirm}>
+                    {B.orderApproved}
+                  </ConfirmButton>
+                </form>
+              )}
+              <form action={withdrawRequest} style={{ marginTop: 8 }}>
+                <input type="hidden" name="request" value={open.id} />
+                <ConfirmButton className="btn btn-line" message={B.withdrawConfirm}>
+                  {B.withdraw}
+                </ConfirmButton>
+              </form>
+            </div>
+          )}
+          {!open && ['approved', 'preparing', 'shipped', 'active'].includes(p.status) && !unpaidEquipment && (
             <>
-              <p>{p.status !== 'approved' ? B.orderMoreText(T.yen(yen(price?.unit_yen ?? 40000))) : B.orderText(T.yen(yen(price?.unit_yen ?? 40000)))}</p>
+              <h3 className="shipment-title">{B.requestTitle}</h3>
+              {lastRejected && <p className="small warn">{B.lastRejected(lastRejected.note)}</p>}
+              <p className="small">{B.requestText(T.yen(yen(unit)))}</p>
               <MachineOrderForm
-                action={orderMachine}
-                unitYen={price?.unit_yen ?? 40000}
-                defaults={p.requested_discounts || []}
-                labels={{ ...B.orderForm, discount: T.discount('{h}'), yenFormat: T.yen('{n}'), confirm: B.orderConfirm, submit: p.status !== 'approved' ? B.orderMore : B.order }}
+                action={requestMachines}
+                unitYen={unit}
+                labels={{
+                  ...B.orderForm,
+                  choose: B.choose,
+                  total: B.estimate,
+                  discount: T.discount('{h}'),
+                  yenFormat: T.yen('{n}'),
+                  confirm: B.requestConfirm,
+                  submit: B.requestSubmit,
+                }}
               />
             </>
           )}
@@ -67,7 +117,6 @@ export default async function Billing({ searchParams }) {
               <h3 className="shipment-title">{B.openOrders}</h3>
               {openOrders.map((i) => {
                 const ms = (machines || []).filter((m) => m.equipment_invoice_id === i.id);
-                const sent = ms.some((m) => m.amano_ordered_on || m.shipped_on);
                 return (
                   <div key={i.id} className="open-order">
                     <p style={{ margin: 0 }}>
@@ -78,22 +127,14 @@ export default async function Billing({ searchParams }) {
                     </p>
                     {i.status === 'published' && (
                       <form action={cancelMyOrder}>
+                        <p className="small muted" style={{ margin: '4px 0' }}>{B.unpaidHint}</p>
                         <input type="hidden" name="invoice" value={i.id} />
                         <ConfirmButton className="btn btn-line" message={B.cancelOrderConfirm}>
                           {B.cancelOrder}
                         </ConfirmButton>
                       </form>
                     )}
-                    {i.status === 'paid' && !sent && (
-                      <form action={requestCancel}>
-                        <input type="hidden" name="invoice_no" value={i.invoice_no} />
-                        <p className="small muted" style={{ margin: '4px 0' }}>{B.cancelPaidHint}</p>
-                        <ConfirmButton className="btn btn-line" message={B.requestCancelConfirm}>
-                          {B.requestCancel}
-                        </ConfirmButton>
-                      </form>
-                    )}
-                    {i.status === 'paid' && sent && <p className="small muted" style={{ margin: '4px 0 0' }}>{B.cannotCancel}</p>}
+                    {i.status === 'paid' && <p className="small muted" style={{ margin: '4px 0 0' }}>{B.paidFinal}</p>}
                   </div>
                 );
               })}

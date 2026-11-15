@@ -5,6 +5,7 @@ import { submitApplication } from '@/lib/actions/apply';
 import { programText } from '@/lib/content/program';
 import { DISCOUNT_TYPES, CATEGORIES, USAGE, USAGE_COUNT, DOC_KINDS, estimateMonthly } from '@/lib/program-data';
 import { href } from '@/lib/i18n';
+import MachineFields from '@/components/MachineFields';
 import { getContent } from '@/lib/content';
 
 function Field({ id, label, req, t, children }) {
@@ -68,7 +69,6 @@ export default function ApplyForm({ lang = 'ja' }) {
     );
   }
 
-  const toggle = (code, on) => setPicked((p) => (on ? [...p, code] : p.filter((c) => c !== code)));
   const terms = t.agreeTerms(t.termsLink);
   const privacy = t.agreePrivacy(t.privacyLink);
 
@@ -135,24 +135,14 @@ export default function ApplyForm({ lang = 'ja' }) {
           ))}
         </select>
       </Field>
-      <fieldset>
-        <legend>
-          {t.f.discounts} <span className="small muted">（{t.required}）</span>
-        </legend>
-        {DISCOUNT_TYPES.map((d) => (
-          <label key={d.code} className="check">
-            <input
-              type="checkbox"
-              name="discounts"
-              value={d.code}
-              checked={picked.includes(d.code)}
-              disabled={!picked.includes(d.code) && picked.length >= 2}
-              onChange={(e) => toggle(d.code, e.target.checked)}
-            />
-            {t.discountLabel(d.hours)}（{yen(d.yen)}）
-          </label>
-        ))}
-      </fieldset>
+      <h3 className="apply-sub">{t.f.machines}</h3>
+      <p className="small muted" style={{ margin: 0 }}>
+        {t.machinesHint}
+      </p>
+      <MachineFields
+        labels={{ ...t.mf, discount: t.discountLabel('{h}'), yenFormat: c.yen('{n}') }}
+        onChange={(items) => setPicked([...new Set(items.flatMap((m) => m.discounts))])}
+      />
       <Estimate usage={usage} picked={picked} t={t} yen={yen} />
 
       <h2>{t.sections.document}</h2>

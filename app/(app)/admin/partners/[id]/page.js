@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder, decideMachineRequest } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +49,10 @@ export default async function AdminPartner({ params, searchParams }) {
     supabase.from('invoices').select('id, invoice_no, kind, status, total_yen, issued_on, due_on, payments(amount_yen, paid_on, method)').eq('partner_id', id).order('created_at', { ascending: false }),
     supabase.rpc('first_use_date', { p_partner: id }),
   ]);
+  const { data: requests } = await supabase.from('machine_requests').select('*').eq('partner_id', id).order('id', { ascending: false });
+  const appRequest = (requests || []).find((r) => r.kind === 'application');
+  const itemsText = (items) =>
+    (items || []).map((m, i) => `${B.orderForm.machine.replace('{n}', i + 1)}：${m.discounts.map(label).join('・')}`);
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
   const unpaidEquipment = (invoices || []).find((i) => i.kind === 'equipment' && i.status === 'published');
@@ -56,13 +60,8 @@ export default async function AdminPartner({ params, searchParams }) {
   // Paid, numbered machines not shipped yet: shown to Amano (setup request) and in the shipment form.
   const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on && !m.cancelled_at);
   const notSentToAmano = toShip.filter((m) => !m.amano_ordered_on);
-  // Machine orders that can still be cancelled: not cancelled, nothing sent to Amano or shipped.
-  const cancellable = (invoices || []).filter(
-    (i) =>
-      i.kind === 'equipment' &&
-      ['published', 'paid'].includes(i.status) &&
-      !(machines || []).some((m) => m.equipment_invoice_id === i.id && (m.amano_ordered_on || m.shipped_on)),
-  );
+  // Only unpaid machine orders can be cancelled; paid orders are final (owner, 2026-11-16).
+  const cancellable = (invoices || []).filter((i) => i.kind === 'equipment' && i.status === 'published');
 
   return (
     <section className="wrap section">
@@ -70,7 +69,7 @@ export default async function AdminPartner({ params, searchParams }) {
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>
-      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved, amanoOrdered: A.amanoOrderedDone, orderCancelled: A.orderCancelledDone }} />
+      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved, amanoOrdered: A.amanoOrderedDone, orderCancelled: A.orderCancelledDone, reqDecided: A.reqDecided, reqNoMail: A.reqNoMail }} />
 
       <div className="detail-layout">
         <div className="card">
@@ -96,7 +95,11 @@ export default async function AdminPartner({ params, searchParams }) {
                 )}
               </Row>
               <Row label={A.usage}>{P.usage[p.expected_usage] || p.expected_usage}</Row>
-              <Row label={A.discounts}>{(p.requested_discounts || []).map(label).join(' / ') || null}</Row>
+              <Row label={P.f.machines}>
+                {appRequest
+                  ? itemsText(appRequest.items).map((t) => <div key={t}>{t}</div>)
+                  : (p.requested_discounts || []).map(label).join(' / ') || null}
+              </Row>
               <Row label={P.f.docKind}>
                 {p.doc_path ? (
                   <a href={`/admin/partners/${p.id}/document`} target="_blank" rel="noopener">
@@ -155,6 +158,42 @@ export default async function AdminPartner({ params, searchParams }) {
                   {A.invite}
                 </SubmitButton>
               </form>
+            </div>
+          )}
+
+          {(requests || []).length > 0 && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.reqTitle}</h2>
+              {requests.map((r) => (
+                <div key={r.id} className={`request-row${r.status === 'pending' && r.kind === 'additional' ? ' request-box' : ''}`}>
+                  <p style={{ margin: 0 }}>
+                    <strong>{A.reqKinds[r.kind]}</strong> · {jstDateTime(r.created_at)} · <span className="status-pill">{A.reqStatus[r.status]}</span>
+                  </p>
+                  <div className="small">
+                    {itemsText(r.items).map((t) => (
+                      <div key={t}>{t}</div>
+                    ))}
+                  </div>
+                  {r.note && <p className="small muted" style={{ margin: '2px 0 0' }}>{r.note}</p>}
+                  {r.status === 'pending' && r.kind === 'application' && <p className="small muted" style={{ margin: '2px 0 0' }}>{A.reqPendingWithApp}</p>}
+                  {r.status === 'pending' && r.kind === 'additional' && (
+                    <form action={decideMachineRequest} className="form" style={{ marginTop: 8, marginBottom: 0 }}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="request" value={r.id} />
+                      <label htmlFor={`rq_${r.id}`}>{A.reqNote}</label>
+                      <input id={`rq_${r.id}`} name="note" type="text" maxLength={500} />
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <ConfirmButton className="btn btn-primary" name="decision" value="approve" message={A.reqApproveConfirm}>
+                          {A.reqApprove}
+                        </ConfirmButton>
+                        <ConfirmButton className="btn btn-line" name="decision" value="reject" message={A.reqRejectConfirm}>
+                          {A.reqReject}
+                        </ConfirmButton>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
@@ -231,31 +270,18 @@ export default async function AdminPartner({ params, searchParams }) {
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.cancelTitle}</h2>
               <p className="small muted">{A.cancelHint}</p>
-              {cancellable.map((i) => {
-                const paid = (i.payments || []).reduce((sum, x) => sum + x.amount_yen, 0);
-                return (
-                  <form key={i.id} action={cancelMachineOrder} className="form" style={{ borderTop: '1px solid var(--line)', paddingTop: 10 }}>
-                    <input type="hidden" name="id" value={p.id} />
-                    <input type="hidden" name="invoice" value={i.id} />
-                    <p style={{ margin: 0 }}>
-                      <strong className="num">{i.invoice_no}</strong> · {T.yen(yen(i.total_yen))} · {B.invStatus[i.status]}
-                    </p>
-                    {paid > 0 && (
-                      <>
-                        <label htmlFor={`rf_on_${i.id}`}>{A.refundedOn}</label>
-                        <input id={`rf_on_${i.id}`} name="refunded_on" type="date" required max={jstToday()} />
-                        <label htmlFor={`rf_${i.id}`}>{A.refundAmount}</label>
-                        <input id={`rf_${i.id}`} name="refund" type="number" min="1" required defaultValue={paid} />
-                      </>
-                    )}
-                    <label htmlFor={`cn_${i.id}`}>{A.note}</label>
-                    <input id={`cn_${i.id}`} name="note" type="text" maxLength={500} />
-                    <ConfirmButton className="btn btn-line" message={paid > 0 ? A.cancelConfirmPaid : A.cancelConfirm}>
-                      {A.cancelOrder}
-                    </ConfirmButton>
-                  </form>
-                );
-              })}
+              {cancellable.map((i) => (
+                <form key={i.id} action={cancelMachineOrder} className="form" style={{ borderTop: '1px solid var(--line)', paddingTop: 10 }}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <input type="hidden" name="invoice" value={i.id} />
+                  <p style={{ margin: 0 }}>
+                    <strong className="num">{i.invoice_no}</strong> · {T.yen(yen(i.total_yen))} · {B.invStatus[i.status]}
+                  </p>
+                  <ConfirmButton className="btn btn-line" message={A.cancelConfirm}>
+                    {A.cancelOrder}
+                  </ConfirmButton>
+                </form>
+              ))}
             </div>
           )}
 

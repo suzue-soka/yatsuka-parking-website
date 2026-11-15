@@ -6,7 +6,9 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/admin-guard';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendMail } from '@/lib/mail';
-import { shippedMail } from '@/lib/content/mail';
+import { shippedMail, requestApprovedMail } from '@/lib/content/mail';
+import { appText } from '@/lib/content/app';
+import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { carrierFor } from '@/lib/carriers';
 
 const back = (id, params) => redirect(`/admin/partners/${id}?${new URLSearchParams(params)}`);
@@ -103,19 +105,49 @@ export async function markAmanoOrdered(fd) {
   back(id, error ? { err: error.message } : { ok: 'amanoOrdered' });
 }
 
-// Cancel a machine order that has not been sent to Amano; a paid order needs the refund.
+// Cancel an unpaid machine order (e.g. long overdue). Paid orders are final.
 export async function cancelMachineOrder(fd) {
   const { supabase } = await requireAdmin();
   const id = s(fd, 'id', 40);
-  const amount = Number(s(fd, 'refund', 12)) || null;
-  const { error } = await supabase.rpc('cancel_machine_order', {
-    p_invoice: s(fd, 'invoice', 40),
-    p_refunded_on: s(fd, 'refunded_on', 10) || null,
-    p_refund_yen: amount,
-    p_note: s(fd, 'note', 500) || null,
-  });
+  const { error } = await supabase.rpc('cancel_unpaid_machine_order', { p_invoice: s(fd, 'invoice', 40) });
   revalidatePath('/admin');
   back(id, error ? { err: error.message } : { ok: 'orderCancelled' });
+}
+
+// Approve or reject a partner's request for extra machines; on approval the partner is emailed.
+export async function decideMachineRequest(fd) {
+  const { supabase } = await requireAdmin();
+  const id = s(fd, 'id', 40);
+  const approve = s(fd, 'decision', 10) === 'approve';
+  const reqId = Number(fd.get('request')) || 0;
+  const { error } = await supabase.rpc('decide_machine_request', { p_id: reqId, p_approve: approve, p_note: s(fd, 'note', 500) || null });
+  revalidatePath('/admin');
+  if (error) back(id, { err: error.message });
+  if (!approve) back(id, { ok: 'reqDecided' });
+
+  let mailError = null;
+  try {
+    const [{ data: p }, { data: r }, { data: prof }] = await Promise.all([
+      supabase.from('partners').select('name, partner_code, email, applied_lang').eq('id', id).single(),
+      supabase.from('machine_requests').select('items').eq('id', reqId).single(),
+      supabase.from('profiles').select('preferred_lang').eq('partner_id', id).limit(1).maybeSingle(),
+    ]);
+    if (!p?.email) throw new Error('no email address');
+    const lang = prof?.preferred_lang || p.applied_lang || 'ja';
+    const T = appText(lang);
+    const hours = (c) => DISCOUNT_TYPES.find((d) => d.code === c)?.hours;
+    const mail = requestApprovedMail(lang, {
+      name: p.name,
+      code: p.partner_code,
+      lines: r.items.map((m) => m.discounts.map((c) => T.discount(hours(c))).join('・')),
+      portalUrl: `${await origin()}/portal/billing`,
+    });
+    await sendMail({ to: p.email, ...mail });
+  } catch (e) {
+    mailError = e.message;
+  }
+  if (mailError) back(id, { warn: mailError, wk: 'reqNoMail' });
+  back(id, { ok: 'reqDecided' });
 }
 
 export async function recordShipment(fd) {

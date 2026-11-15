@@ -14,7 +14,7 @@ export async function generateMetadata() {
   return { title: onbText(await getAppLang()).admin.partners, robots: { index: false, follow: false } };
 }
 
-const FILTERS = ['applied', 'approved', 'awaiting_payment', 'preparing', 'active', 'rejected'];
+const FILTERS = ['applied', 'machine_request', 'approved', 'awaiting_payment', 'preparing', 'active', 'rejected'];
 // Sortable columns, in the same order as O.admin.th. Status sorts by workflow order, not alphabetically.
 const COLS = ['partner_code', 'name', 'category', 'status', 'created_at'];
 const STATUS_ORDER = ['applied', 'approved', 'awaiting_payment', 'preparing', 'shipped', 'active', 'rejected'];
@@ -33,6 +33,10 @@ export default async function AdminPartners({ searchParams }) {
     // Any partner with an unpaid machine invoice, including additional orders from partners already preparing or active.
     const { data: unpaid } = await supabase.from('invoices').select('partner_id').eq('kind', 'equipment').eq('status', 'published');
     q = q.in('id', [...new Set((unpaid || []).map((i) => i.partner_id))]);
+  } else if (status === 'machine_request') {
+    // Partners with a request for extra machines waiting for approval.
+    const { data: reqs } = await supabase.from('machine_requests').select('partner_id').eq('kind', 'additional').eq('status', 'pending');
+    q = q.in('id', [...new Set((reqs || []).map((r) => r.partner_id))]);
   } else if (status === 'preparing') {
     // Any partner with a paid machine not shipped yet, including additional machines of active partners.
     const { data: waiting } = await supabase.from('machines').select('partner_id').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null);
