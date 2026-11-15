@@ -51,10 +51,12 @@ export async function orderMachine(fd) {
 
 // Cancel an unpaid machine order (the partner's own).
 export async function cancelMyOrder(fd) {
-  const { supabase } = await requirePartner('/portal/billing');
+  const { supabase, O } = await requirePartner('/portal/billing');
   const { error } = await supabase.rpc('cancel_my_machine_order', { p_invoice: s(fd, 'invoice', 40) });
   revalidatePath('/portal');
-  go('/portal/billing', error ? { err: error.message } : { ok: 'orderCancelled' });
+  // The page may have been opened before 鈴江 confirmed the payment: explain instead of showing the database message.
+  const paid = error && /only unpaid|payment has already/.test(error.message);
+  go('/portal/billing', error ? { err: paid ? O.billing.alreadyPaid : error.message } : { ok: 'orderCancelled' });
 }
 
 // Paid order not yet sent to Amano: ask 鈴江 to cancel it (sent as an inquiry; the refund is made by bank transfer).
