@@ -1,26 +1,12 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import fontkit from '@pdf-lib/fontkit';
 import { createClient, getClaims } from '@/lib/supabase/server';
 import { invoicePdf } from '@/lib/invoice-pdf';
+import { pdfAssets, pdfResponse } from '@/lib/pdf/assets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-let assets; // font and logo, loaded once per server instance
-async function loadAssets() {
-  if (!assets) {
-    const [font, logo] = await Promise.all([
-      readFile(path.join(process.cwd(), 'assets/fonts/ipag.ttf')),
-      readFile(path.join(process.cwd(), 'public/images/logo-lockup.png')),
-    ]);
-    assets = { font, logo, fontkit };
-  }
-  return assets;
-}
-
-// PDF download of an invoice. Partners get their own invoices only, admins all (database rules);
-// sign-in, 2-step verification and the 30-minute inactivity rule are checked as for every portal page.
+// PDF download of an invoice, always in Japanese. Partners get their own invoices only, admins all
+// (database rules); sign-in, 2-step verification and the inactivity rule apply as on every portal page.
 export async function GET(request, { params }) {
   const supabase = await createClient();
   const claims = await getClaims(supabase);
@@ -35,14 +21,5 @@ export async function GET(request, { params }) {
     .eq('id', id)
     .maybeSingle();
   if (!inv) return new Response('Not found', { status: 404 });
-
-  const bytes = await invoicePdf(inv, await loadAssets()); // always Japanese
-  const name = `${inv.invoice_no}.pdf`.replace(/[^A-Za-z0-9._-]/g, '_');
-  return new Response(bytes, {
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${name}"`,
-      'Cache-Control': 'private, no-store',
-    },
-  });
+  return pdfResponse(await invoicePdf(inv, await pdfAssets()), `${inv.invoice_no}.pdf`);
 }

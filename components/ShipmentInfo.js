@@ -71,6 +71,15 @@ export default function ShipmentInfo({ machine: m, lang = 'ja', showTitle = true
           )}
         </tbody>
       </table>
+      {m.delivery_note_no && (
+        <p className="small" style={{ margin: '8px 0 0' }}>
+          <a href={`/portal/machines/${m.id}/delivery-note?download=1`} download>
+            {M.deliveryNote}
+          </a>
+          {' '}
+          <span className="muted num">{m.delivery_note_no}</span>
+        </p>
+      )}
       {m.tracking_no && carrier && (
         <p className="small" style={{ marginBottom: 0 }}>
           <a className="btn btn-line" href={carrier.url} target="_blank" rel="noopener noreferrer">

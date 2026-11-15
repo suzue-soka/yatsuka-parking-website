@@ -250,6 +250,14 @@ export default async function AdminPartner({ params, searchParams }) {
                   <li key={m.id}>
                     {m.model} · {B.machine.serial} {m.serial_no || '—'} · {B.machine.shipped} {m.shipped_on || '—'} · {m.carrier || ''} {m.tracking_no || ''}
                     {m.warranty_until ? ` · ${B.machine.warranty} ${m.warranty_until}` : ''}
+                    {m.delivery_note_no && (
+                      <>
+                        {' · '}
+                        <a href={`/portal/machines/${m.id}/delivery-note`} target="_blank" rel="noopener">
+                          {A.deliveryNote} {m.delivery_note_no}
+                        </a>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>

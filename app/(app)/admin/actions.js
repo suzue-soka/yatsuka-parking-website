@@ -120,6 +120,7 @@ export async function recordShipment(fd) {
       carrierUrl: carrier?.url || null,
       tracking: m?.tracking_no,
       portalUrl: `${await origin()}/portal/billing`,
+      deliveryNoteUrl: m?.delivery_note_no ? `${await origin()}/portal/machines/${m.id}/delivery-note?download=1` : null,
     });
     await sendMail({ to: p.email, ...mail });
   } catch (e) {
