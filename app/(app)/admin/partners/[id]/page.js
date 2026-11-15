@@ -59,7 +59,7 @@ export default async function AdminPartner({ params, searchParams }) {
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>
-      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite }} />
+      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail }} />
 
       <div className="detail-layout">
         <div className="card">

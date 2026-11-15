@@ -5,6 +5,9 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/admin-guard';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendMail } from '@/lib/mail';
+import { shippedMail } from '@/lib/content/mail';
+import { carrierFor } from '@/lib/carriers';
 
 const back = (id, params) => redirect(`/admin/partners/${id}?${new URLSearchParams(params)}`);
 const s = (fd, k, max = 300) => String(fd.get(k) ?? '').trim().slice(0, max);
@@ -94,7 +97,36 @@ export async function recordShipment(fd) {
     p_shipped_on: s(fd, 'shipped_on', 10),
   });
   revalidatePath('/admin');
-  back(id, error ? { err: error.message } : { ok: 'saved' });
+  if (error) back(id, { err: error.message });
+
+  // Tell the partner by email, in their language. The shipment stays recorded even if the email fails.
+  let mailError = null;
+  try {
+    const [{ data: p }, { data: m }, { data: prof }] = await Promise.all([
+      supabase.from('partners').select('name, partner_code, email, applied_lang').eq('id', id).single(),
+      supabase.from('machines').select('*').eq('partner_id', id).order('id', { ascending: false }).limit(1).single(),
+      supabase.from('profiles').select('preferred_lang').eq('partner_id', id).limit(1).maybeSingle(),
+    ]);
+    if (!p?.email) throw new Error('no email address');
+    const lang = prof?.preferred_lang || p.applied_lang || 'ja';
+    const carrier = carrierFor(m?.carrier);
+    const mail = shippedMail(lang, {
+      name: p.name,
+      code: p.partner_code,
+      model: m?.model,
+      serial: m?.serial_no,
+      shippedOn: m?.shipped_on,
+      carrierName: carrier ? carrier[lang] || carrier.ja : m?.carrier,
+      carrierUrl: carrier?.url || null,
+      tracking: m?.tracking_no,
+      portalUrl: `${await origin()}/portal/billing`,
+    });
+    await sendMail({ to: p.email, ...mail });
+  } catch (e) {
+    mailError = e.message;
+  }
+  if (mailError) back(id, { warn: mailError, wk: 'shippedNoMail' });
+  back(id, { ok: 'shippedMailed' });
 }
 
 export async function startService(fd) {
