@@ -29,8 +29,8 @@ export default function ShipmentTable({ machines, lang = 'ja' }) {
     }
   }
 
-  // One tracking link per carrier + tracking number (machines shipped together share it).
-  const tracks = [...new Map(machines.filter((m) => m.tracking_no && carrierFor(m.carrier)).map((m) => [`${m.carrier}|${m.tracking_no}`, m])).values()];
+  // One tracking link per carrier: the carrier's page is the same for every tracking number.
+  const tracks = [...new Map(machines.filter((m) => m.tracking_no && carrierFor(m.carrier)).map((m) => [carrierFor(m.carrier).url, m])).values()];
 
   return (
     <div className="shipment">
