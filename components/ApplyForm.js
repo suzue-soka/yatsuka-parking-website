@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useEffect, useState } from 'react';
 import { submitApplication } from '@/lib/actions/apply';
 import { programText } from '@/lib/content/program';
-import { DISCOUNT_TYPES, CATEGORIES, USAGE, DOC_KINDS } from '@/lib/program-data';
+import { DISCOUNT_TYPES, CATEGORIES, USAGE, USAGE_COUNT, DOC_KINDS, estimateMonthly } from '@/lib/program-data';
 import { href } from '@/lib/i18n';
 import { getContent } from '@/lib/content';
 
@@ -18,6 +18,37 @@ function Field({ id, label, req, t, children }) {
   );
 }
 
+// Estimated monthly invoice for the chosen usage and discount types (one line per type).
+export function Estimate({ usage, picked, t, yen }) {
+  const count = USAGE_COUNT[usage];
+  if (!count || picked.length === 0) {
+    return usage === 'unknown' && picked.length ? <p className="small muted">{t.est.unknown}</p> : null;
+  }
+  const rows = DISCOUNT_TYPES.filter((d) => picked.includes(d.code)).map((d) => ({ d, e: estimateMonthly(count, d.yen) }));
+  return (
+    <div className="estimate" role="status" aria-live="polite">
+      <strong>{t.est.title}</strong>
+      <p className="small" style={{ margin: '2px 0 8px' }}>
+        {t.est.basis(count, usage === 'u201+')}
+      </p>
+      {rows.map(({ d, e }) => (
+        <div key={d.code} className="estimate-row">
+          <span>
+            {rows.length > 1 ? t.est.onlyType(t.discountLabel(d.hours)) : t.discountLabel(d.hours)}
+            <span className="small muted" style={{ display: 'block' }}>
+              {t.est.calc(yen(d.yen), e.count, yen(e.gross), e.rate)}
+            </span>
+          </span>
+          <strong className="num">{yen(e.total)}</strong>
+        </div>
+      ))}
+      <p className="small muted" style={{ margin: '8px 0 0' }}>
+        {t.est.note}
+      </p>
+    </div>
+  );
+}
+
 export default function ApplyForm({ lang = 'ja' }) {
   const t = programText(lang);
   const c = getContent(lang);
@@ -25,6 +56,7 @@ export default function ApplyForm({ lang = 'ja' }) {
   const [state, action, pending] = useActionState(submitApplication.bind(null, lang), null);
   const [started, setStarted] = useState(0);
   const [picked, setPicked] = useState([]);
+  const [usage, setUsage] = useState('');
   useEffect(() => setStarted(Date.now()), []);
 
   if (state?.ok) {
@@ -92,7 +124,7 @@ export default function ApplyForm({ lang = 'ja' }) {
 
       <h2>{t.sections.service}</h2>
       <Field id="usage" label={t.f.usage} req t={t}>
-        <select id="usage" name="usage" required defaultValue="">
+        <select id="usage" name="usage" required value={usage} onChange={(e) => setUsage(e.target.value)}>
           <option value="" disabled>
             {t.choose}
           </option>
@@ -121,6 +153,7 @@ export default function ApplyForm({ lang = 'ja' }) {
           </label>
         ))}
       </fieldset>
+      <Estimate usage={usage} picked={picked} t={t} yen={yen} />
 
       <h2>{t.sections.document}</h2>
       <fieldset>

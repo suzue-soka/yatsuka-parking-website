@@ -11,3 +11,11 @@ test('published example: 80 × 1h at 7% = 22,320', () => {
   const tier = VOLUME_TIERS.find((t) => 80 >= t.min && (t.max === null || 80 <= t.max));
   assert.equal(Math.floor(300 * 80 * (1 - tier.rate / 100)), 22320);
 });
+
+test('application estimate uses the top of the usage range and its volume discount', async () => {
+  const { estimateMonthly, USAGE_COUNT } = await import('../lib/program-data.js');
+  assert.deepEqual(estimateMonthly(USAGE_COUNT['u1-50'], 300), { count: 50, gross: 15000, rate: 5, total: 14250 });
+  assert.equal(estimateMonthly(USAGE_COUNT['u51-100'], 600).total, 55800);
+  assert.equal(estimateMonthly(USAGE_COUNT['u101-200'], 1200).total, 216000);
+  assert.equal(estimateMonthly(USAGE_COUNT['u201+'], 2700).total, 434160);
+});
