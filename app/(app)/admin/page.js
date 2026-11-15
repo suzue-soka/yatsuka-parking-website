@@ -7,6 +7,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { onbText } from '@/lib/content/onboarding';
 import { adminLinks } from '@/lib/admin-links';
+import { billingText } from '@/lib/content/billing';
 import { markAllAmanoOrdered } from './actions';
 import ConfirmButton from '@/components/ConfirmButton';
 import Notice from '@/components/Notice';
@@ -27,7 +28,7 @@ export default async function AdminHome({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
-  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }, { data: unshipped }, { data: pendingRequests }] = await Promise.all([
+  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }, { data: unshipped }, { data: pendingRequests }, { count: draftCount }] = await Promise.all([
     supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
     supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
@@ -37,6 +38,7 @@ export default async function AdminHome({ searchParams }) {
     // Paid machines not shipped yet — also additional machines of partners already 利用中.
     supabase.from('machines').select('partner_id').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null),
     supabase.from('machine_requests').select('partner_id').eq('kind', 'additional').eq('status', 'pending'),
+    supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('kind', 'monthly').eq('status', 'draft'),
   ]);
   const toShip = new Set((unshipped || []).map((m) => m.partner_id)).size;
   const awaitingPayment = new Set((unpaidMachineInvoices || []).map((i) => i.partner_id)).size;
@@ -44,6 +46,7 @@ export default async function AdminHome({ searchParams }) {
   const byStatus = (st) => (allPartners || []).filter((p) => p.status === st).length;
   const todo = [
     { label: o.counts.applied, n: byStatus('applied'), href: '/admin/partners?status=applied' },
+    { label: billingText(lang).todoDrafts, n: draftCount ?? 0, href: '/admin/billing' },
     { label: o.counts.machineRequests, n: new Set((pendingRequests || []).map((r) => r.partner_id)).size, href: '/admin/partners?status=machine_request' },
     { label: o.counts.awaiting_payment, n: awaitingPayment, href: '/admin/partners?status=awaiting_payment' },
     { label: o.counts.preparing, n: toShip, href: '/admin/partners?status=preparing' },
@@ -164,7 +167,6 @@ export default async function AdminHome({ searchParams }) {
             </table>
           </SortableTable>
         </div>
-        <p className="small muted">{t.nextStage}</p>
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>

@@ -4,7 +4,7 @@ import PrintButton from '@/components/PrintButton';
 import IdleWatch from '@/components/IdleWatch';
 import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
-import { yen } from '@/lib/dates';
+import { yen, periodRange } from '@/lib/dates';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -59,8 +59,14 @@ export default async function Invoice({ params }) {
           <dl className="doc-meta">
             <div>
               <dt>{I.no}</dt>
-              <dd>{inv.invoice_no}</dd>
+              <dd>{inv.status === 'draft' ? I.draft : inv.invoice_no}</dd>
             </div>
+            {inv.period_month && (
+              <div>
+                <dt>{I.period}</dt>
+                <dd>{periodRange(inv.period_month)}</dd>
+              </div>
+            )}
             <div>
               <dt>{I.issued}</dt>
               <dd>{inv.issued_on || '—'}</dd>

@@ -55,7 +55,8 @@ export default async function AdminPartner({ params, searchParams }) {
     (items || []).map((m, i) => `${B.orderForm.machine.replace('{n}', i + 1)}：${m.discounts.map(label).join('・')}`);
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
-  const unpaidEquipment = (invoices || []).find((i) => i.kind === 'equipment' && i.status === 'published');
+  // Every invoice waiting for payment (machine and monthly), oldest first.
+  const unpaidList = (invoices || []).filter((i) => i.status === 'published' && ['equipment', 'monthly'].includes(i.kind)).reverse();
   const B = O.billing;
   // Paid, numbered machines not shipped yet: shown to Amano (setup request) and in the shipment form.
   const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on && !m.cancelled_at);
@@ -210,25 +211,26 @@ export default async function AdminPartner({ params, searchParams }) {
             </div>
           )}
 
-          {unpaidEquipment && (
+          {unpaidList.length > 0 && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.payTitle}</h2>
-              <p className="small">
-                {unpaidEquipment.invoice_no} · {T.yen(yen(unpaidEquipment.total_yen))}
-              </p>
-              <form action={confirmPayment} className="form">
-                <input type="hidden" name="id" value={p.id} />
-                <input type="hidden" name="invoice" value={unpaidEquipment.id} />
-                <label htmlFor="paid_on">{A.paidOn}</label>
-                <input id="paid_on" name="paid_on" type="date" required defaultValue={jstToday()} />
-                <label htmlFor="amount">{A.amount}</label>
-                <input id="amount" name="amount" type="number" min="1" required defaultValue={unpaidEquipment.total_yen} />
-                <label htmlFor="pnote">{A.note}</label>
-                <input id="pnote" name="note" type="text" maxLength={500} />
-                <SubmitButton className="btn btn-primary">
-                  {A.confirmPay}
-                </SubmitButton>
-              </form>
+              {unpaidList.map((inv) => (
+                <form key={inv.id} action={confirmPayment} className="form" style={{ borderTop: '1px solid var(--line)', paddingTop: 10 }}>
+                  <p className="small" style={{ margin: 0 }}>
+                    <strong className="num">{inv.invoice_no}</strong> · {B.kinds[inv.kind]} · {T.yen(yen(inv.total_yen))} · {A.dueShort}
+                    {inv.due_on || '—'}
+                  </p>
+                  <input type="hidden" name="id" value={p.id} />
+                  <input type="hidden" name="invoice" value={inv.id} />
+                  <label htmlFor={`paid_on_${inv.id}`}>{A.paidOn}</label>
+                  <input id={`paid_on_${inv.id}`} name="paid_on" type="date" required defaultValue={jstToday()} />
+                  <label htmlFor={`amount_${inv.id}`}>{A.amount}</label>
+                  <input id={`amount_${inv.id}`} name="amount" type="number" min="1" required defaultValue={inv.total_yen} />
+                  <label htmlFor={`pnote_${inv.id}`}>{A.note}</label>
+                  <input id={`pnote_${inv.id}`} name="note" type="text" maxLength={500} />
+                  <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>
+                </form>
+              ))}
             </div>
           )}
 

@@ -7,6 +7,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { parseReport } from '@/lib/parkingweb';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
+import { headers } from 'next/headers';
+import { draftAfterImport } from '@/lib/billing';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -72,9 +74,20 @@ export async function importCsv(prevState, formData) {
   await admin.from('import_runs').update({ status: 'ok', finished_at: new Date().toISOString(), rows_added: added, rows_already_present: already_present, message }).eq('id', run.id);
   await admin.from('audit_log').insert({ actor: claims.sub, action: 'import_parkingweb', entity: 'import_run', entity_id: String(run.id), detail: { file: file.name, sha256, added, already_present } });
 
+  // Monthly invoices: drafts for the previous month once the data reaches its last day.
+  let billing = null;
+  try {
+    const h = await headers();
+    const origin = `${h.get('x-forwarded-proto') || 'https'}://${h.get('x-forwarded-host') || h.get('host')}`;
+    billing = await draftAfterImport(admin, { runId: run.id, periodTo: report.period?.to, origin });
+  } catch (e) {
+    billing = { status: 'error', error: e.message };
+  }
+
   revalidatePath('/admin');
   return {
     ok: true,
+    billing,
     period: report.period,
     rows: report.rows.length,
     totalCount: report.total?.count,
