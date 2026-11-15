@@ -86,6 +86,18 @@ export async function confirmPayment(fd) {
   back(id, error ? { err: error.message } : { ok: 'saved' });
 }
 
+// 店No. per discount value, as given to Amano when ordering the machine.
+export async function setPlannedStores(fd) {
+  const { supabase } = await requireAdmin();
+  const id = s(fd, 'id', 40);
+  const stores = [0, 1]
+    .map((i) => ({ store_no: Number(s(fd, `store_no_${i}`, 6)), discount_code: s(fd, `discount_${i}`, 10) }))
+    .filter((x) => x.store_no > 0 && x.discount_code);
+  const { error } = await supabase.rpc('set_planned_stores', { p_partner: id, p_stores: stores });
+  revalidatePath('/admin');
+  back(id, error ? { err: error.message } : { ok: 'storesSaved' });
+}
+
 export async function recordShipment(fd) {
   const { supabase } = await requireAdmin();
   const id = s(fd, 'id', 40);
@@ -95,6 +107,7 @@ export async function recordShipment(fd) {
     p_carrier: s(fd, 'carrier', 100),
     p_tracking: s(fd, 'tracking', 100),
     p_shipped_on: s(fd, 'shipped_on', 10),
+    p_received_on: s(fd, 'received_on', 10) || null,
   });
   revalidatePath('/admin');
   if (error) back(id, { err: error.message });

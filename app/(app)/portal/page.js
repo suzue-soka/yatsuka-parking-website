@@ -24,16 +24,17 @@ export default async function Portal({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from, to } = monthRange(ym);
 
-  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: shipped }] = await Promise.all([
+  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: shipped }, { data: firstUse }] = await Promise.all([
     supabase.from('partners').select('partner_code, name').eq('id', profile.partner_id).single(),
     supabase.from('store_numbers').select('store_no, note, valid_from, valid_to, discount_types(hours, unit_yen)').order('store_no'),
     supabase.rpc('monthly_charge', { p_partner: profile.partner_id, p_month: from }),
     supabase.rpc('my_validations', { p_from: from, p_to: to }),
     supabase.from('invoices').select('invoice_no, kind, period_month, status, total_yen, due_on, issued_on').order('created_at', { ascending: false }).limit(24),
-    me.status === 'shipped'
-      ? supabase.from('machines').select('*').not('shipped_on', 'is', null).order('id', { ascending: false })
-      : Promise.resolve({ data: [] }),
+    supabase.from('machines').select('*').not('shipped_on', 'is', null).order('id', { ascending: false }),
+    supabase.rpc('first_use_date', { p_partner: me.id }),
   ]);
+  // Shipping details on the dashboard for 30 days after shipping (always on 認証機・お支払い).
+  const recent = (shipped || []).filter((m) => m.shipped_on && Date.now() - Date.parse(m.shipped_on) < 30 * 86400000);
 
   const charge = chargeRows?.[0] || { validation_count: 0, gross_yen: 0, volume_rate: 0, total_yen: 0 };
   const today = jstToday();
@@ -52,11 +53,14 @@ export default async function Portal({ searchParams }) {
     <section className="wrap section">
       <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} links={portalLinks(O)} />
       <OnboardingCard status={me.status} O={O} />
-      {(shipped || []).length > 0 && (
+      {recent.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          {shipped.map((m) => (
+          {recent.map((m) => (
             <ShipmentInfo key={m.id} machine={m} lang={lang} />
           ))}
+          <p className="small" style={{ marginBottom: 0 }}>
+            {O.billing.machine.firstUse}：{firstUse || O.billing.machine.notUsedYet}
+          </p>
         </div>
       )}
 

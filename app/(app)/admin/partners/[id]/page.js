@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService, setPlannedStores } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -42,11 +42,12 @@ export default async function AdminPartner({ params, searchParams }) {
 
   const { data: p } = await supabase.from('partners').select('*').eq('id', id).maybeSingle();
   if (!p) notFound();
-  const [{ data: accounts }, { data: stores }, { data: machines }, { data: invoices }] = await Promise.all([
+  const [{ data: accounts }, { data: stores }, { data: machines }, { data: invoices }, { data: firstUse }] = await Promise.all([
     supabase.from('profiles').select('id').eq('partner_id', id),
     supabase.from('store_numbers').select('store_no, discount_code, valid_from, valid_to, note').eq('partner_id', id).order('store_no'),
     supabase.from('machines').select('*').eq('partner_id', id).order('id'),
     supabase.from('invoices').select('id, invoice_no, kind, status, total_yen, issued_on, due_on, payments(amount_yen, paid_on, method)').eq('partner_id', id).order('created_at', { ascending: false }),
+    supabase.rpc('first_use_date', { p_partner: id }),
   ]);
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
@@ -59,7 +60,7 @@ export default async function AdminPartner({ params, searchParams }) {
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>
-      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail }} />
+      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved }} />
 
       <div className="detail-layout">
         <div className="card">
@@ -169,9 +170,66 @@ export default async function AdminPartner({ params, searchParams }) {
             </div>
           )}
 
+          {['approved', 'awaiting_payment', 'preparing'].includes(p.status) && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.amanoTitle}</h2>
+              <p className="small muted">{A.amanoHint}</p>
+              <form action={setPlannedStores} className="form">
+                <input type="hidden" name="id" value={p.id} />
+                {[0, 1].map((i) => {
+                  const planned = (p.planned_stores || [])[i];
+                  return (
+                    <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
+                      <div className="form">
+                        <label htmlFor={`ps_no_${i}`}>
+                          {A.storeNo} {i + 1}
+                        </label>
+                        <input id={`ps_no_${i}`} name={`store_no_${i}`} type="number" min="1" required={i === 0} defaultValue={planned?.store_no || ''} />
+                      </div>
+                      <div className="form">
+                        <label htmlFor={`ps_d_${i}`}>{A.discount}</label>
+                        <select id={`ps_d_${i}`} name={`discount_${i}`} defaultValue={planned?.discount_code || (p.requested_discounts || [])[i] || ''}>
+                          <option value="">—</option>
+                          {DISCOUNT_TYPES.map((d) => (
+                            <option key={d.code} value={d.code}>
+                              {T.discount(d.hours)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })}
+                <SubmitButton className="btn btn-line">{A.saveStores}</SubmitButton>
+              </form>
+              {(p.planned_stores || []).length > 0 && (
+                <>
+                  <label className="small" htmlFor="amano-text" style={{ display: 'block', marginTop: 12 }}>
+                    {A.amanoCopy}
+                  </label>
+                  <textarea
+                    id="amano-text"
+                    readOnly
+                    rows={2 + p.planned_stores.length}
+                    style={{ width: '100%', fontFamily: 'inherit' }}
+                    defaultValue={[
+                      `提携店舗：${p.name}（${p.partner_code || ''}）`,
+                      ...p.planned_stores.map((x) => {
+                        const dt = DISCOUNT_TYPES.find((d) => d.code === x.discount_code);
+                        return `店No.${x.store_no}：${dt ? `${dt.hours}時間無料（${dt.yen.toLocaleString('ja-JP')}円）` : x.discount_code}`;
+                      }),
+                      '省スペース型QRコード割引券発行機 1台',
+                    ].join('\n')}
+                  />
+                </>
+              )}
+            </div>
+          )}
+
           {p.status === 'preparing' && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.shipTitle}</h2>
+              {!(p.planned_stores || []).length && <p className="alert">{A.needStores}</p>}
               <form action={recordShipment} className="form">
                 <input type="hidden" name="id" value={p.id} />
                 <label htmlFor="serial">{A.serial}</label>
@@ -185,9 +243,11 @@ export default async function AdminPartner({ params, searchParams }) {
                 </datalist>
                 <label htmlFor="tracking">{A.tracking}</label>
                 <input id="tracking" name="tracking" type="text" maxLength={100} />
+                <label htmlFor="received_on">{A.receivedOn}</label>
+                <input id="received_on" name="received_on" type="date" required max={jstToday()} />
                 <label htmlFor="shipped_on">{A.shippedOn}</label>
                 <input id="shipped_on" name="shipped_on" type="date" required defaultValue={jstToday()} />
-                <SubmitButton className="btn btn-primary">
+                <SubmitButton className="btn btn-primary" disabled={!(p.planned_stores || []).length}>
                   {A.ship}
                 </SubmitButton>
               </form>
@@ -245,6 +305,9 @@ export default async function AdminPartner({ params, searchParams }) {
           {(machines || []).length > 0 && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.machines}</h2>
+              <p className="small" style={{ marginTop: 0 }}>
+                {B.machine.firstUse}：{firstUse || B.machine.notUsedYet}
+              </p>
               <ul className="small" style={{ paddingLeft: 20, margin: 0 }}>
                 {machines.map((m) => (
                   <li key={m.id}>
