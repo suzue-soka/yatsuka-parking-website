@@ -115,11 +115,10 @@ export default async function Invoice({ params }) {
         </table>
         <p className="doc-tax">{I.taxLine(Y(inv.total_yen), Y(inv.tax_yen))}</p>
 
-        <p className="doc-pay">
-          {I.bank}
-          <br />
-          <span className="doc-small">{onbText('ja').billing.transferName(p.partner_code)}</span>
-        </p>
+        <div className="doc-pay">
+          <p className="doc-bank">{I.bank}</p>
+          <p className="doc-small">{onbText('ja').billing.transferName(p.partner_code)}</p>
+        </div>
         <p className="doc-foot">{I.issuer}</p>
       </article>
     </section>

@@ -1281,6 +1281,15 @@ html {
   font-size: 13px;
   margin: 0;
 }
+/* お振込先: easy to find — pale box, navy bar, larger navy text */
+.doc-bank {
+  margin: 0 0 8px;
+  padding: 10px 14px;
+  font-size: 16px;
+  color: var(--doc-navy);
+  background: var(--doc-pale);
+  border-left: 4px solid var(--doc-navy);
+}
 .doc-foot {
   text-align: center;
   font-size: 11px;
@@ -1321,6 +1330,7 @@ html {
     background: #fff !important;
   }
   .doc-total,
+  .doc-bank,
   .doc-stamp {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
