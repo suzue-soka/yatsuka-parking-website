@@ -45,7 +45,8 @@ export default async function AdminPartners({ searchParams }) {
     if (x === '' && y !== '') return 1; // empty values (e.g. no ID yet) always last
     if (y === '' && x !== '') return -1;
     const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'ja', { numeric: true });
-    return dir === 'asc' ? c : -c;
+    if (c) return dir === 'asc' ? c : -c;
+    return String(a.partner_code || '~').localeCompare(String(b.partner_code || '~'), 'ja', { numeric: true }); // ties: by partner ID
   });
   const sortHref = (col) => {
     const qs = new URLSearchParams();
