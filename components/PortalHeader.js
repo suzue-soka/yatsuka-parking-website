@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import PortalNav from '@/components/PortalNav';
 import IdleWatch from '@/components/IdleWatch';
 
 // Log-out is in the site toolbar (top right), next to 提携店舗ページへ / 管理画面へ.
@@ -13,13 +13,7 @@ export default function PortalHeader({ title, links = [], email }) {
           </p>
           <h1 style={{ margin: '2px 0 0', fontSize: 24 }}>{title}</h1>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {links.map((l) => (
-            <Link key={l.href} className="btn btn-ghost" href={l.href}>
-              {l.label}
-            </Link>
-          ))}
-        </div>
+        <PortalNav links={links} />
       </div>
     </div>
   );

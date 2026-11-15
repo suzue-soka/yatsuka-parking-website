@@ -1385,3 +1385,10 @@ th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
 th.sortable:hover, th.sortable:focus-visible { text-decoration: underline; }
 th.sortable[aria-sort='ascending']::after { content: ' ▲'; }
 th.sortable[aria-sort='descending']::after { content: ' ▼'; }
+
+/* Current page in the partner / admin header */
+.btn-ghost.is-current {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--navy);
+}
