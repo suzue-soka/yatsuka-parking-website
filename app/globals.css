@@ -205,7 +205,7 @@ a {
 }
 .hero-inner {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: 32px;
   align-items: start;
   padding-top: 40px;
@@ -268,23 +268,22 @@ a {
   width: 100%;
 }
 .hero-facts {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.hero-facts ul {
+  /* Full width under the text and the photo, one row when there is room. */
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .hero-facts li {
+  text-align: center;
+  white-space: nowrap;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -920,6 +919,9 @@ html {
 
 /* Two columns: line the photo's top edge up with the top of 谷塚駅すぐの. */
 @media (min-width: 700px) {
+  .hero-inner {
+    grid-template-columns: 1fr 1fr;
+  }
   .hero-inner > img {
     margin-top: var(--hero-photo-offset, 47px);
   }

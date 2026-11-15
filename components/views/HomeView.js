@@ -102,17 +102,13 @@ export default function HomeView({ lang = 'ja' }) {
               </p>
             )}
             <p className="lead">{c.hero.lead}</p>
-            <div className="hero-facts">
-              {c.hero.facts.map((row) => (
-                <ul key={row[0]}>
-                  {row.map((f) => (
-                    <li key={f}>{f}</li>
-                  ))}
-                </ul>
-              ))}
-            </div>
           </div>
           <Image src="/images/front.jpg" alt={c.hero.imgAlt} width={1600} height={900} priority sizes="(min-width: 900px) 560px, 100vw" />
+          <ul className="hero-facts">
+            {c.hero.facts.flat().map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
         </div>
       </section>
 
