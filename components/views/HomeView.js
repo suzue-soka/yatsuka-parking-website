@@ -90,9 +90,11 @@ export default function HomeView({ lang = 'ja' }) {
           <div>
             <p className="eyebrow">{c.hero.eyebrow}</p>
             <h1>
-              {c.hero.h1[0]}
-              <br />
-              {c.hero.h1[1]}
+              {c.hero.h1.map((line, i) => (
+                <span key={line} className={i >= 2 ? 'h1-line h1-sub' : 'h1-line'}>
+                  {line}
+                </span>
+              ))}
             </h1>
             {lang !== 'ja' && (
               <p className="eyebrow" lang="ja" style={{ marginTop: 8 }}>
