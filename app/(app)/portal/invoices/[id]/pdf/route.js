@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import fontkit from '@pdf-lib/fontkit';
 import { createClient, getClaims } from '@/lib/supabase/server';
-import { getAppLang } from '@/lib/app-lang';
 import { invoicePdf } from '@/lib/invoice-pdf';
 
 export const runtime = 'nodejs';
@@ -37,7 +36,7 @@ export async function GET(request, { params }) {
     .maybeSingle();
   if (!inv) return new Response('Not found', { status: 404 });
 
-  const bytes = await invoicePdf(inv, await loadAssets(), await getAppLang());
+  const bytes = await invoicePdf(inv, await loadAssets()); // always Japanese
   const name = `${inv.invoice_no}.pdf`.replace(/[^A-Za-z0-9._-]/g, '_');
   return new Response(bytes, {
     headers: {
