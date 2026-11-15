@@ -91,7 +91,6 @@ export default async function Billing({ searchParams }) {
           )}
           {!open && ['approved', 'preparing', 'shipped', 'active'].includes(p.status) && !unpaidEquipment && (
             <>
-              <h3 className="shipment-title">{B.requestTitle}</h3>
               {lastRejected && <p className="small warn">{B.lastRejected(lastRejected.note)}</p>}
               <p className="small">{B.requestText(T.yen(yen(unit)))}</p>
               <MachineOrderForm
