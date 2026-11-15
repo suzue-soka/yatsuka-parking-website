@@ -34,7 +34,7 @@ export default function ShipmentTable({ machines, lang = 'ja' }) {
 
   return (
     <div className="shipment">
-      <h3 className="shipment-title">{M.shippedTitle}</h3>
+      <h3 className="shipment-title">{M.tableTitle}</h3>
       <div className="table-wrap">
         <table>
           <thead>
