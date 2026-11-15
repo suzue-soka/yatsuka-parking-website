@@ -36,7 +36,7 @@ export default async function AdminPartners({ searchParams }) {
   } else if (status) q = q.eq('status', status);
   const { data: list } = await q;
 
-  const sort = COLS.includes(sp?.sort) ? sp.sort : 'created_at';
+  const sort = COLS.includes(sp?.sort) ? sp.sort : 'partner_code';
   const dir = sp?.dir === 'asc' || sp?.dir === 'desc' ? sp.dir : sort === 'created_at' ? 'desc' : 'asc';
   const keyOf = (r) =>
     sort === 'status' ? STATUS_ORDER.indexOf(r.status) : sort === 'category' ? P.categories[r.category] || r.category || '' : r[sort] ?? '';

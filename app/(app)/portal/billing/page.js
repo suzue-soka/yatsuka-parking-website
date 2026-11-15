@@ -121,7 +121,7 @@ export default async function Billing({ searchParams }) {
 
       <div className="card table-wrap" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.invoicesTitle}</h2>
-        <SortableTable>
+        <SortableTable initial={0}>
           <table>
             <thead>
               <tr>

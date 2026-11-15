@@ -6,8 +6,9 @@ import { useEffect, useRef } from 'react';
  *  - Headers with no text are not sortable.
  *  - A cell's data-sort attribute, if present, is used instead of its text.
  *  - Rows containing a cell with colSpan (totals, "no data" lines) stay where they are, at the end.
+ *  - `initial` = index of the column to sort by (ascending) when the page opens.
  *  - Numbers are compared as numbers (¥, 円, %, commas ignored); empty values ("—") always go last. */
-export default function SortableTable({ children }) {
+export default function SortableTable({ children, initial }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -59,13 +60,14 @@ export default function SortableTable({ children }) {
         sortBy(th);
       }
     };
+    if (initial != null && ths[initial]?.classList.contains('sortable')) sortBy(ths[initial]);
     head.addEventListener('click', onClick);
     head.addEventListener('keydown', onKey);
     return () => {
       head.removeEventListener('click', onClick);
       head.removeEventListener('keydown', onKey);
     };
-  }, []);
+  }, [initial]);
 
   return (
     <div ref={ref} className="sortable-table">

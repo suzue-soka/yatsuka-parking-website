@@ -110,7 +110,7 @@ export default async function AdminHome({ searchParams }) {
           </div>
         </div>
         <div className="table-wrap">
-          <SortableTable>
+          <SortableTable initial={0}>
             <table>
               <thead>
                 <tr>
