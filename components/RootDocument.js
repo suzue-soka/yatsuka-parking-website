@@ -41,7 +41,7 @@ export function rootMetadata(lang) {
       description: c.description,
       images: [{ url: '/images/front.jpg', width: 1600, height: 900, alt: c.meta.ogAlt }],
     },
-    icons: { icon: '/images/logo-navy.png', apple: '/images/logo-navy.png' },
+    icons: { icon: '/images/logo-mark.svg', apple: '/images/apple-icon.png' },
     formatDetection: { telephone: false },
   };
 }

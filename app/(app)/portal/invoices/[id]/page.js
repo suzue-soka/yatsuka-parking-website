@@ -39,18 +39,10 @@ export default async function Invoice({ params }) {
       </p>
       <div className="card invoice" lang="ja">
         <div className="invoice-brand">
-          <span className="on-screen">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-navy.png" alt="" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="wordmark" src="/images/wordmark-navy.png" alt="谷塚駅東口共同駐車場" />
-          </span>
-          <span className="on-paper">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-outline.png" alt="" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="wordmark" src="/images/wordmark-outline.png" alt="谷塚駅東口共同駐車場" />
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="on-screen" src="/images/logo-lockup.svg" alt="谷塚駅東口共同駐車場" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="on-paper" src="/images/logo-lockup-outline.svg" alt="谷塚駅東口共同駐車場" />
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>

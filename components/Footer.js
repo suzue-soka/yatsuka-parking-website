@@ -12,7 +12,7 @@ export default function Footer({ lang = 'ja' }) {
     <footer className="footer">
       <div className="wrap footer-grid">
         <div>
-          <Image src="/images/wordmark-white.png" alt={c.name} width={222} height={32} />
+          <Image src="/images/logo-lockup-white.svg" alt={c.name} width={211} height={44} unoptimized />
           <p>
             {c.addressFull}
             <br />

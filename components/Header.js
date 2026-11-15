@@ -23,8 +23,7 @@ export default function Header({ lang = 'ja', app = false }) {
     <header className="header">
       <div className="wrap header-inner">
         <Link href={home} className="brand" aria-label={`${c.name} ${c.nav.toTop}`}>
-          <Image className="brand-mark" src="/images/logo-navy.png" alt="" width={29} height={40} priority />
-          <Image className="brand-word" src="/images/wordmark-navy.png" alt={c.name} width={194} height={28} priority />
+          <Image className="brand-logo" src="/images/logo-lockup.svg" alt={c.name} width={249} height={52} priority unoptimized />
         </Link>
       </div>
     </header>
