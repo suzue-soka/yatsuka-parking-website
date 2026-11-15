@@ -1096,3 +1096,28 @@ html {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   font-weight: 600;
 }
+
+/* Machine shipping details (partner dashboard and 認証機・お支払い) */
+.shipment + .shipment {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.shipment-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.shipment-tracking {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.shipment-tracking strong {
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  user-select: all;
+}
+.shipment .btn {
+  margin-top: 8px;
+}

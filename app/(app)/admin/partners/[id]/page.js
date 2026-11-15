@@ -13,6 +13,7 @@ import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
 import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService } from '../../actions';
+import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -176,7 +177,12 @@ export default async function AdminPartner({ params, searchParams }) {
                 <label htmlFor="serial">{A.serial}</label>
                 <input id="serial" name="serial" type="text" maxLength={100} />
                 <label htmlFor="carrier">{A.carrier}</label>
-                <input id="carrier" name="carrier" type="text" maxLength={100} />
+                <input id="carrier" name="carrier" type="text" maxLength={100} list="carrier-list" autoComplete="off" />
+                <datalist id="carrier-list">
+                  {CARRIERS.map((c) => (
+                    <option key={c.ja} value={c.ja} />
+                  ))}
+                </datalist>
                 <label htmlFor="tracking">{A.tracking}</label>
                 <input id="tracking" name="tracking" type="text" maxLength={100} />
                 <label htmlFor="shipped_on">{A.shippedOn}</label>

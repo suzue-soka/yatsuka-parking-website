@@ -5,6 +5,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import OnboardingCard from '@/components/OnboardingCard';
+import ShipmentInfo from '@/components/ShipmentInfo';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).portal.metaTitle, robots: { index: false, follow: false } };
@@ -12,7 +13,7 @@ export async function generateMetadata() {
 export const dynamic = 'force-dynamic';
 
 export default async function Portal({ searchParams }) {
-  const { supabase, claims, partner: me, T, O } = await requirePartner('/portal');
+  const { supabase, claims, partner: me, T, O, lang } = await requirePartner('/portal');
   const t = T.portal;
   if (!me) {
     return <p className="wrap section">{t.noPartner}</p>;
@@ -23,12 +24,15 @@ export default async function Portal({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from, to } = monthRange(ym);
 
-  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }] = await Promise.all([
+  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: shipped }] = await Promise.all([
     supabase.from('partners').select('partner_code, name').eq('id', profile.partner_id).single(),
     supabase.from('store_numbers').select('store_no, note, valid_from, valid_to, discount_types(hours, unit_yen)').order('store_no'),
     supabase.rpc('monthly_charge', { p_partner: profile.partner_id, p_month: from }),
     supabase.rpc('my_validations', { p_from: from, p_to: to }),
     supabase.from('invoices').select('invoice_no, kind, period_month, status, total_yen, due_on, issued_on').order('created_at', { ascending: false }).limit(24),
+    me.status === 'shipped'
+      ? supabase.from('machines').select('*').not('shipped_on', 'is', null).order('id', { ascending: false })
+      : Promise.resolve({ data: [] }),
   ]);
 
   const charge = chargeRows?.[0] || { validation_count: 0, gross_yen: 0, volume_rate: 0, total_yen: 0 };
@@ -48,6 +52,13 @@ export default async function Portal({ searchParams }) {
     <section className="wrap section">
       <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} links={portalLinks(O)} />
       <OnboardingCard status={me.status} O={O} />
+      {(shipped || []).length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          {shipped.map((m) => (
+            <ShipmentInfo key={m.id} machine={m} lang={lang} />
+          ))}
+        </div>
+      )}
 
       <div className="grid">
         <div className="card stat">

@@ -6,6 +6,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import { yen } from '@/lib/dates';
+import ShipmentInfo from '@/components/ShipmentInfo';
 import { orderMachine } from '../actions';
 
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export async function generateMetadata() {
 }
 
 export default async function Billing({ searchParams }) {
-  const { supabase, claims, partner: p, T, O } = await requirePartner('/portal/billing');
+  const { supabase, claims, partner: p, T, O, lang } = await requirePartner('/portal/billing');
   if (!p) return <p className="wrap section">{T.portal.noPartner}</p>;
   const B = O.billing;
   const sp = await searchParams;
@@ -51,20 +52,7 @@ export default async function Billing({ searchParams }) {
             </p>
           )}
           {(machines || []).map((m) => (
-            <ul key={m.id} className="small" style={{ paddingLeft: 20 }}>
-              <li>{m.model}</li>
-              <li>
-                {B.machine.serial}：{m.serial_no || '—'}
-              </li>
-              <li>
-                {B.machine.shipped}：{m.shipped_on || '—'} {m.carrier || ''} {m.tracking_no ? `${B.machine.tracking} ${m.tracking_no}` : ''}
-              </li>
-              {m.warranty_until && (
-                <li>
-                  {B.machine.warranty}：{m.warranty_until}
-                </li>
-              )}
-            </ul>
+            <ShipmentInfo key={m.id} machine={m} lang={lang} />
           ))}
         </div>
 
