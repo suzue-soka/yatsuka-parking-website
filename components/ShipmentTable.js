@@ -15,7 +15,8 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
     (m.discount_codes || []).map((c, i) => {
       const d = type(c);
       const no = (m.store_nos || [])[i];
-      const note = no != null ? storeNotes[no] : null;
+      // Notes such as 透析用 are shown; the machine ID (stored as the note of its 店No.) is not — it has its own column.
+      const note = no != null && storeNotes[no] !== m.machine_code ? storeNotes[no] : null;
       const text = d ? priceLabel(T.yen(d.yen.toLocaleString('ja-JP')), T.discount(d.hours), note) : [c, note].filter(Boolean).join('・');
       return { no: no ?? '—', text };
     });
