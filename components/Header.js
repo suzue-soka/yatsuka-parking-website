@@ -13,8 +13,8 @@ export default function Header({ lang = 'ja', app = false }) {
     { href: anchor('calc'), label: c.nav.calc },
     { href: anchor('access'), label: c.nav.access },
     { href: anchor('monthly'), label: c.nav.monthly },
-    { href: anchor('support'), label: c.nav.support },
     { href: href(lang, '/partners'), label: c.nav.partners },
+    { href: anchor('support'), label: c.nav.support },
   ];
 
   return (

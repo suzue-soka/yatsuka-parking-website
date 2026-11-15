@@ -100,20 +100,6 @@ export default function HomeView({ lang = 'ja' }) {
               </p>
             )}
             <p className="lead">{c.hero.lead}</p>
-            <div className="hero-cta">
-              <a className="btn btn-primary" href="#rates">
-                {c.hero.cta.rates}
-              </a>
-              <a className="btn btn-ghost" href="#calc">
-                {c.hero.cta.calc}
-              </a>
-              <a className="btn btn-ghost" href="#access">
-                {c.hero.cta.access}
-              </a>
-              <a className="btn btn-ghost" href="#monthly">
-                {c.hero.cta.monthly}
-              </a>
-            </div>
             <ul className="hero-facts">
               {c.hero.facts.map((f) => (
                 <li key={f}>{f}</li>
