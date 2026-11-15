@@ -1,20 +1,12 @@
 'use client';
 
-import { useFormStatus } from 'react-dom';
+import SubmitButton from '@/components/SubmitButton';
 
-// Submit button that asks for confirmation first.
+// Submit button that asks for confirmation first, then shows 処理中… until done.
 export default function ConfirmButton({ message, children, ...props }) {
-  const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      onClick={(e) => {
-        if (!window.confirm(message)) e.preventDefault();
-      }}
-      {...props}
-    >
+    <SubmitButton confirm={message} {...props}>
       {children}
-    </button>
+    </SubmitButton>
   );
 }

@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/admin-guard';
@@ -124,9 +125,9 @@ export default async function AdminPartner({ params, searchParams }) {
                 <input type="hidden" name="id" value={p.id} />
                 <label htmlFor="note">{A.rejectNote}</label>
                 <textarea id="note" name="note" maxLength={1000} style={{ minHeight: 80 }} />
-                <button className="btn btn-line" type="submit">
+                <SubmitButton className="btn btn-line" confirm={A.rejectConfirm}>
                   {A.reject}
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}
@@ -138,9 +139,9 @@ export default async function AdminPartner({ params, searchParams }) {
                 <p className="small muted" style={{ margin: 0 }}>
                   {A.account}: {(accounts || []).length ? '✓' : A.noAccount} · {p.email}
                 </p>
-                <button className="btn btn-line" type="submit">
+                <SubmitButton className="btn btn-line" confirm={A.inviteConfirm}>
                   {A.invite}
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}
@@ -160,9 +161,9 @@ export default async function AdminPartner({ params, searchParams }) {
                 <input id="amount" name="amount" type="number" min="1" required defaultValue={unpaidEquipment.total_yen} />
                 <label htmlFor="pnote">{A.note}</label>
                 <input id="pnote" name="note" type="text" maxLength={500} />
-                <button className="btn btn-primary" type="submit">
+                <SubmitButton className="btn btn-primary">
                   {A.confirmPay}
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}
@@ -180,9 +181,9 @@ export default async function AdminPartner({ params, searchParams }) {
                 <input id="tracking" name="tracking" type="text" maxLength={100} />
                 <label htmlFor="shipped_on">{A.shippedOn}</label>
                 <input id="shipped_on" name="shipped_on" type="date" required defaultValue={jstToday()} />
-                <button className="btn btn-primary" type="submit">
+                <SubmitButton className="btn btn-primary">
                   {A.ship}
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}
@@ -215,9 +216,9 @@ export default async function AdminPartner({ params, searchParams }) {
                     </div>
                   </div>
                 ))}
-                <button className="btn btn-primary" type="submit">
+                <SubmitButton className="btn btn-primary">
                   {A.start}
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}

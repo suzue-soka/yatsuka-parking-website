@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import PortalHeader from '@/components/PortalHeader';
 import Notice from '@/components/Notice';
 import { getAppLang } from '@/lib/app-lang';
@@ -29,9 +30,9 @@ export default async function Inquiries({ searchParams }) {
             <input id="subject" name="subject" type="text" required maxLength={200} />
             <label htmlFor="body">{Q.body}</label>
             <textarea id="body" name="body" required maxLength={5000} />
-            <button className="btn btn-primary" type="submit">
+            <SubmitButton className="btn btn-primary">
               {Q.send}
-            </button>
+            </SubmitButton>
           </form>
         </div>
         <div className="card">

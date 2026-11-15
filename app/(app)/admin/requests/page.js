@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin-guard';
 import PortalHeader from '@/components/PortalHeader';
@@ -50,9 +51,9 @@ export default async function AdminRequests({ searchParams }) {
             <input type="hidden" name="inquiry" value={q.id} />
             <label htmlFor={`a${q.id}`}>{A.answer}</label>
             <textarea id={`a${q.id}`} name="answer" maxLength={5000} style={{ minHeight: 80 }} />
-            <button className="btn btn-primary" type="submit">
+            <SubmitButton className="btn btn-primary">
               {A.close}
-            </button>
+            </SubmitButton>
           </form>
         </div>
       ))}
@@ -91,12 +92,12 @@ export default async function AdminRequests({ searchParams }) {
             <label htmlFor={`n${r.id}`}>{A.note}</label>
             <input id={`n${r.id}`} name="note" type="text" maxLength={1000} />
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <button className="btn btn-primary" type="submit" name="decision" value="approve">
+              <SubmitButton className="btn btn-primary" name="decision" value="approve">
                 {A.approveChange}
-              </button>
-              <button className="btn btn-line" type="submit" name="decision" value="reject">
+              </SubmitButton>
+              <SubmitButton className="btn btn-line" name="decision" value="reject">
                 {A.rejectChange}
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>

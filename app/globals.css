@@ -978,3 +978,58 @@ html {
 .pw-toggle[aria-pressed='true'] {
   color: var(--orange-text);
 }
+
+/* ---------- Click feedback ---------- */
+.btn,
+.toolbar a,
+.chip,
+.langbar a,
+.pw-toggle {
+  transition: transform 0.08s ease, background-color 0.15s ease, filter 0.15s ease;
+}
+.btn:active:not(:disabled),
+.toolbar a:active,
+.chip:active,
+.langbar a:active {
+  transform: scale(0.96);
+  filter: brightness(0.9);
+}
+.btn:disabled,
+.btn.is-pending {
+  cursor: progress;
+  opacity: 0.75;
+}
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  vertical-align: -0.15em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+  .btn:active:not(:disabled),
+  .toolbar a:active {
+    transform: none;
+  }
+}
+.page-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40vh;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--navy);
+}

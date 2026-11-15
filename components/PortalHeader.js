@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 
 export default function PortalHeader({ title, links = [], email, logout = 'ログアウト' }) {
@@ -17,9 +18,9 @@ export default function PortalHeader({ title, links = [], email, logout = 'ロ�
             </Link>
           ))}
           <form action="/auth/signout" method="post">
-            <button className="btn btn-ghost" type="submit">
+            <SubmitButton className="btn btn-ghost">
               {logout}
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>

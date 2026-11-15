@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/SubmitButton';
 import PortalHeader from '@/components/PortalHeader';
 import Notice from '@/components/Notice';
 import { getAppLang } from '@/lib/app-lang';
@@ -56,9 +57,9 @@ export default async function Company({ searchParams }) {
               <span>{C.permissionB}</span>
             </label>
             <p className="small muted">{C.contactNote}</p>
-            <button className="btn btn-primary" type="submit">
+            <SubmitButton className="btn btn-primary">
               {C.save}
-            </button>
+            </SubmitButton>
           </form>
         </div>
 
@@ -75,9 +76,9 @@ export default async function Company({ searchParams }) {
                   <input id={k} name={k} type="text" maxLength={300} />
                 </div>
               ))}
-              <button className="btn btn-line" type="submit">
+              <SubmitButton className="btn btn-line">
                 {C.request}
-              </button>
+              </SubmitButton>
             </form>
           </div>
           <div className="card" style={{ marginTop: 16 }}>
