@@ -178,6 +178,7 @@ export default function ApplyForm({ lang = 'ja' }) {
       {state?.error && (
         <p className="alert" role="alert">
           {t.errors[state.error] || t.errors.server}
+          {state.code ? ` (${state.code})` : ''}
         </p>
       )}
       <button className="btn btn-primary" type="submit" disabled={pending || !started}>
