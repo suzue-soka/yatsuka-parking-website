@@ -29,6 +29,10 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  // The invoice PDF reads the Japanese font and the logo from disk: ship them with that route.
+  outputFileTracingIncludes: {
+    '/portal/invoices/**': ['./assets/fonts/ipag.ttf', './public/images/logo-lockup.png'],
+  },
   // One 404 page for the whole site (the site has a root layout per language).
   experimental: {
     globalNotFound: true,

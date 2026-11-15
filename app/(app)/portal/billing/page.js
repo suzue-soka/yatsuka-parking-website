@@ -100,6 +100,10 @@ export default async function Billing({ searchParams }) {
                 <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>{B.invStatus[i.status]}</td>
                 <td>
                   <Link href={`/portal/invoices/${i.id}`}>{B.view}</Link>
+                  {' ・ '}
+                  <a href={`/portal/invoices/${i.id}/pdf`} download>
+                    PDF
+                  </a>
                 </td>
               </tr>
             ))}

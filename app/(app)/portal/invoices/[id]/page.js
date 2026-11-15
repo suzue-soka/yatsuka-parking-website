@@ -37,7 +37,10 @@ export default async function Invoice({ params }) {
     <section className="wrap section" style={{ maxWidth: 820 }}>
       <IdleWatch />
       <p className="no-print">
-        <PrintButton label={I.print} />
+        <PrintButton label={I.print} />{' '}
+        <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
+          {I.pdf}
+        </a>
       </p>
       <div className="card invoice" lang="ja">
         <div className="invoice-brand">

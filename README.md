@@ -43,3 +43,7 @@ Run the tests with `npm test`.
 Vercel environment variables (Settings → Environment Variables):
 - `SUPABASE_SECRET_KEY` = the Supabase **secret** key (`sb_secret_…`), marked Sensitive. Never put it in code or chat.
 - Optional overrides: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (defaults are in `lib/supabase/config.js`)
+
+## Fonts
+
+Invoice PDFs embed IPAゴシック (IPAGothic, assets/fonts/ipag.ttf) under the IPA Font License v1.0 — see assets/fonts/IPA_Font_License_v1.0.txt.
