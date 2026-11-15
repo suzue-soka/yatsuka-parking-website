@@ -14,7 +14,7 @@ import { jstToday, yen } from '@/lib/dates';
 import { dueDate, addMonths } from '@/lib/holidays';
 import { billingMonth } from '@/lib/billing';
 import AutoPublishToggle from './AutoPublishToggle';
-import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts, addHoliday, removeHoliday } from './actions';
+import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts } from './actions';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -31,9 +31,8 @@ export default async function AdminBilling({ searchParams }) {
   const today = jstToday();
   const n = sp?.n || '0';
 
-  const [{ data: settings }, { data: holidays }, { data: drafts }, { data: recent }, { data: runs }] = await Promise.all([
+  const [{ data: settings }, { data: drafts }, { data: recent }, { data: runs }] = await Promise.all([
     supabase.from('billing_settings').select('auto_publish').eq('id', 1).maybeSingle(),
-    supabase.from('company_holidays').select('day, note').order('day'),
     supabase
       .from('invoices')
       .select('id, period_month, validation_count, gross_yen, volume_rate, total_yen, partner_id, partners(partner_code, name)')
@@ -48,7 +47,7 @@ export default async function AdminBilling({ searchParams }) {
       .limit(200),
     supabase.from('billing_runs').select('month'),
   ]);
-  const due = dueDate(today, (holidays || []).map((h) => h.day));
+  const due = dueDate(today);
   const months = [...new Set((drafts || []).map((d) => d.period_month))].sort();
   const target = billingMonth(today);
   const canCreate = !(runs || []).some((r) => r.month === target) && !months.includes(target);
@@ -174,7 +173,7 @@ export default async function AdminBilling({ searchParams }) {
         </div>
       ))}
 
-      <div className="card table-wrap" style={{ marginBottom: 16 }}>
+      <div className="card table-wrap">
         <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.recentTitle}</h2>
         {(recent || []).length === 0 ? (
           <p className="small muted">{t.noRecent}</p>
@@ -212,35 +211,6 @@ export default async function AdminBilling({ searchParams }) {
         )}
       </div>
 
-      <div className="card">
-        <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.holidaysTitle}</h2>
-        <p className="small muted">{t.holidaysHint}</p>
-        {(holidays || []).length === 0 ? (
-          <p className="small muted">{t.noHolidays}</p>
-        ) : (
-          <ul className="small" style={{ paddingLeft: 20 }}>
-            {holidays.map((h) => (
-              <li key={h.day} style={{ marginBottom: 4 }}>
-                <span className="num">{h.day}</span>
-                {h.note ? `　${h.note}` : ''}{' '}
-                <form action={removeHoliday} style={{ display: 'inline' }}>
-                  <input type="hidden" name="day" value={h.day} />
-                  <button type="submit" className="chip">
-                    {t.holidayRemove}
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        )}
-        <form action={addHoliday} className="form" style={{ marginBottom: 0 }}>
-          <label htmlFor="hday">{t.holidayDay}</label>
-          <input id="hday" name="day" type="date" required />
-          <label htmlFor="hnote">{t.holidayNote}</label>
-          <input id="hnote" name="note" type="text" maxLength={100} />
-          <SubmitButton className="btn btn-line">{t.holidayAdd}</SubmitButton>
-        </form>
-      </div>
     </section>
   );
 }

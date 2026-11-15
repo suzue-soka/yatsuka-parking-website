@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/admin-guard';
 import { jstToday } from '@/lib/dates';
 import { dueDate } from '@/lib/holidays';
-import { companyHolidays, publishAndNotify } from '@/lib/billing';
+import { publishAndNotify } from '@/lib/billing';
 
 const s = (fd, k, max = 300) => String(fd.get(k) ?? '').trim().slice(0, max);
 const back = (params) => redirect(`/admin/billing?${new URLSearchParams(params)}`);
@@ -33,7 +33,7 @@ export async function createDraftsNow(fd) {
   const { data, error } = await supabase.rpc('create_monthly_drafts', {
     p_month: month,
     p_issued: today,
-    p_due: dueDate(today, await companyHolidays(supabase)),
+    p_due: dueDate(today),
     p_import_run: null,
   });
   revalidatePath('/admin');
@@ -47,7 +47,7 @@ export async function publishDrafts(fd) {
   const ids = fd.getAll('ids').map(String).filter((v) => /^[0-9a-f-]{36}$/.test(v));
   if (!isDate(month) || !ids.length) back({ err: 'none selected' });
   const today = jstToday();
-  const due = dueDate(today, await companyHolidays(supabase));
+  const due = dueDate(today);
   const res = await publishAndNotify(supabase, { month, issued: today, due, ids, origin: await origin() });
   revalidatePath('/admin');
   revalidatePath('/portal');
@@ -67,27 +67,9 @@ export async function redoDrafts(fd) {
   const { data, error } = await supabase.rpc('create_monthly_drafts', {
     p_month: month,
     p_issued: today,
-    p_due: dueDate(today, await companyHolidays(supabase)),
+    p_due: dueDate(today),
     p_import_run: null,
   });
   revalidatePath('/admin');
   back(error ? { err: error.message } : { ok: 'redone', n: String(data || 0) });
-}
-
-export async function addHoliday(fd) {
-  const { supabase } = await requireAdmin();
-  const day = s(fd, 'day', 10);
-  if (!isDate(day)) back({ err: 'date' });
-  const { error } = await supabase.rpc('add_company_holiday', { p_day: day, p_note: s(fd, 'note', 100) || null });
-  revalidatePath('/admin/billing');
-  back(error ? { err: error.message } : { ok: 'saved' });
-}
-
-export async function removeHoliday(fd) {
-  const { supabase } = await requireAdmin();
-  const day = s(fd, 'day', 10);
-  if (!isDate(day)) back({ err: 'date' });
-  const { error } = await supabase.rpc('remove_company_holiday', { p_day: day });
-  revalidatePath('/admin/billing');
-  back(error ? { err: error.message } : { ok: 'saved' });
 }

@@ -22,7 +22,6 @@ test('due date: 25th or the closest working day', () => {
   assert.equal(dueDate('2027-07-01'), '2027-07-26'); // 25th Sunday → Monday (1 day) beats Friday 23rd (2 days)
   assert.equal(dueDate('2026-10-01'), '2026-10-26'); // 25th Sunday → Monday
   assert.equal(dueDate('2027-09-01'), '2027-09-24'); // 25th Saturday → Friday (tie-free, 1 day)
-  assert.equal(dueDate('2026-12-01', ['2026-12-25']), '2026-12-24'); // company holiday → earlier on a tie
 });
 
 test('working days and month helpers', () => {
