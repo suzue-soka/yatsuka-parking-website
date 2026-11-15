@@ -15,6 +15,9 @@ export async function generateMetadata() {
 }
 
 const FILTERS = ['applied', 'approved', 'awaiting_payment', 'preparing', 'active', 'rejected'];
+// Sortable columns, in the same order as O.admin.th. Status sorts by workflow order, not alphabetically.
+const COLS = ['partner_code', 'name', 'category', 'status', 'created_at'];
+const STATUS_ORDER = ['applied', 'approved', 'awaiting_payment', 'preparing', 'shipped', 'active', 'rejected'];
 
 export default async function AdminPartners({ searchParams }) {
   const { supabase, claims } = await requireAdmin();
@@ -31,18 +34,44 @@ export default async function AdminPartners({ searchParams }) {
     const { data: unpaid } = await supabase.from('invoices').select('partner_id').eq('kind', 'equipment').eq('status', 'published');
     q = q.in('id', [...new Set((unpaid || []).map((i) => i.partner_id))]);
   } else if (status) q = q.eq('status', status);
-  const { data: rows } = await q;
+  const { data: list } = await q;
+
+  const sort = COLS.includes(sp?.sort) ? sp.sort : 'created_at';
+  const dir = sp?.dir === 'asc' || sp?.dir === 'desc' ? sp.dir : sort === 'created_at' ? 'desc' : 'asc';
+  const keyOf = (r) =>
+    sort === 'status' ? STATUS_ORDER.indexOf(r.status) : sort === 'category' ? P.categories[r.category] || r.category || '' : r[sort] ?? '';
+  const rows = [...(list || [])].sort((a, b) => {
+    const x = keyOf(a), y = keyOf(b);
+    if (x === '' && y !== '') return 1; // empty values (e.g. no ID yet) always last
+    if (y === '' && x !== '') return -1;
+    const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'ja', { numeric: true });
+    return dir === 'asc' ? c : -c;
+  });
+  const sortHref = (col) => {
+    const qs = new URLSearchParams();
+    if (status) qs.set('status', status);
+    qs.set('sort', col);
+    qs.set('dir', col === sort ? (dir === 'asc' ? 'desc' : 'asc') : col === 'created_at' ? 'desc' : 'asc');
+    return `/admin/partners?${qs}`;
+  };
+  const chipHref = (f) => {
+    const qs = new URLSearchParams();
+    if (f) qs.set('status', f);
+    if (sp?.sort) { qs.set('sort', sort); qs.set('dir', dir); }
+    const t = qs.toString();
+    return t ? `/admin/partners?${t}` : '/admin/partners';
+  };
 
   return (
     <section className="wrap section">
       <PortalHeader title={O.admin.partners} email={claims.email} links={adminLinks(lang)} />
       <Notice sp={sp} o={O} extra={{ invited: `${sp?.name ? `${sp.name}：` : ''}${O.admin.invited}`, rejected: O.admin.rejectedDone }} />
       <div className="chips" style={{ marginBottom: 12 }}>
-        <Link className={`chip${status ? '' : ' active'}`} href="/admin/partners">
+        <Link className={`chip${status ? '' : ' active'}`} href={chipHref(null)}>
           {O.admin.all}
         </Link>
         {FILTERS.map((f) => (
-          <Link key={f} className={`chip${status === f ? ' active' : ''}`} href={`/admin/partners?status=${f}`}>
+          <Link key={f} className={`chip${status === f ? ' active' : ''}`} href={chipHref(f)}>
             {O.status[f]}
           </Link>
         ))}
@@ -51,22 +80,25 @@ export default async function AdminPartners({ searchParams }) {
         <table>
           <thead>
             <tr>
-              {O.admin.th.map((h) => (
-                <th key={h} scope="col">
-                  {h}
+              {O.admin.th.map((h, i) => (
+                <th key={h} scope="col" aria-sort={COLS[i] === sort ? (dir === 'asc' ? 'ascending' : 'descending') : undefined}>
+                  <Link className="th-sort" href={sortHref(COLS[i])}>
+                    {h}
+                    <span aria-hidden="true">{COLS[i] === sort ? (dir === 'asc' ? ' ▲' : ' ▼') : ''}</span>
+                  </Link>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {(rows || []).length === 0 && (
+            {rows.length === 0 && (
               <tr>
                 <td colSpan={5} className="muted">
                   {O.admin.none}
                 </td>
               </tr>
             )}
-            {(rows || []).map((r) => (
+            {rows.map((r) => (
               <tr key={r.id}>
                 <td className="num">{r.partner_code || '—'}</td>
                 <td>
