@@ -207,7 +207,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 32px;
-  align-items: center;
+  align-items: start;
   padding-top: 40px;
   padding-bottom: 48px;
 }
@@ -916,4 +916,11 @@ html {
 }
 .hero h1 .h1-sub:first-of-type {
   margin-top: 0.2em;
+}
+
+/* Two columns: line the photo's top edge up with the top of 谷塚駅すぐの. */
+@media (min-width: 700px) {
+  .hero-inner > img {
+    margin-top: var(--hero-photo-offset, 47px);
+  }
 }
