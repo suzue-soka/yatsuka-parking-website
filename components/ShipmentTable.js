@@ -10,15 +10,23 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
   const M = O.billing.machine;
   const T = appText(lang);
   const type = (code) => DISCOUNT_TYPES.find((d) => d.code === code);
-  // 店No.12：300円（1時間無料・透析用） — 店No. assigned at payment, price per validation, note.
-  const discountLines = (m) =>
+  // One entry per button: Btn.No. (the 店No. assigned at payment) and 300円（1時間無料・透析用）.
+  const buttons = (m) =>
     (m.discount_codes || []).map((c, i) => {
       const d = type(c);
       const no = (m.store_nos || [])[i];
       const note = no != null ? storeNotes[no] : null;
       const text = d ? priceLabel(T.yen(d.yen.toLocaleString('ja-JP')), T.discount(d.hours), note) : [c, note].filter(Boolean).join('・');
-      return `${no != null ? `${O.terms.store(no)}：` : ''}${text}`;
+      return { no: no ?? '—', text };
     });
+  const stack = (list, key) =>
+    list.length
+      ? list.map((b, i) => (
+          <div key={i} style={{ whiteSpace: 'nowrap' }}>
+            {b[key]}
+          </div>
+        ))
+      : '—';
 
   return (
     <div className="shipment">
@@ -28,7 +36,8 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
           <thead>
             <tr>
               <th scope="col">{M.machineId}</th>
-              <th scope="col">{M.storeDiscounts}</th>
+              <th scope="col">{M.btnNo}</th>
+              <th scope="col">{M.discounts}</th>
               <th scope="col">{M.serial}</th>
               <th scope="col">{M.warranty}</th>
               <th scope="col">{M.deliveryNoteShort}</th>
@@ -40,15 +49,8 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
                 <td className="num">
                   <strong>{m.machine_code || '—'}</strong>
                 </td>
-                <td>
-                  {discountLines(m).length
-                    ? discountLines(m).map((l) => (
-                        <div key={l} style={{ whiteSpace: 'nowrap' }}>
-                          {l}
-                        </div>
-                      ))
-                    : '—'}
-                </td>
+                <td className="num">{stack(buttons(m), 'no')}</td>
+                <td>{stack(buttons(m), 'text')}</td>
                 <td className="num">{m.serial_no || '—'}</td>
                 <td className="num">{m.warranty_until || '—'}</td>
                 <td>
