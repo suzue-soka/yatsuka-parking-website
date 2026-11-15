@@ -517,6 +517,8 @@ td {
   padding: 8px 10px;
   text-align: left;
   white-space: nowrap;
+  /* Cells with several lines (e.g. two buttons of one machine) line up with the others from the top. */
+  vertical-align: top;
 }
 thead tr {
   background: var(--bg);
