@@ -32,6 +32,10 @@ export default async function Invoice({ params }) {
   const p = inv.partners || {};
   const lines = inv.invoice_lines || [];
   const Y = (n) => `${yen(n)}円`;
+  const isCn = inv.kind === 'cancellation';
+  const { data: orig } = isCn && inv.cancels_invoice_id
+    ? await supabase.from('invoices').select('invoice_no, issued_on').eq('id', inv.cancels_invoice_id).maybeSingle()
+    : { data: null };
 
   return (
     <section className="wrap section" style={{ maxWidth: 860 }}>
@@ -48,8 +52,9 @@ export default async function Invoice({ params }) {
 
         <div className="doc-head">
           <h1 className="doc-title">
-            {I.title}
-            {inv.status === 'paid' && <span className="doc-stamp">{I.receipt}</span>}
+            {isCn ? I.cnTitle : I.title}
+            {!isCn && inv.status === 'paid' && <span className="doc-stamp">{I.receipt}</span>}
+            {inv.status === 'cancelled' && <span className="doc-stamp">{I.cancelledStamp}</span>}
           </h1>
           <dl className="doc-meta">
             <div>
@@ -115,10 +120,16 @@ export default async function Invoice({ params }) {
         </table>
         <p className="doc-tax">{I.taxLine(Y(inv.total_yen), Y(inv.tax_yen))}</p>
 
-        <div className="doc-pay">
-          <p className="doc-bank">{I.bank}</p>
-          <p className="doc-small">{onbText('ja').billing.transferName(p.partner_code)}</p>
-        </div>
+        {isCn ? (
+          <p className="doc-pay">{I.cancels(orig?.invoice_no || '—', orig?.issued_on || '—')}</p>
+        ) : (
+          inv.status !== 'cancelled' && (
+            <div className="doc-pay">
+              <p className="doc-bank">{I.bank}</p>
+              <p className="doc-small">{onbText('ja').billing.transferName(p.partner_code)}</p>
+            </div>
+          )
+        )}
         <p className="doc-foot">{I.issuer}</p>
       </article>
     </section>

@@ -12,7 +12,7 @@ export async function GET(request, { params }) {
   const { id } = await params;
   const [{ data: p }, { data: ms }] = await Promise.all([
     supabase.from('partners').select('partner_code, name, address').eq('id', id).maybeSingle(),
-    supabase.from('machines').select('machine_code, discount_codes, store_nos').eq('partner_id', id).not('machine_code', 'is', null).is('shipped_on', null).order('machine_no'),
+    supabase.from('machines').select('machine_code, discount_codes, store_nos').eq('partner_id', id).not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null).order('machine_no'),
   ]);
   if (!p || !ms?.length) return new Response('Not found', { status: 404 });
   const bytes = await setupRequestPdf({ date: jstToday(), partner: p, machines: ms }, await pdfAssets());

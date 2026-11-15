@@ -49,6 +49,27 @@ export async function orderMachine(fd) {
   redirect(`/portal/invoices/${data}`);
 }
 
+// Cancel an unpaid machine order (the partner's own).
+export async function cancelMyOrder(fd) {
+  const { supabase } = await requirePartner('/portal/billing');
+  const { error } = await supabase.rpc('cancel_my_machine_order', { p_invoice: s(fd, 'invoice', 40) });
+  revalidatePath('/portal');
+  go('/portal/billing', error ? { err: error.message } : { ok: 'orderCancelled' });
+}
+
+// Paid order not yet sent to Amano: ask 鈴江 to cancel it (sent as an inquiry; the refund is made by bank transfer).
+export async function requestCancel(fd) {
+  const { supabase, partner, O } = await requirePartner('/portal/billing');
+  const invoiceNo = s(fd, 'invoice_no', 40);
+  const { error } = await supabase.from('inquiries').insert({
+    partner_id: partner.id,
+    subject: O.billing.cancelRequestSubject(invoiceNo),
+    body: O.billing.cancelRequestBody(invoiceNo),
+  });
+  revalidatePath('/portal/inquiries');
+  go('/portal/billing', error ? { err: error.message } : { ok: 'cancelRequested' });
+}
+
 export async function sendInquiry(fd) {
   const { supabase, partner } = await requirePartner('/portal/inquiries');
   const subject = s(fd, 'subject', 200);

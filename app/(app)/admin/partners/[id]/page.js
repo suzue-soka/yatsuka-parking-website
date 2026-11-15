@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService, markAmanoOrdered, cancelMachineOrder } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -54,7 +54,15 @@ export default async function AdminPartner({ params, searchParams }) {
   const unpaidEquipment = (invoices || []).find((i) => i.kind === 'equipment' && i.status === 'published');
   const B = O.billing;
   // Paid, numbered machines not shipped yet: shown to Amano (setup request) and in the shipment form.
-  const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on);
+  const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on && !m.cancelled_at);
+  const notSentToAmano = toShip.filter((m) => !m.amano_ordered_on);
+  // Machine orders that can still be cancelled: not cancelled, nothing sent to Amano or shipped.
+  const cancellable = (invoices || []).filter(
+    (i) =>
+      i.kind === 'equipment' &&
+      ['published', 'paid'].includes(i.status) &&
+      !(machines || []).some((m) => m.equipment_invoice_id === i.id && (m.amano_ordered_on || m.shipped_on)),
+  );
 
   return (
     <section className="wrap section">
@@ -62,7 +70,7 @@ export default async function AdminPartner({ params, searchParams }) {
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>
-      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved }} />
+      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved, amanoOrdered: A.amanoOrderedDone, orderCancelled: A.orderCancelledDone }} />
 
       <div className="detail-layout">
         <div className="card">
@@ -181,6 +189,7 @@ export default async function AdminPartner({ params, searchParams }) {
                   <tr>
                     <th scope="col">{A.machineId}</th>
                     <th scope="col">{A.storeNo}・{A.discount}</th>
+                    <th scope="col">{A.amanoOrderedOn}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -194,15 +203,59 @@ export default async function AdminPartner({ params, searchParams }) {
                           </div>
                         ))}
                       </td>
+                      <td className="num">{m.amano_ordered_on || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <p style={{ marginBottom: 0 }}>
+              <p>
                 <a className="btn btn-line" href={`/admin/partners/${p.id}/setup-request`} target="_blank" rel="noopener">
                   {A.setupRequest}
                 </a>
               </p>
+              {notSentToAmano.length > 0 && (
+                <form action={markAmanoOrdered} className="form" style={{ marginBottom: 0 }}>
+                  <input type="hidden" name="id" value={p.id} />
+                  <label htmlFor="amano_date">{A.amanoOrderedOn}</label>
+                  <input id="amano_date" name="date" type="date" required defaultValue={jstToday()} max={jstToday()} />
+                  <p className="small muted" style={{ margin: 0 }}>{A.amanoOrderedHint}</p>
+                  <ConfirmButton className="btn btn-primary" message={A.amanoOrderedConfirm}>
+                    {A.amanoOrdered}
+                  </ConfirmButton>
+                </form>
+              )}
+            </div>
+          )}
+
+          {cancellable.length > 0 && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.cancelTitle}</h2>
+              <p className="small muted">{A.cancelHint}</p>
+              {cancellable.map((i) => {
+                const paid = (i.payments || []).reduce((sum, x) => sum + x.amount_yen, 0);
+                return (
+                  <form key={i.id} action={cancelMachineOrder} className="form" style={{ borderTop: '1px solid var(--line)', paddingTop: 10 }}>
+                    <input type="hidden" name="id" value={p.id} />
+                    <input type="hidden" name="invoice" value={i.id} />
+                    <p style={{ margin: 0 }}>
+                      <strong className="num">{i.invoice_no}</strong> · {T.yen(yen(i.total_yen))} · {B.invStatus[i.status]}
+                    </p>
+                    {paid > 0 && (
+                      <>
+                        <label htmlFor={`rf_on_${i.id}`}>{A.refundedOn}</label>
+                        <input id={`rf_on_${i.id}`} name="refunded_on" type="date" required max={jstToday()} />
+                        <label htmlFor={`rf_${i.id}`}>{A.refundAmount}</label>
+                        <input id={`rf_${i.id}`} name="refund" type="number" min="1" required defaultValue={paid} />
+                      </>
+                    )}
+                    <label htmlFor={`cn_${i.id}`}>{A.note}</label>
+                    <input id={`cn_${i.id}`} name="note" type="text" maxLength={500} />
+                    <ConfirmButton className="btn btn-line" message={paid > 0 ? A.cancelConfirmPaid : A.cancelConfirm}>
+                      {A.cancelOrder}
+                    </ConfirmButton>
+                  </form>
+                );
+              })}
             </div>
           )}
 
@@ -294,7 +347,8 @@ export default async function AdminPartner({ params, searchParams }) {
               <ul className="small" style={{ paddingLeft: 20, margin: 0 }}>
                 {machines.map((m) => (
                   <li key={m.id}>
-                    <strong className="num">{m.machine_code || A.notNumbered}</strong> ·{' '}
+                    <strong className="num">{m.machine_code || A.notNumbered}</strong>
+                    {m.cancelled_at ? ` （${A.cancelled}）` : ''} ·{' '}
                     {(m.discount_codes || []).map((code, i) => `${O.terms.store((m.store_nos || [])[i] ?? '—')} ${label(code)}`).join('、')} · {B.machine.serial}{' '}
                     {m.serial_no || '—'} · {B.machine.shipped} {m.shipped_on || '—'} · {m.carrier || ''} {m.tracking_no || ''}
                     {m.warranty_until ? ` · ${B.machine.warranty} ${m.warranty_until}` : ''}

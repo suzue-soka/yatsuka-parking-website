@@ -6,6 +6,10 @@ import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { onbText } from '@/lib/content/onboarding';
 import { adminLinks } from '@/lib/admin-links';
+import { markAllAmanoOrdered } from './actions';
+import ConfirmButton from '@/components/ConfirmButton';
+import Notice from '@/components/Notice';
+import { jstToday } from '@/lib/dates';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).admin.metaTitle, robots: { index: false, follow: false } };
@@ -22,11 +26,12 @@ export default async function AdminHome({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
-  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }] = await Promise.all([
+  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }] = await Promise.all([
     supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
     supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
     supabase.from('change_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('machines').select('id, machine_code').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null).is('amano_ordered_on', null).order('machine_code'),
   ]);
   const partners = (allPartners || []).filter((p) => p.partner_code && ['active', 'suspended', 'shipped'].includes(p.status));
   const byStatus = (st) => (allPartners || []).filter((p) => p.status === st).length;
@@ -61,6 +66,32 @@ export default async function AdminHome({ searchParams }) {
           </Link>
         ))}
       </div>
+
+      <Notice sp={sp} o={onbText(lang)} extra={{ amanoOrdered: o.amanoOrderedDone }} />
+      {(amanoWaiting || []).length > 0 && (
+        <div className="card" style={{ marginBottom: 16, borderColor: 'var(--orange)' }}>
+          <h2 style={{ marginTop: 0, fontSize: 20 }}>{o.amanoBatchTitle(amanoWaiting.length)}</h2>
+          <p className="small" style={{ marginTop: 0 }}>
+            {amanoWaiting.map((m) => m.machine_code).join('、')}
+          </p>
+          <p className="small muted">{o.amanoBatchHint}</p>
+          <p>
+            <a className="btn btn-line" href={`/admin/setup-request?ids=${amanoWaiting.map((m) => m.id).join(',')}`} target="_blank" rel="noopener">
+              {o.setupRequest}
+            </a>
+          </p>
+          <form action={markAllAmanoOrdered} className="form" style={{ marginBottom: 0 }}>
+            {amanoWaiting.map((m) => (
+              <input key={m.id} type="hidden" name="ids" value={m.id} />
+            ))}
+            <label htmlFor="amano_all_date">{o.amanoOrderedOn}</label>
+            <input id="amano_all_date" name="date" type="date" required defaultValue={jstToday()} max={jstToday()} />
+            <ConfirmButton className="btn btn-primary" message={o.amanoOrderedConfirm}>
+              {o.amanoOrdered}
+            </ConfirmButton>
+          </form>
+        </div>
+      )}
 
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>

@@ -86,6 +86,38 @@ export async function confirmPayment(fd) {
   back(id, error ? { err: error.message } : { ok: 'saved' });
 }
 
+// Dashboard: the combined setup request (all partners) was sent to Amano.
+export async function markAllAmanoOrdered(fd) {
+  const { supabase } = await requireAdmin();
+  const ids = fd.getAll('ids').map((v) => Number(v)).filter((n) => Number.isInteger(n) && n > 0);
+  const { error } = await supabase.rpc('mark_machines_amano_ordered', { p_machine_ids: ids, p_date: s(fd, 'date', 10) || null });
+  revalidatePath('/admin');
+  redirect(`/admin?${new URLSearchParams(error ? { err: error.message } : { ok: 'amanoOrdered' })}`);
+}
+
+export async function markAmanoOrdered(fd) {
+  const { supabase } = await requireAdmin();
+  const id = s(fd, 'id', 40);
+  const { error } = await supabase.rpc('mark_amano_ordered', { p_partner: id, p_date: s(fd, 'date', 10) || null });
+  revalidatePath('/admin');
+  back(id, error ? { err: error.message } : { ok: 'amanoOrdered' });
+}
+
+// Cancel a machine order that has not been sent to Amano; a paid order needs the refund.
+export async function cancelMachineOrder(fd) {
+  const { supabase } = await requireAdmin();
+  const id = s(fd, 'id', 40);
+  const amount = Number(s(fd, 'refund', 12)) || null;
+  const { error } = await supabase.rpc('cancel_machine_order', {
+    p_invoice: s(fd, 'invoice', 40),
+    p_refunded_on: s(fd, 'refunded_on', 10) || null,
+    p_refund_yen: amount,
+    p_note: s(fd, 'note', 500) || null,
+  });
+  revalidatePath('/admin');
+  back(id, error ? { err: error.message } : { ok: 'orderCancelled' });
+}
+
 export async function recordShipment(fd) {
   const { supabase } = await requireAdmin();
   const id = s(fd, 'id', 40);

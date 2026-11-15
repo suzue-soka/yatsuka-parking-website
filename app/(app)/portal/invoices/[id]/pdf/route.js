@@ -21,7 +21,10 @@ export async function GET(request, { params }) {
     .eq('id', id)
     .maybeSingle();
   if (!inv) return new Response('Not found', { status: 404 });
+  const { data: orig } = inv.kind === 'cancellation' && inv.cancels_invoice_id
+    ? await supabase.from('invoices').select('invoice_no, issued_on').eq('id', inv.cancels_invoice_id).maybeSingle()
+    : { data: null };
   // ?view=1 opens it in the browser instead of saving it.
   const view = new URL(request.url).searchParams.get('view');
-  return pdfResponse(await invoicePdf(inv, await pdfAssets()), `${inv.invoice_no}.pdf`, view ? 'inline' : 'attachment');
+  return pdfResponse(await invoicePdf(inv, await pdfAssets(), 'ja', orig), `${inv.invoice_no}.pdf`, view ? 'inline' : 'attachment');
 }

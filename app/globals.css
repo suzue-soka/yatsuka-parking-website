@@ -1365,3 +1365,15 @@ html {
   font-size: 20px;
   margin: 0 6px;
 }
+
+/* Machine orders still open (cancellation) */
+.open-orders {
+  margin: 12px 0 16px;
+}
+.open-order {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.open-order form {
+  margin-top: 6px;
+}

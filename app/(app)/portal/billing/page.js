@@ -7,7 +7,8 @@ import { onbText } from '@/lib/content/onboarding';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import { yen } from '@/lib/dates';
 import ShipmentInfo from '@/components/ShipmentInfo';
-import { orderMachine } from '../actions';
+import { orderMachine, cancelMyOrder, requestCancel } from '../actions';
+import ConfirmButton from '@/components/ConfirmButton';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -27,11 +28,18 @@ export default async function Billing({ searchParams }) {
   ]);
   const unpaid = (invoices || []).some((i) => i.status === 'published');
   const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
+  // Machine orders not completely shipped yet (can be cancelled until sent to Amano).
+  const openOrders = (invoices || []).filter(
+    (i) =>
+      i.kind === 'equipment' &&
+      ['published', 'paid'].includes(i.status) &&
+      (machines || []).some((m) => m.equipment_invoice_id === i.id && !m.shipped_on && !m.cancelled_at),
+  );
 
   return (
     <section className="wrap section">
       <PortalHeader title={B.title} email={claims.email} links={portalLinks(O)} />
-      <Notice sp={sp} o={O} />
+      <Notice sp={sp} o={O} extra={{ orderCancelled: B.orderCancelled, cancelRequested: B.cancelRequested }} />
 
       <div className="grid" style={{ alignItems: 'start' }}>
         <div className="card">
@@ -53,9 +61,48 @@ export default async function Billing({ searchParams }) {
               <strong>{O.status[p.status]}</strong>：{O.onboarding.next[p.status]}
             </p>
           )}
-          {(machines || []).map((m) => (
-            <ShipmentInfo key={m.id} machine={m} lang={lang} />
-          ))}
+          {openOrders.length > 0 && (
+            <div className="open-orders">
+              <h3 className="shipment-title">{B.openOrders}</h3>
+              {openOrders.map((i) => {
+                const ms = (machines || []).filter((m) => m.equipment_invoice_id === i.id);
+                const sent = ms.some((m) => m.amano_ordered_on || m.shipped_on);
+                return (
+                  <div key={i.id} className="open-order">
+                    <p style={{ margin: 0 }}>
+                      <Link href={`/portal/invoices/${i.id}`} className="num">
+                        {i.invoice_no}
+                      </Link>{' '}
+                      · {B.machineCount(ms.length)} · {T.yen(yen(i.total_yen))} · {B.invStatus[i.status]}
+                    </p>
+                    {i.status === 'published' && (
+                      <form action={cancelMyOrder}>
+                        <input type="hidden" name="invoice" value={i.id} />
+                        <ConfirmButton className="btn btn-line" message={B.cancelOrderConfirm}>
+                          {B.cancelOrder}
+                        </ConfirmButton>
+                      </form>
+                    )}
+                    {i.status === 'paid' && !sent && (
+                      <form action={requestCancel}>
+                        <input type="hidden" name="invoice_no" value={i.invoice_no} />
+                        <p className="small muted" style={{ margin: '4px 0' }}>{B.cancelPaidHint}</p>
+                        <ConfirmButton className="btn btn-line" message={B.requestCancelConfirm}>
+                          {B.requestCancel}
+                        </ConfirmButton>
+                      </form>
+                    )}
+                    {i.status === 'paid' && sent && <p className="small muted" style={{ margin: '4px 0 0' }}>{B.cannotCancel}</p>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {(machines || [])
+            .filter((m) => !m.cancelled_at)
+            .map((m) => (
+              <ShipmentInfo key={m.id} machine={m} lang={lang} />
+            ))}
         </div>
 
         <div className="card">
