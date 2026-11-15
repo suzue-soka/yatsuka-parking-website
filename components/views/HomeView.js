@@ -102,11 +102,15 @@ export default function HomeView({ lang = 'ja' }) {
               </p>
             )}
             <p className="lead">{c.hero.lead}</p>
-            <ul className="hero-facts">
-              {c.hero.facts.map((f) => (
-                <li key={f}>{f}</li>
+            <div className="hero-facts">
+              {c.hero.facts.map((row) => (
+                <ul key={row[0]}>
+                  {row.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
               ))}
-            </ul>
+            </div>
           </div>
           <Image src="/images/front.jpg" alt={c.hero.imgAlt} width={1600} height={900} priority sizes="(min-width: 900px) 560px, 100vw" />
         </div>

@@ -268,10 +268,16 @@ a {
   width: 100%;
 }
 .hero-facts {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hero-facts ul {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 20px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
