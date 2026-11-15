@@ -238,7 +238,7 @@ export default async function AdminPartner({ params, searchParams }) {
                       <td>
                         {(m.discount_codes || []).map((code, i) => (
                           <div key={code}>
-                            {O.terms.store((m.store_nos || [])[i] ?? '—')}：{label(code)}
+                            {A.btn((m.store_nos || [])[i] ?? '—')}：{label(code)}
                           </div>
                         ))}
                       </td>
@@ -324,7 +324,7 @@ export default async function AdminPartner({ params, searchParams }) {
               <ul className="small" style={{ paddingLeft: 20, margin: 0 }}>
                 {stores.map((s) => (
                   <li key={`${s.store_no}-${s.valid_from}`}>
-                    {O.terms.store(s.store_no)}：{label(s.discount_code)}（{s.valid_from}〜{s.valid_to || ''}）{s.note ? ` ${s.note}` : ''}
+                    {A.btn(s.store_no)}：{label(s.discount_code)}（{s.valid_from}〜{s.valid_to || ''}）{s.note ? ` ${s.note}` : ''}
                   </li>
                 ))}
               </ul>
@@ -342,7 +342,7 @@ export default async function AdminPartner({ params, searchParams }) {
                   <li key={m.id}>
                     <strong className="num">{m.machine_code || A.notNumbered}</strong>
                     {m.cancelled_at ? ` （${A.cancelled}）` : ''} ·{' '}
-                    {(m.discount_codes || []).map((code, i) => `${O.terms.store((m.store_nos || [])[i] ?? '—')} ${label(code)}`).join('、')} · {B.machine.serial}{' '}
+                    {(m.discount_codes || []).map((code, i) => `${A.btn((m.store_nos || [])[i] ?? '—')} ${label(code)}`).join('、')} · {B.machine.serial}{' '}
                     {m.serial_no || '—'} · {B.machine.shipped} {m.shipped_on || '—'} · {m.carrier || ''} {m.tracking_no || ''}
                     {m.warranty_until ? ` · ${B.machine.warranty} ${m.warranty_until}` : ''}
                     {m.delivery_note_no && (
