@@ -33,6 +33,10 @@ export default async function AdminPartners({ searchParams }) {
     // Any partner with an unpaid machine invoice, including additional orders from partners already preparing or active.
     const { data: unpaid } = await supabase.from('invoices').select('partner_id').eq('kind', 'equipment').eq('status', 'published');
     q = q.in('id', [...new Set((unpaid || []).map((i) => i.partner_id))]);
+  } else if (status === 'preparing') {
+    // Any partner with a paid machine not shipped yet, including additional machines of active partners.
+    const { data: waiting } = await supabase.from('machines').select('partner_id').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null);
+    q = q.in('id', [...new Set((waiting || []).map((m) => m.partner_id))]);
   } else if (status) q = q.eq('status', status);
   const { data: list } = await q;
 
