@@ -8,7 +8,7 @@ import { DISCOUNT_TYPES } from '@/lib/program-data';
 
 /** Shipping details of several machines as one table (partner dashboard): one row per machine,
  *  with a copy button for the tracking number and a link to each carrier's tracking page below. */
-export default function ShipmentTable({ machines, lang = 'ja' }) {
+export default function ShipmentTable({ machines, usedIds = [], lang = 'ja' }) {
   const M = onbText(lang).billing.machine;
   const T = appText(lang);
   const [copied, setCopied] = useState(null);
@@ -29,8 +29,13 @@ export default function ShipmentTable({ machines, lang = 'ja' }) {
     }
   }
 
-  // One tracking link per carrier: the carrier's page is the same for every tracking number.
-  const tracks = [...new Map(machines.filter((m) => m.tracking_no && carrierFor(m.carrier)).map((m) => [carrierFor(m.carrier).url, m])).values()];
+  // One tracking link per carrier (its page is the same for every tracking number), only while
+  // a shipped machine has not been used yet — first use shows it has arrived.
+  const tracks = [
+    ...new Map(
+      machines.filter((m) => m.tracking_no && carrierFor(m.carrier) && !usedIds.includes(m.id)).map((m) => [carrierFor(m.carrier).url, m]),
+    ).values(),
+  ];
 
   return (
     <div className="shipment">
