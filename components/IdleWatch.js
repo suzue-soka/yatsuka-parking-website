@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLang } from '@/components/LangProvider';
 import { appText } from '@/lib/content/app';
-import { IDLE_COOKIE, IDLE_MS, IDLE_WARN_MS } from '@/lib/idle';
+import { IDLE_COOKIE, IDLE_MS, IDLE_WARN_MS, IDLE_ENABLED } from '@/lib/idle';
 
 const readSeen = () => Number((document.cookie.match(new RegExp(`(?:^|;\\s*)${IDLE_COOKIE}=(\\d+)`)) || [])[1] || 0);
 const writeSeen = () => {
@@ -21,6 +21,7 @@ export default function IdleWatch() {
   const [warn, setWarn] = useState(false);
 
   useEffect(() => {
+    if (!IDLE_ENABLED) return undefined;
     let lastWrite = 0;
     const onActivity = () => {
       const now = Date.now();
