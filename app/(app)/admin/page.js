@@ -26,18 +26,20 @@ export default async function AdminHome({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
-  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }] = await Promise.all([
+  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }] = await Promise.all([
     supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
     supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
     supabase.from('change_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('machines').select('id, machine_code').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null).is('amano_ordered_on', null).order('machine_code'),
+    supabase.from('invoices').select('partner_id').eq('kind', 'equipment').eq('status', 'published'),
   ]);
+  const awaitingPayment = new Set((unpaidMachineInvoices || []).map((i) => i.partner_id)).size;
   const partners = (allPartners || []).filter((p) => p.partner_code && ['active', 'suspended', 'shipped'].includes(p.status));
   const byStatus = (st) => (allPartners || []).filter((p) => p.status === st).length;
   const todo = [
     { label: o.counts.applied, n: byStatus('applied'), href: '/admin/partners?status=applied' },
-    { label: o.counts.awaiting_payment, n: byStatus('awaiting_payment'), href: '/admin/partners?status=awaiting_payment' },
+    { label: o.counts.awaiting_payment, n: awaitingPayment, href: '/admin/partners?status=awaiting_payment' },
     { label: o.counts.preparing, n: byStatus('preparing'), href: '/admin/partners?status=preparing' },
     { label: o.counts.shipped, n: byStatus('shipped'), href: '/admin/partners?status=shipped' },
     { label: o.counts.inquiries, n: openInquiries ?? 0, href: '/admin/requests' },

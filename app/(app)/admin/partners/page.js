@@ -26,7 +26,11 @@ export default async function AdminPartners({ searchParams }) {
   const status = FILTERS.includes(sp?.status) ? sp.status : null;
 
   let q = supabase.from('partners').select('id, partner_code, name, category, status, created_at').order('created_at', { ascending: false });
-  if (status) q = q.eq('status', status);
+  if (status === 'awaiting_payment') {
+    // Any partner with an unpaid machine invoice, including additional orders from partners already preparing or active.
+    const { data: unpaid } = await supabase.from('invoices').select('partner_id').eq('kind', 'equipment').eq('status', 'published');
+    q = q.in('id', [...new Set((unpaid || []).map((i) => i.partner_id))]);
+  } else if (status) q = q.eq('status', status);
   const { data: rows } = await q;
 
   return (

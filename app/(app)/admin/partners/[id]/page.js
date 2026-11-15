@@ -158,7 +158,7 @@ export default async function AdminPartner({ params, searchParams }) {
             </div>
           )}
 
-          {p.status === 'awaiting_payment' && unpaidEquipment && (
+          {unpaidEquipment && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.payTitle}</h2>
               <p className="small">
