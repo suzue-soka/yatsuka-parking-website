@@ -947,3 +947,34 @@ html {
   font-size: 20px;
   white-space: nowrap;
 }
+
+/* Password field with show/hide eye button */
+.pw-field {
+  position: relative;
+}
+.pw-field input {
+  width: 100%;
+  padding-right: 52px !important;
+}
+.pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.pw-toggle:hover {
+  background: var(--bg);
+}
+.pw-toggle[aria-pressed='true'] {
+  color: var(--orange-text);
+}

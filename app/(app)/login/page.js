@@ -1,5 +1,7 @@
 'use client';
 
+import PasswordInput from '@/components/PasswordInput';
+
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -60,7 +62,7 @@ function LoginForm() {
         <label htmlFor="email">{t.email}</label>
         <input id="email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
         <label htmlFor="password">{t.password}</label>
-        <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <PasswordInput id="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && (
           <p className="alert" role="alert">
             {error}

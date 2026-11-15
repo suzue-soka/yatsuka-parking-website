@@ -1,5 +1,7 @@
 'use client';
 
+import PasswordInput from '@/components/PasswordInput';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -31,9 +33,9 @@ export default function SetPassword() {
       <h1 style={{ marginTop: 0, fontSize: 24 }}>{t.title}</h1>
       <form onSubmit={onSubmit} className="form">
         <label htmlFor="pw">{t.new}</label>
-        <input id="pw" type="password" autoComplete="new-password" required value={pw} onChange={(e) => setPw(e.target.value)} />
+        <PasswordInput id="pw" autoComplete="new-password" required value={pw} onChange={(e) => setPw(e.target.value)} />
         <label htmlFor="pw2">{t.again}</label>
-        <input id="pw2" type="password" autoComplete="new-password" required value={pw2} onChange={(e) => setPw2(e.target.value)} />
+        <PasswordInput id="pw2" autoComplete="new-password" required value={pw2} onChange={(e) => setPw2(e.target.value)} />
         {error && (
           <p className="alert" role="alert">
             {error}

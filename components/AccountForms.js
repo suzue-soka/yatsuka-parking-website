@@ -1,5 +1,7 @@
 'use client';
 
+import PasswordInput from '@/components/PasswordInput';
+
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useLang } from '@/components/LangProvider';
@@ -55,9 +57,9 @@ export default function AccountForms({ email }) {
       <form className="card form" onSubmit={changePassword}>
         <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.changePw}</h2>
         <label htmlFor="pw">{A.newPw}</label>
-        <input id="pw" name="pw" type="password" required autoComplete="new-password" />
+        <PasswordInput id="pw" name="pw" required autoComplete="new-password" />
         <label htmlFor="pw2">{A.newPw2}</label>
-        <input id="pw2" name="pw2" type="password" required autoComplete="new-password" />
+        <PasswordInput id="pw2" name="pw2" required autoComplete="new-password" />
         <Msg m={msg.pw} />
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {A.changePw}
