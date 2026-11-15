@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-const ORDER = ['approved', 'awaiting_payment', 'preparing', 'shipped', 'active'];
+// The machine shipment starts the service, so 発送 and ご利用開始 are one step.
+const ORDER = ['approved', 'awaiting_payment', 'preparing', 'active'];
 
 // Progress from approval to the start of service, with the partner's next step.
 export default function OnboardingCard({ status, O }) {

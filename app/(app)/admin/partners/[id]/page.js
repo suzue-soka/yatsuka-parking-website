@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService, markAmanoOrdered, cancelMachineOrder } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -286,41 +286,6 @@ export default async function AdminPartner({ params, searchParams }) {
                 <label htmlFor="shipped_on">{A.shippedOn}</label>
                 <input id="shipped_on" name="shipped_on" type="date" required defaultValue={jstToday()} />
                 <SubmitButton className="btn btn-primary">{A.ship}</SubmitButton>
-              </form>
-            </div>
-          )}
-
-          {p.status === 'shipped' && (
-            <div className="card" style={{ marginBottom: 16 }}>
-              <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.startTitle}</h2>
-              <form action={startService} className="form">
-                <input type="hidden" name="id" value={p.id} />
-                <label htmlFor="from">{A.startFrom}</label>
-                <input id="from" name="from" type="date" required defaultValue={jstToday()} />
-                {[0, 1].map((i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
-                    <div className="form">
-                      <label htmlFor={`store_no_${i}`}>
-                        {A.storeNo} {i + 1}
-                      </label>
-                      <input id={`store_no_${i}`} name={`store_no_${i}`} type="number" min="1" required={i === 0} />
-                    </div>
-                    <div className="form">
-                      <label htmlFor={`discount_${i}`}>{A.discount}</label>
-                      <select id={`discount_${i}`} name={`discount_${i}`} defaultValue={(p.requested_discounts || [])[i] || ''}>
-                        <option value="">—</option>
-                        {DISCOUNT_TYPES.map((d) => (
-                          <option key={d.code} value={d.code}>
-                            {T.discount(d.hours)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ))}
-                <SubmitButton className="btn btn-primary">
-                  {A.start}
-                </SubmitButton>
               </form>
             </div>
           )}

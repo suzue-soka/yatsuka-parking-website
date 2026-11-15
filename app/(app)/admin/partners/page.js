@@ -14,7 +14,7 @@ export async function generateMetadata() {
   return { title: onbText(await getAppLang()).admin.partners, robots: { index: false, follow: false } };
 }
 
-const FILTERS = ['applied', 'approved', 'awaiting_payment', 'preparing', 'shipped', 'active', 'rejected'];
+const FILTERS = ['applied', 'approved', 'awaiting_payment', 'preparing', 'active', 'rejected'];
 
 export default async function AdminPartners({ searchParams }) {
   const { supabase, claims } = await requireAdmin();

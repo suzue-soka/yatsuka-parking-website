@@ -41,7 +41,6 @@ export default async function AdminHome({ searchParams }) {
     { label: o.counts.applied, n: byStatus('applied'), href: '/admin/partners?status=applied' },
     { label: o.counts.awaiting_payment, n: awaitingPayment, href: '/admin/partners?status=awaiting_payment' },
     { label: o.counts.preparing, n: byStatus('preparing'), href: '/admin/partners?status=preparing' },
-    { label: o.counts.shipped, n: byStatus('shipped'), href: '/admin/partners?status=shipped' },
     { label: o.counts.inquiries, n: openInquiries ?? 0, href: '/admin/requests' },
     { label: o.counts.changes, n: pendingChanges ?? 0, href: '/admin/requests' },
   ];
