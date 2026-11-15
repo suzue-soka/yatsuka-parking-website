@@ -7,7 +7,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import { yen } from '@/lib/dates';
-import ShipmentInfo from '@/components/ShipmentInfo';
+import ShipmentTable from '@/components/ShipmentTable';
 import { requestMachines, orderRequest, withdrawRequest, cancelMyOrder } from '../actions';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import ConfirmButton from '@/components/ConfirmButton';
@@ -22,13 +22,17 @@ export default async function Billing({ searchParams }) {
   if (!p) return <p className="wrap section">{T.portal.noPartner}</p>;
   const B = O.billing;
   const sp = await searchParams;
-  const [{ data: price }, { data: invoices }, { data: payments }, { data: machines }] = await Promise.all([
+  const [{ data: price }, { data: invoices }, { data: machines }] = await Promise.all([
     supabase.from('price_list').select('unit_yen').eq('code', 'qr_validator').single(),
     supabase.from('invoices').select('id, invoice_no, kind, status, total_yen, issued_on, due_on').order('created_at', { ascending: false }),
-    supabase.from('payments').select('id, paid_on, method, amount_yen, invoices(invoice_no)').order('paid_on', { ascending: false }),
     supabase.from('machines').select('*').order('id'),
   ]);
-  const { data: requests } = await supabase.from('machine_requests').select('*').order('id', { ascending: false });
+  const [{ data: requests }, { data: firstUse }] = await Promise.all([
+    supabase.from('machine_requests').select('*').order('id', { ascending: false }),
+    supabase.rpc('first_use_date', { p_partner: p.id }),
+  ]);
+  // Paid machines (numbered), shipped or not yet, in machine-number order.
+  const shippedList = (machines || []).filter((m) => m.machine_code && !m.cancelled_at).sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0));
   const open = (requests || []).find((r) => ['pending', 'approved'].includes(r.status));
   const lastRejected = !open && requests?.[0]?.status === 'rejected' && requests[0].kind === 'additional' ? requests[0] : null;
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
@@ -140,11 +144,6 @@ export default async function Billing({ searchParams }) {
               })}
             </div>
           )}
-          {(machines || [])
-            .filter((m) => !m.cancelled_at)
-            .map((m) => (
-              <ShipmentInfo key={m.id} machine={m} lang={lang} />
-            ))}
         </div>
 
         <div className="card">
@@ -160,83 +159,14 @@ export default async function Billing({ searchParams }) {
         </div>
       </div>
 
-      <div className="card table-wrap" style={{ marginTop: 16 }}>
-        <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.invoicesTitle}</h2>
-        <SortableTable initial={0}>
-          <table>
-            <thead>
-              <tr>
-                {B.th.map((h) => (
-                  <th key={h} scope="col">
-                    {h}
-                  </th>
-                ))}
-                <th scope="col" />
-              </tr>
-            </thead>
-            <tbody>
-              {(invoices || []).length === 0 && (
-                <tr>
-                  <td colSpan={7} className="muted">
-                    {B.noInvoices}
-                  </td>
-                </tr>
-              )}
-              {(invoices || []).map((i) => (
-                <tr key={i.id}>
-                  <td className="num">{i.invoice_no}</td>
-                  <td>{B.kinds[i.kind]}</td>
-                  <td className="right num">{T.yen(yen(i.total_yen))}</td>
-                  <td className="num">{i.issued_on || '—'}</td>
-                  <td className="num">{i.due_on || '—'}</td>
-                  <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>{B.invStatus[i.status]}</td>
-                  <td>
-                    <Link href={`/portal/invoices/${i.id}`}>{B.view}</Link>
-                    {' ・ '}
-                    <a href={`/portal/invoices/${i.id}/pdf`} download>
-                      PDF
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </SortableTable>
-      </div>
-
-      <div className="card table-wrap" style={{ marginTop: 16 }}>
-        <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.paymentsTitle}</h2>
-        <SortableTable>
-          <table>
-            <thead>
-              <tr>
-                {B.pth.map((h) => (
-                  <th key={h} scope="col">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(payments || []).length === 0 && (
-                <tr>
-                  <td colSpan={4} className="muted">
-                    {B.noPayments}
-                  </td>
-                </tr>
-              )}
-              {(payments || []).map((x) => (
-                <tr key={x.id}>
-                  <td className="num">{x.paid_on}</td>
-                  <td className="num">{x.invoices?.invoice_no}</td>
-                  <td>{B.methods[x.method]}</td>
-                  <td className="right num">{T.yen(yen(x.amount_yen))}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </SortableTable>
-      </div>
+      {shippedList.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <ShipmentTable machines={shippedList} lang={lang} />
+          <p className="small" style={{ marginBottom: 0 }}>
+            {B.machine.firstUse}：{firstUse || B.machine.notUsedYet}
+          </p>
+        </div>
+      )}
     </section>
   );
 }

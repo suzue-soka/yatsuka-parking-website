@@ -6,7 +6,6 @@ import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import OnboardingCard from '@/components/OnboardingCard';
-import ShipmentTable from '@/components/ShipmentTable';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).portal.metaTitle, robots: { index: false, follow: false } };
@@ -25,17 +24,15 @@ export default async function Portal({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from, to } = monthRange(ym);
 
-  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: shipped }, { data: firstUse }] = await Promise.all([
+  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: payments }] = await Promise.all([
     supabase.from('partners').select('partner_code, name').eq('id', profile.partner_id).single(),
     supabase.from('store_numbers').select('store_no, note, valid_from, valid_to, discount_types(hours, unit_yen)').order('store_no'),
     supabase.rpc('monthly_charge', { p_partner: profile.partner_id, p_month: from }),
     supabase.rpc('my_validations', { p_from: from, p_to: to }),
-    supabase.from('invoices').select('invoice_no, kind, period_month, status, total_yen, due_on, issued_on').order('created_at', { ascending: false }).limit(24),
-    supabase.from('machines').select('*').not('shipped_on', 'is', null).order('id', { ascending: false }),
-    supabase.rpc('first_use_date', { p_partner: me.id }),
+    supabase.from('invoices').select('id, invoice_no, kind, period_month, status, total_yen, due_on, issued_on').order('created_at', { ascending: false }),
+    supabase.from('payments').select('id, paid_on, method, amount_yen, invoices(invoice_no)').order('paid_on', { ascending: false }),
   ]);
-  // Shipping details on the dashboard for 30 days after shipping (always on 認証機・お支払い).
-  const recent = (shipped || []).filter((m) => m.shipped_on && Date.now() - Date.parse(m.shipped_on) < 30 * 86400000);
+  const B = O.billing;
 
   const charge = chargeRows?.[0] || { validation_count: 0, gross_yen: 0, volume_rate: 0, total_yen: 0 };
   const today = jstToday();
@@ -54,14 +51,6 @@ export default async function Portal({ searchParams }) {
     <section className="wrap section">
       <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} links={portalLinks(O)} />
       <OnboardingCard status={me.status} O={O} />
-      {recent.length > 0 && (
-        <div className="card" style={{ marginBottom: 16 }}>
-          <ShipmentTable machines={[...recent].sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0))} lang={lang} />
-          <p className="small" style={{ marginBottom: 0 }}>
-            {O.billing.machine.firstUse}：{firstUse || O.billing.machine.notUsedYet}
-          </p>
-        </div>
-      )}
 
       <div className="grid">
         <div className="card stat">
@@ -141,25 +130,84 @@ export default async function Portal({ searchParams }) {
             ))}
           </ul>
         </div>
-        <div className="card">
-          <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.invoices}</h2>
-          {(invoices || []).length === 0 ? (
-            <p className="small muted">{t.noInvoices}</p>
-          ) : (
-            <ul className="small" style={{ paddingLeft: 20 }}>
-              {invoices.map((i) => (
-                <li key={i.invoice_no}>
-                  {i.invoice_no}
-                  {t.sep}
-                  {T.yen(yen(i.total_yen))}
-                  {t.sep}
-                  {t.status[i.status] || i.status}
-                  {i.due_on ? `${t.sep}${t.due(i.due_on)}` : ''}
-                </li>
+      </div>
+
+      <div className="card table-wrap" style={{ marginTop: 16 }}>
+        <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.invoicesTitle}</h2>
+        <SortableTable initial={0}>
+          <table>
+            <thead>
+              <tr>
+                {B.th.map((h) => (
+                  <th key={h} scope="col">
+                    {h}
+                  </th>
+                ))}
+                <th scope="col" />
+              </tr>
+            </thead>
+            <tbody>
+              {(invoices || []).length === 0 && (
+                <tr>
+                  <td colSpan={7} className="muted">
+                    {B.noInvoices}
+                  </td>
+                </tr>
+              )}
+              {(invoices || []).map((i) => (
+                <tr key={i.id}>
+                  <td className="num">{i.invoice_no}</td>
+                  <td>{B.kinds[i.kind]}</td>
+                  <td className="right num">{T.yen(yen(i.total_yen))}</td>
+                  <td className="num">{i.issued_on || '—'}</td>
+                  <td className="num">{i.due_on || '—'}</td>
+                  <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>{B.invStatus[i.status]}</td>
+                  <td>
+                    <Link href={`/portal/invoices/${i.id}`}>{B.view}</Link>
+                    {' ・ '}
+                    <a href={`/portal/invoices/${i.id}/pdf`} download>
+                      PDF
+                    </a>
+                  </td>
+                </tr>
               ))}
-            </ul>
-          )}
-        </div>
+            </tbody>
+          </table>
+        </SortableTable>
+      </div>
+
+      <div className="card table-wrap" style={{ marginTop: 16 }}>
+        <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.paymentsTitle}</h2>
+        <SortableTable>
+          <table>
+            <thead>
+              <tr>
+                {B.pth.map((h) => (
+                  <th key={h} scope="col">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {(payments || []).length === 0 && (
+                <tr>
+                  <td colSpan={4} className="muted">
+                    {B.noPayments}
+                  </td>
+                </tr>
+              )}
+              {(payments || []).map((x) => (
+                <tr key={x.id}>
+                  <td className="num">{x.paid_on}</td>
+                  <td className="num">{x.invoices?.invoice_no}</td>
+                  <td>{B.methods[x.method]}</td>
+                  <td className="right num">{T.yen(yen(x.amount_yen))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </SortableTable>
       </div>
     </section>
   );

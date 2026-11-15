@@ -1088,7 +1088,7 @@ html {
   font-weight: 600;
 }
 
-/* Machine shipping details (partner dashboard and 認証機・お支払い) */
+/* Machine shipping details (認証機 page) */
 .shipment + .shipment {
   margin-top: 20px;
   padding-top: 16px;
