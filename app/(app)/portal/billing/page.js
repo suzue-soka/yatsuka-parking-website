@@ -27,16 +27,13 @@ export default async function Billing({ searchParams }) {
     supabase.from('invoices').select('id, invoice_no, kind, status, total_yen, issued_on, due_on').order('created_at', { ascending: false }),
     supabase.from('machines').select('*').order('id'),
   ]);
-  const [{ data: requests }, { data: firstUse }, { data: machineUse }, { data: storeRows }] = await Promise.all([
+  const [{ data: requests }, { data: firstUse }, { data: storeRows }] = await Promise.all([
     supabase.from('machine_requests').select('*').order('id', { ascending: false }),
     supabase.rpc('first_use_date', { p_partner: p.id }),
-    supabase.rpc('machine_first_use', { p_partner: p.id }),
     supabase.from('store_numbers').select('store_no, note'),
   ]);
   // Notes registered for a 店No. (e.g. 透析用), shown next to the discount.
   const storeNotes = Object.fromEntries((storeRows || []).filter((r) => r.note).map((r) => [r.store_no, r.note]));
-  // Machines already used at least once (so they have arrived): no tracking link needed for them.
-  const usedIds = (machineUse || []).map((r) => r.machine_id);
   // Paid machines (numbered), shipped or not yet, in machine-number order.
   const shippedList = (machines || []).filter((m) => m.machine_code && !m.cancelled_at).sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0));
   const open = (requests || []).find((r) => ['pending', 'approved'].includes(r.status));
@@ -59,7 +56,7 @@ export default async function Billing({ searchParams }) {
 
       {shippedList.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          <ShipmentTable machines={shippedList} usedIds={usedIds} storeNotes={storeNotes} lang={lang} />
+          <ShipmentTable machines={shippedList} storeNotes={storeNotes} lang={lang} />
           <p className="small" style={{ marginBottom: 0 }}>
             {B.machine.firstUse}：{firstUse || B.machine.notUsedYet}
           </p>
