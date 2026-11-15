@@ -6,7 +6,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import OnboardingCard from '@/components/OnboardingCard';
-import ShipmentInfo from '@/components/ShipmentInfo';
+import ShipmentTable from '@/components/ShipmentTable';
 
 export async function generateMetadata() {
   return { title: appText(await getAppLang()).portal.metaTitle, robots: { index: false, follow: false } };
@@ -56,9 +56,7 @@ export default async function Portal({ searchParams }) {
       <OnboardingCard status={me.status} O={O} />
       {recent.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
-          {recent.map((m) => (
-            <ShipmentInfo key={m.id} machine={m} lang={lang} />
-          ))}
+          <ShipmentTable machines={[...recent].sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0))} lang={lang} />
           <p className="small" style={{ marginBottom: 0 }}>
             {O.billing.machine.firstUse}：{firstUse || O.billing.machine.notUsedYet}
           </p>
