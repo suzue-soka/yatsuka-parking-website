@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import PortalHeader from '@/components/PortalHeader';
 import Notice from '@/components/Notice';
-import ConfirmButton from '@/components/ConfirmButton';
+import MachineOrderForm from '@/components/MachineOrderForm';
 import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
@@ -26,6 +26,7 @@ export default async function Billing({ searchParams }) {
     supabase.from('machines').select('*').order('id'),
   ]);
   const unpaid = (invoices || []).some((i) => i.status === 'published');
+  const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
 
   return (
     <section className="wrap section">
@@ -35,14 +36,15 @@ export default async function Billing({ searchParams }) {
       <div className="grid" style={{ alignItems: 'start' }}>
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.machineTitle}</h2>
-          {p.status === 'approved' && (
+          {['approved', 'active'].includes(p.status) && !unpaidEquipment && (
             <>
-              <p>{B.orderText(T.yen(yen(price?.unit_yen ?? 40000)))}</p>
-              <form action={orderMachine}>
-                <ConfirmButton className="btn btn-primary" message={B.orderConfirm}>
-                  {B.order}
-                </ConfirmButton>
-              </form>
+              <p>{p.status === 'active' ? B.orderMoreText(T.yen(yen(price?.unit_yen ?? 40000))) : B.orderText(T.yen(yen(price?.unit_yen ?? 40000)))}</p>
+              <MachineOrderForm
+                action={orderMachine}
+                unitYen={price?.unit_yen ?? 40000}
+                defaults={p.requested_discounts || []}
+                labels={{ ...B.orderForm, discount: T.discount('{h}'), yenFormat: T.yen('{n}'), confirm: B.orderConfirm, submit: p.status === 'active' ? B.orderMore : B.order }}
+              />
             </>
           )}
           {p.status === 'applied' && <p className="muted">{B.notYet}</p>}

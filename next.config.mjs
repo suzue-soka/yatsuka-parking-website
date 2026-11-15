@@ -33,6 +33,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/portal/invoices/**': ['./assets/fonts/ipag.ttf', './public/images/logo-lockup.png'],
     '/portal/machines/**': ['./assets/fonts/ipag.ttf', './public/images/logo-lockup.png'],
+    '/admin/partners/**': ['./assets/fonts/ipag.ttf', './public/images/logo-lockup.png'],
   },
   // One 404 page for the whole site (the site has a root layout per language).
   experimental: {

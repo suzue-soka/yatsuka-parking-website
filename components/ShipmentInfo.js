@@ -3,12 +3,16 @@
 import { useState } from 'react';
 import { carrierFor } from '@/lib/carriers';
 import { onbText } from '@/lib/content/onboarding';
+import { appText } from '@/lib/content/app';
+import { DISCOUNT_TYPES } from '@/lib/program-data';
 
 /** Shipping details of one validation machine, for the partner: date, carrier, tracking
  *  number (with a copy button) and a link to the carrier's tracking page. */
 export default function ShipmentInfo({ machine: m, lang = 'ja', showTitle = true }) {
   const M = onbText(lang).billing.machine;
-  const title = showTitle ? M.shippedTitle : null;
+  const T = appText(lang);
+  const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
+  const title = showTitle ? (m.shipped_on ? M.shippedTitle : M.preparingTitle) : null;
   const [copied, setCopied] = useState(false);
   const carrier = carrierFor(m.carrier);
   const carrierName = carrier ? carrier[lang] || carrier.ja : m.carrier;
@@ -30,10 +34,24 @@ export default function ShipmentInfo({ machine: m, lang = 'ja', showTitle = true
       {title && <h3 className="shipment-title">{title}</h3>}
       <table className="kv">
         <tbody>
+          {m.machine_code && (
+            <tr>
+              <th scope="row">{M.machineId}</th>
+              <td className="num">
+                <strong>{m.machine_code}</strong>
+              </td>
+            </tr>
+          )}
           <tr>
             <th scope="row">{M.model}</th>
             <td>{m.model}</td>
           </tr>
+          {(m.discount_codes || []).length > 0 && (
+            <tr>
+              <th scope="row">{M.discounts}</th>
+              <td>{m.discount_codes.map((c) => (hours(c) ? T.discount(hours(c)) : c)).join('、')}</td>
+            </tr>
+          )}
           <tr>
             <th scope="row">{M.serial}</th>
             <td>{m.serial_no || '—'}</td>

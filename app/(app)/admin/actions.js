@@ -86,24 +86,17 @@ export async function confirmPayment(fd) {
   back(id, error ? { err: error.message } : { ok: 'saved' });
 }
 
-// 店No. per discount value, as given to Amano when ordering the machine.
-export async function setPlannedStores(fd) {
-  const { supabase } = await requireAdmin();
-  const id = s(fd, 'id', 40);
-  const stores = [0, 1]
-    .map((i) => ({ store_no: Number(s(fd, `store_no_${i}`, 6)), discount_code: s(fd, `discount_${i}`, 10) }))
-    .filter((x) => x.store_no > 0 && x.discount_code);
-  const { error } = await supabase.rpc('set_planned_stores', { p_partner: id, p_stores: stores });
-  revalidatePath('/admin');
-  back(id, error ? { err: error.message } : { ok: 'storesSaved' });
-}
-
 export async function recordShipment(fd) {
   const { supabase } = await requireAdmin();
   const id = s(fd, 'id', 40);
+  const serials = {};
+  for (const [k, v] of fd.entries()) {
+    const m = /^serial_(\d+)$/.exec(k);
+    if (m) serials[m[1]] = String(v).trim().slice(0, 100);
+  }
   const { error } = await supabase.rpc('record_shipment', {
     p_partner: id,
-    p_serial: s(fd, 'serial', 100),
+    p_serials: serials,
     p_carrier: s(fd, 'carrier', 100),
     p_tracking: s(fd, 'tracking', 100),
     p_shipped_on: s(fd, 'shipped_on', 10),
@@ -115,25 +108,26 @@ export async function recordShipment(fd) {
   // Tell the partner by email, in their language. The shipment stays recorded even if the email fails.
   let mailError = null;
   try {
-    const [{ data: p }, { data: m }, { data: prof }] = await Promise.all([
+    const [{ data: p }, { data: last }, { data: prof }] = await Promise.all([
       supabase.from('partners').select('name, partner_code, email, applied_lang').eq('id', id).single(),
-      supabase.from('machines').select('*').eq('partner_id', id).order('id', { ascending: false }).limit(1).single(),
+      supabase.from('machines').select('id, delivery_note_no').eq('partner_id', id).not('shipped_on', 'is', null).order('id', { ascending: false }).limit(1).single(),
       supabase.from('profiles').select('preferred_lang').eq('partner_id', id).limit(1).maybeSingle(),
     ]);
+    const { data: shipped } = await supabase.from('machines').select('*').eq('delivery_note_no', last.delivery_note_no).order('machine_no');
     if (!p?.email) throw new Error('no email address');
     const lang = prof?.preferred_lang || p.applied_lang || 'ja';
+    const m = shipped[0];
     const carrier = carrierFor(m?.carrier);
     const mail = shippedMail(lang, {
       name: p.name,
       code: p.partner_code,
-      model: m?.model,
-      serial: m?.serial_no,
+      machines: shipped.map((x) => ({ code: x.machine_code, model: x.model, serial: x.serial_no })),
       shippedOn: m?.shipped_on,
       carrierName: carrier ? carrier[lang] || carrier.ja : m?.carrier,
       carrierUrl: carrier?.url || null,
       tracking: m?.tracking_no,
       portalUrl: `${await origin()}/portal/billing`,
-      deliveryNoteUrl: m?.delivery_note_no ? `${await origin()}/portal/machines/${m.id}/delivery-note?download=1` : null,
+      deliveryNoteUrl: `${await origin()}/portal/machines/${m.id}/delivery-note?download=1`,
     });
     await sendMail({ to: p.email, ...mail });
   } catch (e) {

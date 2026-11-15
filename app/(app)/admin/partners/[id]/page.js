@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService, setPlannedStores } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, startService } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -53,6 +53,8 @@ export default async function AdminPartner({ params, searchParams }) {
   const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
   const unpaidEquipment = (invoices || []).find((i) => i.kind === 'equipment' && i.status === 'published');
   const B = O.billing;
+  // Paid, numbered machines not shipped yet: shown to Amano (setup request) and in the shipment form.
+  const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on);
 
   return (
     <section className="wrap section">
@@ -170,70 +172,53 @@ export default async function AdminPartner({ params, searchParams }) {
             </div>
           )}
 
-          {['approved', 'awaiting_payment', 'preparing'].includes(p.status) && (
+          {toShip.length > 0 && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.amanoTitle}</h2>
               <p className="small muted">{A.amanoHint}</p>
-              <form action={setPlannedStores} className="form">
-                <input type="hidden" name="id" value={p.id} />
-                {[0, 1].map((i) => {
-                  const planned = (p.planned_stores || [])[i];
-                  return (
-                    <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
-                      <div className="form">
-                        <label htmlFor={`ps_no_${i}`}>
-                          {A.storeNo} {i + 1}
-                        </label>
-                        <input id={`ps_no_${i}`} name={`store_no_${i}`} type="number" min="1" required={i === 0} defaultValue={planned?.store_no || ''} />
-                      </div>
-                      <div className="form">
-                        <label htmlFor={`ps_d_${i}`}>{A.discount}</label>
-                        <select id={`ps_d_${i}`} name={`discount_${i}`} defaultValue={planned?.discount_code || (p.requested_discounts || [])[i] || ''}>
-                          <option value="">—</option>
-                          {DISCOUNT_TYPES.map((d) => (
-                            <option key={d.code} value={d.code}>
-                              {T.discount(d.hours)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  );
-                })}
-                <SubmitButton className="btn btn-line">{A.saveStores}</SubmitButton>
-              </form>
-              {(p.planned_stores || []).length > 0 && (
-                <>
-                  <label className="small" htmlFor="amano-text" style={{ display: 'block', marginTop: 12 }}>
-                    {A.amanoCopy}
-                  </label>
-                  <textarea
-                    id="amano-text"
-                    readOnly
-                    rows={2 + p.planned_stores.length}
-                    style={{ width: '100%', fontFamily: 'inherit' }}
-                    defaultValue={[
-                      `提携店舗：${p.name}（${p.partner_code || ''}）`,
-                      ...p.planned_stores.map((x) => {
-                        const dt = DISCOUNT_TYPES.find((d) => d.code === x.discount_code);
-                        return `店No.${x.store_no}：${dt ? `${dt.hours}時間無料（${dt.yen.toLocaleString('ja-JP')}円）` : x.discount_code}`;
-                      }),
-                      '省スペース型QRコード割引券発行機 1台',
-                    ].join('\n')}
-                  />
-                </>
-              )}
+              <table className="kv">
+                <thead>
+                  <tr>
+                    <th scope="col">{A.machineId}</th>
+                    <th scope="col">{A.storeNo}・{A.discount}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {toShip.map((m) => (
+                    <tr key={m.id}>
+                      <td className="num">{m.machine_code}</td>
+                      <td>
+                        {(m.discount_codes || []).map((code, i) => (
+                          <div key={code}>
+                            {O.terms.store((m.store_nos || [])[i] ?? '—')}：{label(code)}
+                          </div>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p style={{ marginBottom: 0 }}>
+                <a className="btn btn-line" href={`/admin/partners/${p.id}/setup-request`} target="_blank" rel="noopener">
+                  {A.setupRequest}
+                </a>
+              </p>
             </div>
           )}
 
-          {p.status === 'preparing' && (
+          {toShip.length > 0 && (
             <div className="card" style={{ marginBottom: 16 }}>
               <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.shipTitle}</h2>
-              {!(p.planned_stores || []).length && <p className="alert">{A.needStores}</p>}
               <form action={recordShipment} className="form">
                 <input type="hidden" name="id" value={p.id} />
-                <label htmlFor="serial">{A.serial}</label>
-                <input id="serial" name="serial" type="text" maxLength={100} />
+                {toShip.map((m) => (
+                  <div key={m.id} className="form">
+                    <label htmlFor={`serial_${m.id}`}>
+                      {A.serial}（{m.machine_code}）
+                    </label>
+                    <input id={`serial_${m.id}`} name={`serial_${m.id}`} type="text" maxLength={100} />
+                  </div>
+                ))}
                 <label htmlFor="carrier">{A.carrier}</label>
                 <input id="carrier" name="carrier" type="text" maxLength={100} list="carrier-list" autoComplete="off" />
                 <datalist id="carrier-list">
@@ -247,9 +232,7 @@ export default async function AdminPartner({ params, searchParams }) {
                 <input id="received_on" name="received_on" type="date" required max={jstToday()} />
                 <label htmlFor="shipped_on">{A.shippedOn}</label>
                 <input id="shipped_on" name="shipped_on" type="date" required defaultValue={jstToday()} />
-                <SubmitButton className="btn btn-primary" disabled={!(p.planned_stores || []).length}>
-                  {A.ship}
-                </SubmitButton>
+                <SubmitButton className="btn btn-primary">{A.ship}</SubmitButton>
               </form>
             </div>
           )}
@@ -311,7 +294,9 @@ export default async function AdminPartner({ params, searchParams }) {
               <ul className="small" style={{ paddingLeft: 20, margin: 0 }}>
                 {machines.map((m) => (
                   <li key={m.id}>
-                    {m.model} · {B.machine.serial} {m.serial_no || '—'} · {B.machine.shipped} {m.shipped_on || '—'} · {m.carrier || ''} {m.tracking_no || ''}
+                    <strong className="num">{m.machine_code || A.notNumbered}</strong> ·{' '}
+                    {(m.discount_codes || []).map((code, i) => `${O.terms.store((m.store_nos || [])[i] ?? '—')} ${label(code)}`).join('、')} · {B.machine.serial}{' '}
+                    {m.serial_no || '—'} · {B.machine.shipped} {m.shipped_on || '—'} · {m.carrier || ''} {m.tracking_no || ''}
                     {m.warranty_until ? ` · ${B.machine.warranty} ${m.warranty_until}` : ''}
                     {m.delivery_note_no && (
                       <>

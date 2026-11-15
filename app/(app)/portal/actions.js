@@ -36,9 +36,14 @@ export async function requestChange(fd) {
   go('/portal/company', error ? { err: error.message } : { ok: 'sent' });
 }
 
-export async function orderMachine() {
+// Order 1–5 machines, each with its own 1–2 discount values (fields d_<machine>_<0|1>).
+export async function orderMachine(fd) {
   const { supabase } = await requirePartner('/portal/billing');
-  const { data, error } = await supabase.rpc('order_validation_machine');
+  const count = Math.min(5, Math.max(1, Number(fd.get('count')) || 1));
+  const items = Array.from({ length: count }, (_, i) => ({
+    discounts: [String(fd.get(`d_${i}_0`) || ''), String(fd.get(`d_${i}_1`) || '')].filter(Boolean),
+  }));
+  const { data, error } = await supabase.rpc('order_validation_machines', { p_items: items });
   revalidatePath('/portal');
   if (error) go('/portal/billing', { err: error.message });
   redirect(`/portal/invoices/${data}`);

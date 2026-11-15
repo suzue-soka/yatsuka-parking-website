@@ -1336,3 +1336,32 @@ html {
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* Machine order form: one box per machine */
+.order-machine {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px 12px;
+  margin: 0;
+}
+.order-machine legend {
+  font-weight: 700;
+  padding: 0 6px;
+}
+.order-machine-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .order-machine-row {
+    grid-template-columns: 1fr;
+  }
+}
+.order-total {
+  margin: 4px 0 0;
+}
+.order-total strong {
+  font-size: 20px;
+  margin: 0 6px;
+}
