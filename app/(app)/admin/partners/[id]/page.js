@@ -280,10 +280,7 @@ export default async function AdminPartner({ params, searchParams }) {
                       {c.ja}
                     </option>
                   ))}
-                  <option value="__other">{A.carrierOther}</option>
                 </select>
-                <label htmlFor="carrier_other">{A.carrierOtherName}</label>
-                <input id="carrier_other" name="carrier_other" type="text" maxLength={100} autoComplete="off" />
                 <label htmlFor="tracking">{A.tracking}</label>
                 <input id="tracking" name="tracking" type="text" maxLength={100} />
                 <label htmlFor="received_on">{A.receivedOn}</label>

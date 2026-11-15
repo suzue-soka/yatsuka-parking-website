@@ -129,7 +129,7 @@ export async function recordShipment(fd) {
   const { error } = await supabase.rpc('record_shipment', {
     p_partner: id,
     p_serials: serials,
-    p_carrier: (s(fd, 'carrier', 100) === '__other' ? s(fd, 'carrier_other', 100) : s(fd, 'carrier', 100)) || s(fd, 'carrier_other', 100),
+    p_carrier: s(fd, 'carrier', 100),
     p_tracking: s(fd, 'tracking', 100),
     p_shipped_on: s(fd, 'shipped_on', 10),
     p_received_on: s(fd, 'received_on', 10) || null,
