@@ -17,7 +17,7 @@ function LoginForm() {
   const t = appText(useLang()).login;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(params.get('error') === 'link' ? t.linkError : '');
+  const [error, setError] = useState(params.get('error') === 'link' ? t.linkError : params.get('timeout') === '1' ? t.timedOut : '');
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 

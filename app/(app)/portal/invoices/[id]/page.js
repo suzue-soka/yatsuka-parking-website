@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { createClient, getClaims } from '@/lib/supabase/server';
 import PrintButton from '@/components/PrintButton';
+import IdleWatch from '@/components/IdleWatch';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { onbText } from '@/lib/content/onboarding';
@@ -34,6 +35,7 @@ export default async function Invoice({ params }) {
 
   return (
     <section className="wrap section" style={{ maxWidth: 820 }}>
+      <IdleWatch />
       <p className="no-print">
         <PrintButton label={I.print} />
       </p>

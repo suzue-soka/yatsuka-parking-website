@@ -1,9 +1,11 @@
 import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
+import IdleWatch from '@/components/IdleWatch';
 
 export default function PortalHeader({ title, links = [], email, logout = 'ログアウト' }) {
   return (
     <div className="band" style={{ marginBottom: 20 }}>
+      <IdleWatch />
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
         <div>
           <p className="small" style={{ margin: 0 }}>
