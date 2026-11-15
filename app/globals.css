@@ -860,15 +860,9 @@ tbody tr {
     border: 0 !important;
     box-shadow: none !important;
   }
-  .invoice-brand .on-screen {
-    display: none !important;
-  }
-  .invoice-brand .on-paper {
-    display: block !important;
-  }
 }
 
-/* Invoice letterhead: solid logo on screen, outlined logo on paper (saves ink) */
+/* Invoice letterhead: solid logo, on screen and on paper */
 .invoice-brand {
   padding-bottom: 14px;
   margin-bottom: 18px;
@@ -878,9 +872,6 @@ tbody tr {
   display: block;
   height: 44px;
   width: auto;
-}
-.invoice-brand .on-paper {
-  display: none;
 }
 
 /* ---------- Admin detail page: wide information column + action column ---------- */
