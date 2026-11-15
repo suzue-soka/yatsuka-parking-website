@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SortableTable from '@/components/SortableTable';
 import { requireAdmin } from '@/lib/admin-guard';
 import PortalHeader from '@/components/PortalHeader';
 import { monthParam, monthRange, shiftMonth, jstDateTime, yen } from '@/lib/dates';
@@ -109,52 +110,54 @@ export default async function AdminHome({ searchParams }) {
           </div>
         </div>
         <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">{t.th[0]}</th>
-                <th scope="col">{t.th[1]}</th>
-                <th scope="col">{t.th[2]}</th>
-                {t.th.slice(3).map((h) => (
-                  <th key={h} scope="col" className="right">
-                    {h}
-                  </th>
+          <SortableTable>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">{t.th[0]}</th>
+                  <th scope="col">{t.th[1]}</th>
+                  <th scope="col">{t.th[2]}</th>
+                  {t.th.slice(3).map((h) => (
+                    <th key={h} scope="col" className="right">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {partners.map((p, i) => (
+                  <tr key={p.id}>
+                    <td className="num">{p.partner_code}</td>
+                    <td>{p.name}</td>
+                    <td className="small">
+                      {(p.store_numbers || [])
+                        .map((s) => `${s.store_no}：${T.discount(s.discount_types?.hours)}${s.note ? `（${s.note}）` : ''}`)
+                        .join(' / ')}
+                    </td>
+                    <td className="right num">{charges[i].validation_count}</td>
+                    <td className="right num">{T.yen(yen(charges[i].gross_yen))}</td>
+                    <td className="right num">{Math.round(Number(charges[i].volume_rate) * 100)}%</td>
+                    <td className="right num">
+                      <strong>{T.yen(yen(charges[i].total_yen))}</strong>
+                    </td>
+                  </tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {partners.map((p, i) => (
-                <tr key={p.id}>
-                  <td className="num">{p.partner_code}</td>
-                  <td>{p.name}</td>
-                  <td className="small">
-                    {(p.store_numbers || [])
-                      .map((s) => `${s.store_no}：${T.discount(s.discount_types?.hours)}${s.note ? `（${s.note}）` : ''}`)
-                      .join(' / ')}
+                <tr>
+                  <td colSpan={3}>
+                    <strong>{t.total}</strong>
                   </td>
-                  <td className="right num">{charges[i].validation_count}</td>
-                  <td className="right num">{T.yen(yen(charges[i].gross_yen))}</td>
-                  <td className="right num">{Math.round(Number(charges[i].volume_rate) * 100)}%</td>
                   <td className="right num">
-                    <strong>{T.yen(yen(charges[i].total_yen))}</strong>
+                    <strong>{totalCount}</strong>
+                  </td>
+                  <td />
+                  <td />
+                  <td className="right num">
+                    <strong>{T.yen(yen(totalYen))}</strong>
                   </td>
                 </tr>
-              ))}
-              <tr>
-                <td colSpan={3}>
-                  <strong>{t.total}</strong>
-                </td>
-                <td className="right num">
-                  <strong>{totalCount}</strong>
-                </td>
-                <td />
-                <td />
-                <td className="right num">
-                  <strong>{T.yen(yen(totalYen))}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </SortableTable>
         </div>
         <p className="small muted">{t.nextStage}</p>
       </div>
@@ -162,45 +165,47 @@ export default async function AdminHome({ searchParams }) {
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.runs}</h2>
         <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">{t.runTh[0]}</th>
-                <th scope="col">{t.runTh[1]}</th>
-                <th scope="col">{t.runTh[2]}</th>
-                {t.runTh.slice(3, 6).map((h) => (
-                  <th key={h} scope="col" className="right">
-                    {h}
-                  </th>
-                ))}
-                <th scope="col">{t.runTh[6]}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(runs || []).length === 0 && (
+          <SortableTable>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan={7} className="muted">
-                    {t.noRuns}
-                  </td>
+                  <th scope="col">{t.runTh[0]}</th>
+                  <th scope="col">{t.runTh[1]}</th>
+                  <th scope="col">{t.runTh[2]}</th>
+                  {t.runTh.slice(3, 6).map((h) => (
+                    <th key={h} scope="col" className="right">
+                      {h}
+                    </th>
+                  ))}
+                  <th scope="col">{t.runTh[6]}</th>
                 </tr>
-              )}
-              {(runs || []).map((r) => (
-                <tr key={r.id}>
-                  <td className="num">{jstDateTime(r.started_at)}</td>
-                  <td className={r.status === 'ok' ? 'ok' : 'warn'}>{t.run[r.status] || r.status}</td>
-                  <td className="num small">
-                    {r.period_from ? `${jstDateTime(r.period_from)} 〜 ${jstDateTime(r.period_to)}` : '—'}
-                  </td>
-                  <td className="right num">{r.rows_in_file ?? '—'}</td>
-                  <td className="right num">{r.rows_added ?? '—'}</td>
-                  <td className="right num">{r.rows_already_present ?? '—'}</td>
-                  <td className="small" style={{ whiteSpace: 'normal' }}>
-                    {r.message}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {(runs || []).length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="muted">
+                      {t.noRuns}
+                    </td>
+                  </tr>
+                )}
+                {(runs || []).map((r) => (
+                  <tr key={r.id}>
+                    <td className="num">{jstDateTime(r.started_at)}</td>
+                    <td className={r.status === 'ok' ? 'ok' : 'warn'}>{t.run[r.status] || r.status}</td>
+                    <td className="num small">
+                      {r.period_from ? `${jstDateTime(r.period_from)} 〜 ${jstDateTime(r.period_to)}` : '—'}
+                    </td>
+                    <td className="right num">{r.rows_in_file ?? '—'}</td>
+                    <td className="right num">{r.rows_added ?? '—'}</td>
+                    <td className="right num">{r.rows_already_present ?? '—'}</td>
+                    <td className="small" style={{ whiteSpace: 'normal' }}>
+                      {r.message}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </SortableTable>
         </div>
       </div>
     </section>

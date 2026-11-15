@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SortableTable from '@/components/SortableTable';
 import PortalHeader from '@/components/PortalHeader';
 import { monthParam, monthRange, shiftMonth, jstDate, jstToday, yen } from '@/lib/dates';
 import { getAppLang } from '@/lib/app-lang';
@@ -97,35 +98,37 @@ export default async function Portal({ searchParams }) {
           </div>
         </div>
         <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">{t.th[0]}</th>
-                <th scope="col" className="right">
-                  {t.th[1]}
-                </th>
-                <th scope="col" className="right">
-                  {t.th[2]}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {days.length === 0 && (
+          <SortableTable>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan={3} className="muted">
-                    {t.none}
-                  </td>
+                  <th scope="col">{t.th[0]}</th>
+                  <th scope="col" className="right">
+                    {t.th[1]}
+                  </th>
+                  <th scope="col" className="right">
+                    {t.th[2]}
+                  </th>
                 </tr>
-              )}
-              {days.map(([d, v]) => (
-                <tr key={d}>
-                  <td className="num">{d.replaceAll('-', '/')}</td>
-                  <td className="right num">{v.count}</td>
-                  <td className="right num">{T.yen(yen(v.amount))}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {days.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="muted">
+                      {t.none}
+                    </td>
+                  </tr>
+                )}
+                {days.map(([d, v]) => (
+                  <tr key={d}>
+                    <td className="num">{d.replaceAll('-', '/')}</td>
+                    <td className="right num">{v.count}</td>
+                    <td className="right num">{T.yen(yen(v.amount))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </SortableTable>
         </div>
       </div>
 
