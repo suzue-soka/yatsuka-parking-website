@@ -21,5 +21,7 @@ export async function GET(request, { params }) {
     .eq('id', id)
     .maybeSingle();
   if (!inv) return new Response('Not found', { status: 404 });
-  return pdfResponse(await invoicePdf(inv, await pdfAssets()), `${inv.invoice_no}.pdf`);
+  // ?view=1 opens it in the browser instead of saving it.
+  const view = new URL(request.url).searchParams.get('view');
+  return pdfResponse(await invoicePdf(inv, await pdfAssets()), `${inv.invoice_no}.pdf`, view ? 'inline' : 'attachment');
 }
