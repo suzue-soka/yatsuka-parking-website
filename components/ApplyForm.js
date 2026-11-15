@@ -171,7 +171,9 @@ export default function ApplyForm({ lang = 'ja' }) {
         <input id="document" name="document" type="file" accept="application/pdf,image/jpeg,image/png" required />
       </Field>
 
-      <h2>{t.sections.consent}</h2>
+      <h2>
+        {t.sections.consent} <span className="small muted">（{t.required}）</span>
+      </h2>
       <label className="check">
         <input type="checkbox" name="terms" required />
         <span>
