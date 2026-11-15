@@ -1,4 +1,5 @@
 import PortalHeader from '@/components/PortalHeader';
+import { priceLabel } from '@/lib/price-label';
 import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
 import { programText } from '@/lib/content/program';
@@ -31,12 +32,12 @@ export default async function Terms() {
             {current.length
               ? current.map((s) => (
                   <li key={s.store_no}>
-                    {R.store(s.store_no)}：{P.discountLabel(dt(s.discount_code)?.hours)}（{T.yen(yen(dt(s.discount_code)?.yen))}）
+                    {R.store(s.store_no)}：{priceLabel(T.yen(yen(dt(s.discount_code)?.yen)), P.discountLabel(dt(s.discount_code)?.hours))}
                   </li>
                 ))
               : (p.requested_discounts || []).map((c) => (
                   <li key={c}>
-                    {P.discountLabel(dt(c)?.hours)}（{T.yen(yen(dt(c)?.yen))}）
+                    {priceLabel(T.yen(yen(dt(c)?.yen)), P.discountLabel(dt(c)?.hours))}
                   </li>
                 ))}
           </ul>

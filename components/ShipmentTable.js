@@ -5,6 +5,7 @@ import { carrierFor } from '@/lib/carriers';
 import { onbText } from '@/lib/content/onboarding';
 import { appText } from '@/lib/content/app';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
+import { priceLabel } from '@/lib/price-label';
 
 /** Shipping details of several machines as one table (partner dashboard): one row per machine,
  *  with a copy button for the tracking number and a link to each carrier's tracking page below. */
@@ -14,13 +15,14 @@ export default function ShipmentTable({ machines, usedIds = [], storeNotes = {},
   const T = appText(lang);
   const [copied, setCopied] = useState(null);
   const type = (code) => DISCOUNT_TYPES.find((d) => d.code === code);
-  // 店No.12：1時間無料（¥300・透析用） — 店No. assigned at payment, price per validation, note.
+  // 店No.12：300円（1時間無料・透析用） — 店No. assigned at payment, price per validation, note.
   const discountLines = (m) =>
     (m.discount_codes || []).map((c, i) => {
       const d = type(c);
       const no = (m.store_nos || [])[i];
-      const extra = [d ? T.yen(d.yen.toLocaleString('ja-JP')) : null, no != null ? storeNotes[no] : null].filter(Boolean).join('・');
-      return `${no != null ? `${O.terms.store(no)}：` : ''}${d ? T.discount(d.hours) : c}${extra ? `（${extra}）` : ''}`;
+      const note = no != null ? storeNotes[no] : null;
+      const text = d ? priceLabel(T.yen(d.yen.toLocaleString('ja-JP')), T.discount(d.hours), note) : [c, note].filter(Boolean).join('・');
+      return `${no != null ? `${O.terms.store(no)}：` : ''}${text}`;
     });
   const carrierName = (m) => {
     const c = carrierFor(m.carrier);
