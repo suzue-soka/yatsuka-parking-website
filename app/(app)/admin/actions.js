@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/admin-guard';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendMail } from '@/lib/mail';
-import { shippedMail, requestApprovedMail } from '@/lib/content/mail';
+import { shippedMail, requestApprovedMail, mfaResetMail } from '@/lib/content/mail';
 import { appText } from '@/lib/content/app';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { carrierFor } from '@/lib/carriers';
@@ -148,6 +148,28 @@ export async function decideMachineRequest(fd) {
   }
   if (mailError) back(id, { warn: mailError, wk: 'reqNoMail' });
   back(id, { ok: 'reqDecided' });
+}
+
+// Reset a partner's two-step verification (after confirming their identity) and tell them by email.
+export async function resetPartnerMfa(fd) {
+  const { supabase } = await requireAdmin();
+  const id = s(fd, 'id', 40);
+  const { error } = await supabase.rpc('reset_partner_mfa', { p_partner: id });
+  if (error) back(id, { err: error.message });
+  let mailError = null;
+  try {
+    const [{ data: p }, { data: prof }] = await Promise.all([
+      supabase.from('partners').select('name, email, applied_lang').eq('id', id).single(),
+      supabase.from('profiles').select('preferred_lang').eq('partner_id', id).limit(1).maybeSingle(),
+    ]);
+    if (!p?.email) throw new Error('no email address');
+    const lang = prof?.preferred_lang || p.applied_lang || 'ja';
+    await sendMail({ to: p.email, ...mfaResetMail(lang, { name: p.name, loginUrl: `${await origin()}/login` }) });
+  } catch (e) {
+    mailError = e.message;
+  }
+  if (mailError) back(id, { warn: mailError, wk: 'mfaResetNoMail' });
+  back(id, { ok: 'mfaReset' });
 }
 
 export async function recordShipment(fd) {

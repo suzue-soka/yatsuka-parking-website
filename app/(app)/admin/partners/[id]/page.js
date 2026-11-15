@@ -12,7 +12,7 @@ import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
 import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
-import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder, decideMachineRequest } from '../../actions';
+import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder, decideMachineRequest, resetPartnerMfa } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
 
 export const dynamic = 'force-dynamic';
@@ -69,7 +69,7 @@ export default async function AdminPartner({ params, searchParams }) {
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>
-      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved, amanoOrdered: A.amanoOrderedDone, orderCancelled: A.orderCancelledDone, reqDecided: A.reqDecided, reqNoMail: A.reqNoMail }} />
+      <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite, shippedMailed: A.shippedMailed, shippedNoMail: A.shippedNoMail, storesSaved: A.storesSaved, amanoOrdered: A.amanoOrderedDone, orderCancelled: A.orderCancelledDone, reqDecided: A.reqDecided, reqNoMail: A.reqNoMail, mfaReset: A.mfaResetDone, mfaResetNoMail: A.mfaResetNoMail }} />
 
       <div className="detail-layout">
         <div className="card">
@@ -157,6 +157,19 @@ export default async function AdminPartner({ params, searchParams }) {
                 <SubmitButton className="btn btn-line" confirm={A.inviteConfirm}>
                   {A.invite}
                 </SubmitButton>
+              </form>
+            </div>
+          )}
+
+          {(accounts || []).length > 0 && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.mfaTitle}</h2>
+              <p className="small muted">{A.mfaHint}</p>
+              <form action={resetPartnerMfa} className="form" style={{ marginBottom: 0 }}>
+                <input type="hidden" name="id" value={p.id} />
+                <ConfirmButton className="btn btn-line" message={A.mfaResetConfirm}>
+                  {A.mfaReset}
+                </ConfirmButton>
               </form>
             </div>
           )}
