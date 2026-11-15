@@ -14,7 +14,7 @@ export default async function Account() {
   const A = O.account;
   return (
     <section className="wrap section">
-      <PortalHeader title={A.title} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <PortalHeader title={A.title} email={claims.email} links={portalLinks(O)} />
       <AccountForms email={claims.email} />
       <div className="card" style={{ marginTop: 16 }}>
         <p className="small" style={{ margin: 0 }}>{A.mfa}</p>

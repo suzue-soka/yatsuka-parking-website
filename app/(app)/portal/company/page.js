@@ -25,7 +25,7 @@ export default async function Company({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={C.title} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <PortalHeader title={C.title} email={claims.email} links={portalLinks(O)} />
       <Notice sp={sp} o={O} extra={{ sent: O.sent }} />
       <div className="grid" style={{ alignItems: 'start' }}>
         <div className="card">

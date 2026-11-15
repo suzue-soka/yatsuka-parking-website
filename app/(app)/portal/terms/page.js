@@ -23,7 +23,7 @@ export default async function Terms() {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={R.title} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <PortalHeader title={R.title} email={claims.email} links={portalLinks(O)} />
       <div className="grid" style={{ alignItems: 'start' }}>
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{current.length ? R.yourDiscounts : R.requested}</h2>

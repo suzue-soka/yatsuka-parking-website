@@ -17,7 +17,7 @@ export default async function ImportPage() {
   const t = T.import;
   return (
     <section className="wrap section">
-      <PortalHeader title={t.title} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+      <PortalHeader title={t.title} email={claims.email} links={adminLinks(lang)} />
       <ImportForm />
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0, fontSize: 18 }}>{t.rulesTitle}</h2>

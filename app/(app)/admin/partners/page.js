@@ -31,7 +31,7 @@ export default async function AdminPartners({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={O.admin.partners} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+      <PortalHeader title={O.admin.partners} email={claims.email} links={adminLinks(lang)} />
       <Notice sp={sp} o={O} extra={{ invited: `${sp?.name ? `${sp.name}：` : ''}${O.admin.invited}`, rejected: O.admin.rejectedDone }} />
       <div className="chips" style={{ marginBottom: 12 }}>
         <Link className={`chip${status ? '' : ' active'}`} href="/admin/partners">

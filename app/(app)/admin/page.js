@@ -50,7 +50,7 @@ export default async function AdminHome({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={t.title} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+      <PortalHeader title={t.title} email={claims.email} links={adminLinks(lang)} />
 
       <h2 style={{ fontSize: 20 }}>{o.todo}</h2>
       <div className="grid compact" style={{ marginBottom: 16 }}>

@@ -1,8 +1,8 @@
-import SubmitButton from '@/components/SubmitButton';
 import Link from 'next/link';
 import IdleWatch from '@/components/IdleWatch';
 
-export default function PortalHeader({ title, links = [], email, logout = 'ログアウト' }) {
+// Log-out is in the site toolbar (top right), next to 提携店舗ページへ / 管理画面へ.
+export default function PortalHeader({ title, links = [], email }) {
   return (
     <div className="band" style={{ marginBottom: 20 }}>
       <IdleWatch />
@@ -19,11 +19,6 @@ export default function PortalHeader({ title, links = [], email, logout = 'ロ�
               {l.label}
             </Link>
           ))}
-          <form action="/auth/signout" method="post">
-            <SubmitButton className="btn btn-ghost">
-              {logout}
-            </SubmitButton>
-          </form>
         </div>
       </div>
     </div>

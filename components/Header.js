@@ -35,7 +35,7 @@ export default function Header({ lang = 'ja', app = false }) {
             {l.label}
           </Link>
         ))}
-        <ToolbarAccount lang={lang} labels={{ login: c.nav.login, myPage: c.nav.myPage, admin: c.nav.adminPage }} />
+        <ToolbarAccount lang={lang} labels={{ login: c.nav.login, myPage: c.nav.myPage, admin: c.nav.adminPage, logout: c.nav.logout }} />
       </div>
     </nav>
     </>

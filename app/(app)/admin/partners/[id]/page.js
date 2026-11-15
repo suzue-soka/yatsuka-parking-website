@@ -54,7 +54,7 @@ export default async function AdminPartner({ params, searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={`${p.name}${p.partner_code ? `（${p.partner_code}）` : ''}`} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+      <PortalHeader title={`${p.name}${p.partner_code ? `（${p.partner_code}）` : ''}`} email={claims.email} links={adminLinks(lang)} />
       <p className="small">
         <Link href="/admin/partners">{A.back}</Link>
       </p>

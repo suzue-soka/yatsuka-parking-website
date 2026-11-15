@@ -157,7 +157,8 @@ a {
   padding-top: 8px;
   padding-bottom: 10px;
 }
-.toolbar a {
+.toolbar a,
+.toolbar-logout {
   flex: none;
   white-space: nowrap;
   text-decoration: none;
@@ -171,8 +172,29 @@ a {
   border-radius: 999px;
   background: var(--white);
 }
-.toolbar a:hover {
+.toolbar-logout {
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--navy);
+  cursor: pointer;
+}
+.toolbar a:hover,
+.toolbar-logout:hover {
   background: var(--bg);
+}
+.toolbar-logout:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.toolbar-account {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.toolbar-account form {
+  display: inline-flex;
+  margin: 0;
 }
 .toolbar a.toolbar-login {
   background: var(--navy);
@@ -189,12 +211,13 @@ a {
     top: 0;
     z-index: 50;
   }
-  .toolbar a {
+  .toolbar a,
+  .toolbar-logout {
     font-size: 15px;
     padding: 8px 14px;
     min-height: 40px;
   }
-  .toolbar a.toolbar-login {
+  .toolbar-account {
     margin-left: auto;
   }
 }

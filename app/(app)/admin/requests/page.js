@@ -35,7 +35,7 @@ export default async function AdminRequests({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={A.requests} email={claims.email} links={adminLinks(lang)} logout={T.logout} />
+      <PortalHeader title={A.requests} email={claims.email} links={adminLinks(lang)} />
       <Notice sp={sp} o={O} />
 
       <h2 style={{ fontSize: 20 }}>{A.inquiries}</h2>

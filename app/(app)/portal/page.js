@@ -46,7 +46,7 @@ export default async function Portal({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <PortalHeader title={`${partner?.name ?? ''}（${partner?.partner_code ?? ''}）`} email={claims.email} links={portalLinks(O)} />
       <OnboardingCard status={me.status} O={O} />
 
       <div className="grid">

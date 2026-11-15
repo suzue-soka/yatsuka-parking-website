@@ -28,7 +28,7 @@ export default async function Billing({ searchParams }) {
 
   return (
     <section className="wrap section">
-      <PortalHeader title={B.title} email={claims.email} logout={T.logout} links={portalLinks(O)} />
+      <PortalHeader title={B.title} email={claims.email} links={portalLinks(O)} />
       <Notice sp={sp} o={O} />
 
       <div className="grid" style={{ alignItems: 'start' }}>
