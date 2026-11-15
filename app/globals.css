@@ -927,3 +927,41 @@ tbody tr {
     box-shadow: none !important;
   }
 }
+
+/* ---------- Admin detail page: wide information column + action column ---------- */
+.detail-layout {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+@media (min-width: 1000px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(320px, 2fr);
+  }
+}
+table.kv {
+  font-size: 15px;
+}
+table.kv th,
+table.kv td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+  padding: 10px 12px;
+}
+table.kv th {
+  width: 11em;
+  color: var(--muted, #5b6b7f);
+  font-weight: 700;
+}
+@media (max-width: 599px) {
+  table.kv th,
+  table.kv td {
+    display: block;
+    width: auto;
+    padding: 4px 0;
+  }
+  table.kv th {
+    padding-top: 12px;
+  }
+}

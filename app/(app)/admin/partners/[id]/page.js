@@ -21,10 +21,8 @@ export async function generateMetadata() {
 function Row({ label, children }) {
   return (
     <tr>
-      <th scope="row" style={{ width: '34%' }}>
-        {label}
-      </th>
-      <td style={{ whiteSpace: 'normal' }}>{children ?? '—'}</td>
+      <th scope="row">{label}</th>
+      <td>{children ?? '—'}</td>
     </tr>
   );
 }
@@ -61,10 +59,10 @@ export default async function AdminPartner({ params, searchParams }) {
       </p>
       <Notice sp={sp} o={O} extra={{ invited: A.invited, warnPrefix: A.approvedNoInvite }} />
 
-      <div className="grid" style={{ alignItems: 'start' }}>
-        <div className="card table-wrap">
+      <div className="detail-layout">
+        <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{A.application}</h2>
-          <table>
+          <table className="kv">
             <tbody>
               <Row label={F.status}>
                 <span className="status-pill">{O.status[p.status] || p.status}</span>
