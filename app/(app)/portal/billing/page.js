@@ -51,6 +51,14 @@ export default async function Billing({ searchParams }) {
       <PortalHeader title={B.title} email={claims.email} links={portalLinks(O)} />
       <Notice sp={sp} o={O} extra={{ orderCancelled: B.orderCancelled, requested: B.requested, withdrawn: B.withdrawn }} />
 
+      {shippedList.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <ShipmentTable machines={shippedList} lang={lang} />
+          <p className="small" style={{ marginBottom: 0 }}>
+            {B.machine.firstUse}：{firstUse || B.machine.notUsedYet}
+          </p>
+        </div>
+      )}
       <div>
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{B.machineTitle}</h2>
@@ -146,14 +154,6 @@ export default async function Billing({ searchParams }) {
 
       </div>
 
-      {shippedList.length > 0 && (
-        <div className="card" style={{ marginTop: 16 }}>
-          <ShipmentTable machines={shippedList} lang={lang} />
-          <p className="small" style={{ marginBottom: 0 }}>
-            {B.machine.firstUse}：{firstUse || B.machine.notUsedYet}
-          </p>
-        </div>
-      )}
     </section>
   );
 }
