@@ -24,9 +24,8 @@ export default async function Portal({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from, to } = monthRange(ym);
 
-  const [{ data: partner }, { data: stores }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: payments }] = await Promise.all([
+  const [{ data: partner }, { data: chargeRows }, { data: rows }, { data: invoices }, { data: payments }] = await Promise.all([
     supabase.from('partners').select('partner_code, name').eq('id', profile.partner_id).single(),
-    supabase.from('store_numbers').select('store_no, note, valid_from, valid_to, discount_types(hours, unit_yen)').order('store_no'),
     supabase.rpc('monthly_charge', { p_partner: profile.partner_id, p_month: from }),
     supabase.rpc('my_validations', { p_from: from, p_to: to }),
     supabase.from('invoices').select('id, invoice_no, kind, period_month, status, total_yen, due_on, issued_on').order('created_at', { ascending: false }),
@@ -116,19 +115,6 @@ export default async function Portal({ searchParams }) {
               </tbody>
             </table>
           </SortableTable>
-        </div>
-      </div>
-
-      <div className="grid" style={{ marginTop: 16, alignItems: 'start' }}>
-        <div className="card">
-          <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.machines}</h2>
-          <ul className="small" style={{ paddingLeft: 20 }}>
-            {(stores || []).map((s) => (
-              <li key={`${s.store_no}-${s.valid_from}`}>
-                {t.store(s.store_no)}：{T.discount(s.discount_types?.hours)}（{T.yen(yen(s.discount_types?.unit_yen ?? 0))}）{s.note ? `${t.sep}${s.note}` : ''}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 

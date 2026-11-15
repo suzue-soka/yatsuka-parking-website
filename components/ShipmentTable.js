@@ -8,11 +8,20 @@ import { DISCOUNT_TYPES } from '@/lib/program-data';
 
 /** Shipping details of several machines as one table (partner dashboard): one row per machine,
  *  with a copy button for the tracking number and a link to each carrier's tracking page below. */
-export default function ShipmentTable({ machines, usedIds = [], lang = 'ja' }) {
-  const M = onbText(lang).billing.machine;
+export default function ShipmentTable({ machines, usedIds = [], storeNotes = {}, lang = 'ja' }) {
+  const O = onbText(lang);
+  const M = O.billing.machine;
   const T = appText(lang);
   const [copied, setCopied] = useState(null);
-  const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
+  const type = (code) => DISCOUNT_TYPES.find((d) => d.code === code);
+  // 店No.12：1時間無料（¥300・透析用） — 店No. assigned at payment, price per validation, note.
+  const discountLines = (m) =>
+    (m.discount_codes || []).map((c, i) => {
+      const d = type(c);
+      const no = (m.store_nos || [])[i];
+      const extra = [d ? T.yen(d.yen.toLocaleString('ja-JP')) : null, no != null ? storeNotes[no] : null].filter(Boolean).join('・');
+      return `${no != null ? `${O.terms.store(no)}：` : ''}${d ? T.discount(d.hours) : c}${extra ? `（${extra}）` : ''}`;
+    });
   const carrierName = (m) => {
     const c = carrierFor(m.carrier);
     return c ? c[lang] || c.ja : m.carrier;
@@ -45,7 +54,7 @@ export default function ShipmentTable({ machines, usedIds = [], lang = 'ja' }) {
           <thead>
             <tr>
               <th scope="col">{M.machineId}</th>
-              <th scope="col">{M.discounts}</th>
+              <th scope="col">{M.storeDiscounts}</th>
               <th scope="col">{M.serial}</th>
               <th scope="col">{M.shipped}</th>
               <th scope="col">{M.carrier}</th>
@@ -60,7 +69,15 @@ export default function ShipmentTable({ machines, usedIds = [], lang = 'ja' }) {
                 <td className="num">
                   <strong>{m.machine_code || '—'}</strong>
                 </td>
-                <td>{(m.discount_codes || []).map((c) => (hours(c) ? T.discount(hours(c)) : c)).join('、') || '—'}</td>
+                <td>
+                  {discountLines(m).length
+                    ? discountLines(m).map((l) => (
+                        <div key={l} style={{ whiteSpace: 'nowrap' }}>
+                          {l}
+                        </div>
+                      ))
+                    : '—'}
+                </td>
                 <td className="num">{m.serial_no || '—'}</td>
                 <td className="num">{m.shipped_on || '—'}</td>
                 <td>{carrierName(m) || '—'}</td>
