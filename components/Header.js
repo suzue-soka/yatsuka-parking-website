@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getContent } from '@/lib/content';
 import { href } from '@/lib/i18n';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ToolbarAccount from '@/components/ToolbarAccount';
 
 export default function Header({ lang = 'ja', app = false }) {
   const c = getContent(lang);
@@ -34,9 +35,7 @@ export default function Header({ lang = 'ja', app = false }) {
             {l.label}
           </Link>
         ))}
-        <a className="toolbar-login" href={lang === 'ja' ? '/login' : `/login?lang=${lang}`}>
-          {c.nav.login}
-        </a>
+        <ToolbarAccount lang={lang} labels={{ login: c.nav.login, myPage: c.nav.myPage, admin: c.nav.adminPage }} />
       </div>
     </nav>
     </>
