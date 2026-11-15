@@ -1033,3 +1033,9 @@ html {
   font-weight: 700;
   color: var(--navy);
 }
+.confirm-box {
+  border: 2px solid var(--orange);
+  background: #fff8f2;
+  border-radius: 12px;
+  padding: 14px 16px;
+}

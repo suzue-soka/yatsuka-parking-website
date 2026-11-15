@@ -34,7 +34,7 @@ export async function approveApplication(fd) {
   const id = s(fd, 'id', 40);
   const { error } = await supabase.rpc('approve_application', { p_partner: id });
   if (error) back(id, { err: error.message });
-  const { data: partner } = await supabase.from('partners').select('id, email, applied_lang').eq('id', id).single();
+  const { data: partner } = await supabase.from('partners').select('id, name, email, applied_lang').eq('id', id).single();
   let inviteError = null;
   try {
     await invite(partner);
@@ -42,7 +42,10 @@ export async function approveApplication(fd) {
     inviteError = e.message;
   }
   revalidatePath('/admin');
-  back(id, inviteError ? { warn: inviteError } : { ok: 'invited' });
+  revalidatePath('/admin/partners');
+  // Back to the list, where the row now shows 承認済み.
+  if (inviteError) back(id, { warn: inviteError });
+  redirect(`/admin/partners?${new URLSearchParams({ ok: 'invited', name: partner?.name || '' })}`);
 }
 
 export async function resendInvite(fd) {
@@ -62,7 +65,9 @@ export async function rejectApplication(fd) {
   const id = s(fd, 'id', 40);
   const { error } = await supabase.rpc('reject_application', { p_partner: id, p_note: s(fd, 'note', 1000) || null });
   revalidatePath('/admin');
-  back(id, error ? { err: error.message } : { ok: 'saved' });
+  revalidatePath('/admin/partners');
+  if (error) back(id, { err: error.message });
+  redirect(`/admin/partners?${new URLSearchParams({ ok: 'rejected' })}`);
 }
 
 export async function confirmPayment(fd) {
