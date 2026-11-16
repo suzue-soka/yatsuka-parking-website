@@ -14,7 +14,7 @@ import { jstToday, yen } from '@/lib/dates';
 import { dueDate, addMonths } from '@/lib/holidays';
 import { billingMonth } from '@/lib/billing';
 import AutoPublishToggle from './AutoPublishToggle';
-import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts } from './actions';
+import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts, confirmPaymentInline } from './actions';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -30,6 +30,8 @@ export default async function AdminBilling({ searchParams }) {
   const sp = await searchParams;
   const today = jstToday();
   const n = sp?.n || '0';
+  const A = O.admin;
+  const unpaidOnly = sp?.unpaid === '1';
 
   const [{ data: settings }, { data: drafts }, { data: recent }, { data: runs }] = await Promise.all([
     supabase.from('billing_settings').select('auto_publish').eq('id', 1).maybeSingle(),
@@ -42,7 +44,7 @@ export default async function AdminBilling({ searchParams }) {
       .from('invoices')
       .select('id, invoice_no, period_month, total_yen, issued_on, due_on, status, partners(partner_code, name)')
       .eq('kind', 'monthly')
-      .neq('status', 'draft')
+      .in('status', unpaidOnly ? ['published'] : ['published', 'paid', 'cancelled'])
       .order('issued_on', { ascending: false })
       .limit(200),
     supabase.from('billing_runs').select('month'),
@@ -83,6 +85,7 @@ export default async function AdminBilling({ searchParams }) {
           published: t.published(n),
           redone: t.redone(n),
           mail: t.publishedMailErr(n, ''),
+          paid: t.paidDone(sp?.no || ''),
         }}
       />
       <p className="small muted">{t.rule}</p>
@@ -174,7 +177,12 @@ export default async function AdminBilling({ searchParams }) {
       ))}
 
       <div className="card table-wrap">
-        <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.recentTitle}</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
+          <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.recentTitle}</h2>
+          <Link className="chip" href={unpaidOnly ? '/admin/billing' : '/admin/billing?unpaid=1'}>
+            {unpaidOnly ? t.showAll : t.unpaidOnly}
+          </Link>
+        </div>
         {(recent || []).length === 0 ? (
           <p className="small muted">{t.noRecent}</p>
         ) : (
@@ -202,7 +210,29 @@ export default async function AdminBilling({ searchParams }) {
                     <td className="right num">{T.yen(yen(i.total_yen))}</td>
                     <td className="num">{i.issued_on}</td>
                     <td className="num">{i.due_on}</td>
-                    <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>{O.billing.invStatus[i.status]}</td>
+                    <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>
+                      {i.status === 'published' ? (
+                        // Unpaid: click to confirm the bank transfer right here (date and amount prefilled).
+                        <details className="pay-inline">
+                          <summary>{O.billing.invStatus[i.status]}</summary>
+                          <form action={confirmPaymentInline} className="pay-inline-form">
+                            <input type="hidden" name="invoice" value={i.id} />
+                            <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
+                            <label>
+                              {A.paidOn}
+                              <input name="paid_on" type="date" required defaultValue={today} />
+                            </label>
+                            <label>
+                              {A.amount}
+                              <input name="amount" type="number" min="1" required defaultValue={i.total_yen} />
+                            </label>
+                            <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>
+                          </form>
+                        </details>
+                      ) : (
+                        O.billing.invStatus[i.status]
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

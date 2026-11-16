@@ -75,3 +75,20 @@ export async function redoDrafts(fd) {
   if (delErr) back({ err: delErr.message });
   await draftAndMaybePublish(supabase, month, 'redone', { neverPublish: true });
 }
+
+// Confirm a bank transfer directly from the issued-invoices list (unpaid status → small form).
+export async function confirmPaymentInline(fd) {
+  const { supabase } = await requireAdmin();
+  const invoice = s(fd, 'invoice', 40);
+  const keep = s(fd, 'unpaid', 1) === '1' ? { unpaid: '1' } : {};
+  const { data: inv } = await supabase.from('invoices').select('invoice_no').eq('id', invoice).maybeSingle();
+  const { error } = await supabase.rpc('confirm_bank_payment', {
+    p_invoice: invoice,
+    p_paid_on: s(fd, 'paid_on', 10),
+    p_amount: Number(s(fd, 'amount', 12)),
+    p_note: null,
+  });
+  revalidatePath('/admin');
+  revalidatePath('/portal');
+  back(error ? { ...keep, err: error.message } : { ...keep, ok: 'paid', no: inv?.invoice_no || '' });
+}
