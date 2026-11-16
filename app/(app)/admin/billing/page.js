@@ -14,6 +14,7 @@ import { jstToday, yen } from '@/lib/dates';
 import { dueDate, addMonths } from '@/lib/holidays';
 import { billingMonth } from '@/lib/billing';
 import AutoPublishToggle from './AutoPublishToggle';
+import ScrollToHash from '@/components/ScrollToHash';
 import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts, confirmPaymentInline } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -175,6 +176,7 @@ export default async function AdminBilling({ searchParams }) {
         </div>
       ))}
 
+      <ScrollToHash token={`${sp?.paid || ''}${sp?.perr || ''}${sp?.unpaid || ''}`} />
       <div id="issued" className="card table-wrap" style={{ scrollMarginTop: 90 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.recentTitle}</h2>
