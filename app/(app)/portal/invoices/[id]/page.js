@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { createClient, getClaims } from '@/lib/supabase/server';
 import PrintButton from '@/components/PrintButton';
+import BackButton from '@/components/BackButton';
 import IdleWatch from '@/components/IdleWatch';
 import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
@@ -35,6 +36,9 @@ export default async function Invoice({ params }) {
   const isCn = inv.kind === 'cancellation';
   // Drafts have no number or issue date yet: view only, never printed or downloaded.
   const isDraft = inv.status === 'draft';
+  // Where 戻る goes when the page was opened directly (admins: invoice list, partners: dashboard).
+  const { data: me } = await supabase.from('profiles').select('role').eq('id', claims.sub).maybeSingle();
+  const backTo = me?.role === 'admin' ? '/admin/billing' : '/portal';
   const { data: orig } = isCn && inv.cancels_invoice_id
     ? await supabase.from('invoices').select('invoice_no, issued_on').eq('id', inv.cancels_invoice_id).maybeSingle()
     : { data: null };
@@ -42,16 +46,19 @@ export default async function Invoice({ params }) {
   return (
     <section className="wrap section" style={{ maxWidth: 860 }}>
       <IdleWatch />
-      {isDraft ? (
-        <p className="alert no-print">{L.draftNote}</p>
-      ) : (
-        <p className="no-print">
-          <PrintButton label={L.print} />{' '}
-          <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
-            {L.pdf}
-          </a>
-        </p>
-      )}
+      <p className="no-print">
+        <BackButton label={L.back} fallback={backTo} />
+        {!isDraft && (
+          <>
+            {' '}
+            <PrintButton label={L.print} />{' '}
+            <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
+              {L.pdf}
+            </a>
+          </>
+        )}
+      </p>
+      {isDraft && <p className="alert no-print">{L.draftNote}</p>}
       <article className={`doc${isDraft ? ' doc-draft' : ''}`} lang="ja">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="doc-logo" src="/images/logo-lockup.svg" alt="谷塚駅東口共同駐車場" />
