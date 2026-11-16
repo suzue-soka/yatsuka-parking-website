@@ -30,7 +30,7 @@ export function Estimate({ usage, picked, t, yen }) {
     <div className="estimate" role="status" aria-live="polite">
       <strong>{t.est.title}</strong>
       <p className="small" style={{ margin: '2px 0 8px' }}>
-        {t.est.basis(count, usage === 'u201+')}
+        {t.est.basis(count, usage === 'u801+')}
       </p>
       {rows.map(({ d, e }) => (
         <div key={d.code} className="estimate-row">

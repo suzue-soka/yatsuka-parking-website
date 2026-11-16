@@ -14,8 +14,8 @@ test('published example: 80 × 1h at 10% = 21,600', () => {
 
 test('application estimate uses the top of the usage range and its volume discount', async () => {
   const { estimateMonthly, USAGE_COUNT } = await import('../lib/program-data.js');
-  assert.deepEqual(estimateMonthly(USAGE_COUNT['u1-50'], 300), { count: 50, gross: 15000, rate: 10, total: 13500 });
-  assert.equal(estimateMonthly(USAGE_COUNT['u51-100'], 600).total, 54000);
-  assert.equal(estimateMonthly(USAGE_COUNT['u101-200'], 1200).total, 216000);
-  assert.equal(estimateMonthly(USAGE_COUNT['u201+'], 2700).total, 488430);
+  assert.deepEqual(estimateMonthly(USAGE_COUNT['u1-200'], 300), { count: 200, gross: 60000, rate: 10, total: 54000 });
+  assert.equal(estimateMonthly(USAGE_COUNT['u201-600'], 600).total, 324000);
+  assert.equal(estimateMonthly(USAGE_COUNT['u601-800'], 1200).total, 768000);
+  assert.equal(estimateMonthly(USAGE_COUNT['u801+'], 2700).total, 1513890);
 });
