@@ -33,7 +33,7 @@ export async function createDraftsNow(fd) {
   await draftAndMaybePublish(supabase, month, 'created');
 }
 
-async function draftAndMaybePublish(supabase, month, okKey) {
+async function draftAndMaybePublish(supabase, month, okKey, { neverPublish = false } = {}) {
   const today = jstToday();
   const due = dueDate(today);
   const { data: count, error } = await supabase.rpc('create_monthly_drafts', { p_month: month, p_issued: today, p_due: due, p_import_run: null });
@@ -41,7 +41,7 @@ async function draftAndMaybePublish(supabase, month, okKey) {
   if (error) back({ err: error.message });
   if (!count) back({ ok: 'createdNone' });
   const { data: settings } = await supabase.from('billing_settings').select('auto_publish').eq('id', 1).single();
-  if (!settings?.auto_publish) back({ ok: okKey, n: String(count) });
+  if (neverPublish || !settings?.auto_publish) back({ ok: okKey, n: String(count) });
   const res = await publishAndNotify(supabase, { month, issued: today, due, ids: null, origin: await origin() });
   revalidatePath('/portal');
   if (res.error) back({ err: res.error });
@@ -65,12 +65,13 @@ export async function publishDrafts(fd) {
   back({ ok: 'published', n: String(res.published) });
 }
 
-// Delete a month's drafts and create them again from the latest data (publishing follows the setting).
+// Delete a month's drafts and create them again from the latest data. Always stays as drafts, even
+// with 「自動で公開する」 on: recreating means something was wrong, so the admin checks before publishing.
 export async function redoDrafts(fd) {
   const { supabase } = await requireAdmin();
   const month = s(fd, 'month', 10);
   if (!isDate(month)) back({ err: 'month' });
   const { error: delErr } = await supabase.rpc('discard_monthly_drafts', { p_month: month });
   if (delErr) back({ err: delErr.message });
-  await draftAndMaybePublish(supabase, month, 'redone');
+  await draftAndMaybePublish(supabase, month, 'redone', { neverPublish: true });
 }
