@@ -95,7 +95,10 @@ export default async function Invoice({ params }) {
             </p>
           </div>
           <div className="doc-from">
-            <p className="doc-from-name">{I.issuer}</p>
+            <p className="doc-from-name">
+              {I.issuer}
+              {inv.status !== 'draft' && <img className="doc-seal" src="/images/stamp.png" alt="" aria-hidden="true" />}
+            </p>
             <p className="doc-small">
               {I.issuerAddress}
               <br />

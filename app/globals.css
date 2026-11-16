@@ -1216,6 +1216,20 @@ html {
 .doc-from-name {
   margin: 0 0 2px;
   font-size: 16px;
+  position: relative;
+}
+/* Company seal (角印) overlapping the end of the issuer name — owner, 2026-11-16 */
+.doc-seal {
+  position: absolute;
+  right: -10px;
+  top: -18px;
+  width: 78px;
+  height: 78px;
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+  pointer-events: none;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 .doc-small,
 .doc-to .doc-small,
