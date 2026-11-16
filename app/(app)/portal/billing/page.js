@@ -9,7 +9,7 @@ import { requirePartner, portalLinks } from '@/lib/portal-guard';
 import { yen } from '@/lib/dates';
 import ShipmentTable from '@/components/ShipmentTable';
 import { requestMachines, orderRequest, withdrawRequest, cancelMyOrder } from '../actions';
-import { DISCOUNT_TYPES } from '@/lib/program-data';
+import { discountText } from '@/lib/price-label';
 import ConfirmButton from '@/components/ConfirmButton';
 
 export const dynamic = 'force-dynamic';
@@ -38,7 +38,6 @@ export default async function Billing({ searchParams }) {
   const shippedList = (machines || []).filter((m) => m.machine_code && !m.cancelled_at).sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0));
   const open = (requests || []).find((r) => ['pending', 'approved'].includes(r.status));
   const lastRejected = !open && requests?.[0]?.status === 'rejected' && requests[0].kind === 'additional' ? requests[0] : null;
-  const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const unit = price?.unit_yen ?? 40000;
   const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
   // Machine orders not completely shipped yet (unpaid ones can be cancelled; paid ones are final).
@@ -72,7 +71,7 @@ export default async function Billing({ searchParams }) {
               <ul className="request-items">
                 {open.items.map((m, i) => (
                   <li key={i}>
-                    {B.orderForm.machine.replace('{n}', i + 1)}：{m.discounts.map((c) => T.discount(hours(c))).join('・')}
+                    {B.orderForm.machine.replace('{n}', i + 1)}：{m.discounts.map((c) => discountText(T, c)).join('・')}
                   </li>
                 ))}
               </ul>

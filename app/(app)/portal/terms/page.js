@@ -4,7 +4,7 @@ import { getAppLang } from '@/lib/app-lang';
 import { onbText } from '@/lib/content/onboarding';
 import { programText } from '@/lib/content/program';
 import { requirePartner, portalLinks } from '@/lib/portal-guard';
-import { DISCOUNT_TYPES, VOLUME_TIERS } from '@/lib/program-data';
+import { VOLUME_TIERS, discountType } from '@/lib/program-data';
 import { href } from '@/lib/i18n';
 import { yen } from '@/lib/dates';
 
@@ -19,7 +19,7 @@ export default async function Terms() {
   const R = O.terms;
   const P = programText(lang);
   const { data: stores } = await supabase.from('store_numbers').select('store_no, discount_code, valid_from, valid_to').order('store_no');
-  const dt = (code) => DISCOUNT_TYPES.find((d) => d.code === code);
+  const dt = discountType;
   const current = (stores || []).filter((s) => !s.valid_to);
 
   return (

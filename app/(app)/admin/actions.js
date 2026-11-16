@@ -8,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendMail } from '@/lib/mail';
 import { shippedMail, requestApprovedMail, mfaResetMail } from '@/lib/content/mail';
 import { appText } from '@/lib/content/app';
-import { DISCOUNT_TYPES } from '@/lib/program-data';
+import { discountText } from '@/lib/price-label';
 import { carrierFor } from '@/lib/carriers';
 
 const back = (id, params) => redirect(`/admin/partners/${id}?${new URLSearchParams(params)}`);
@@ -135,11 +135,10 @@ export async function decideMachineRequest(fd) {
     if (!p?.email) throw new Error('no email address');
     const lang = prof?.preferred_lang || p.applied_lang || 'ja';
     const T = appText(lang);
-    const hours = (c) => DISCOUNT_TYPES.find((d) => d.code === c)?.hours;
     const mail = requestApprovedMail(lang, {
       name: p.name,
       code: p.partner_code,
-      lines: r.items.map((m) => m.discounts.map((c) => T.discount(hours(c))).join('・')),
+      lines: r.items.map((m) => m.discounts.map((c) => discountText(T, c)).join('・')),
       portalUrl: `${await origin()}/portal/billing`,
     });
     await sendMail({ to: p.email, ...mail });

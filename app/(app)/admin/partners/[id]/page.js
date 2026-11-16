@@ -10,7 +10,7 @@ import { appText } from '@/lib/content/app';
 import { onbText } from '@/lib/content/onboarding';
 import { programText } from '@/lib/content/program';
 import { adminLinks } from '@/lib/admin-links';
-import { DISCOUNT_TYPES } from '@/lib/program-data';
+import { discountText } from '@/lib/price-label';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
 import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder, decideMachineRequest, resetPartnerMfa } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
@@ -54,8 +54,7 @@ export default async function AdminPartner({ params, searchParams }) {
   const appRequest = (requests || []).find((r) => r.kind === 'application');
   const itemsText = (items) =>
     (items || []).map((m, i) => `${B.orderForm.machine.replace('{n}', i + 1)}：${m.discounts.map(label).join('・')}`);
-  const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
-  const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
+  const label = (code) => discountText(T, code);
   // Every invoice waiting for payment (machine and monthly), oldest first.
   const unpaidList = (invoices || [])
     .filter((i) => i.status === 'published' && ['equipment', 'monthly', 'balance'].includes(i.kind))

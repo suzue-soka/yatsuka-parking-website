@@ -1,6 +1,6 @@
 import { onbText } from '@/lib/content/onboarding';
 import { appText } from '@/lib/content/app';
-import { DISCOUNT_TYPES } from '@/lib/program-data';
+import { discountType } from '@/lib/program-data';
 import { priceLabel } from '@/lib/price-label';
 
 /** 認証機情報 (partner 認証機 page): one row per paid machine. Shipping details (date, carrier,
@@ -9,7 +9,7 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
   const O = onbText(lang);
   const M = O.billing.machine;
   const T = appText(lang);
-  const type = (code) => DISCOUNT_TYPES.find((d) => d.code === code);
+  const type = discountType;
   // One entry per button: Btn.No. (the 店No. assigned at payment) and 300円（1時間無料・透析用）.
   const buttons = (m) =>
     (m.discount_codes || []).map((c, i) => {
