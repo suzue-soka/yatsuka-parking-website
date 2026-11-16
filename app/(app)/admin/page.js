@@ -29,7 +29,7 @@ export default async function AdminHome({ searchParams }) {
   const { from } = monthRange(ym);
 
   const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }, { data: unshipped }, { data: pendingRequests }, { count: draftCount }] = await Promise.all([
-    supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours))').order('partner_code'),
+    supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours, unit_yen))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
     supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
     supabase.from('change_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -139,7 +139,7 @@ export default async function AdminHome({ searchParams }) {
                     <td>{p.name}</td>
                     <td className="small">
                       {(p.store_numbers || [])
-                        .map((s) => `${s.store_no}：${T.discount(s.discount_types?.hours)}${s.note ? `（${s.note}）` : ''}`)
+                        .map((s) => `${s.store_no}：${T.yen(yen(s.discount_types?.unit_yen))}${s.note ? `（${s.note}）` : ''}` /* price per validation (owner, 2026-11-16) */)
                         .join(' / ')}
                     </td>
                     <td className="right num">{charges[i].validation_count}</td>
