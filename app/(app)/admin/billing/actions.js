@@ -90,5 +90,7 @@ export async function confirmPaymentInline(fd) {
   });
   revalidatePath('/admin');
   revalidatePath('/portal');
-  back(error ? { ...keep, err: error.message } : { ...keep, ok: 'paid', no: inv?.invoice_no || '' });
+  // Back to the invoice list itself (#issued), not the top of the page.
+  const qs = new URLSearchParams(error ? { ...keep, perr: error.message } : { ...keep, paid: inv?.invoice_no || '' });
+  redirect(`/admin/billing?${qs}#issued`);
 }
