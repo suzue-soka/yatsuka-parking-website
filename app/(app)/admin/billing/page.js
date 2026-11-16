@@ -34,6 +34,13 @@ export default async function AdminBilling({ searchParams }) {
   const n = sp?.n || '0';
   const A = O.admin;
   const unpaidOnly = sp?.unpaid === '1';
+  // Database messages in the admin's language (owner, 2026-11-16: a refused write-off was easy to miss)
+  const friendlyError = (m) => {
+    if (/please enter a note/.test(m)) return t.writeOffNoteMissing;
+    const r = m.match(/must equal the overpayment \((\d+)\)/);
+    if (r) return t.refundMismatch(T.yen(yen(Number(r[1]))));
+    return m;
+  };
 
   const [{ data: settings }, { data: drafts }, { data: recent }, { data: runs }] = await Promise.all([
     supabase.from('billing_settings').select('auto_publish').eq('id', 1).maybeSingle(),
@@ -237,7 +244,7 @@ export default async function AdminBilling({ searchParams }) {
         </div>
         {sp?.paid && <p className="ok small" style={{ marginTop: 0 }}>{t.paidDone(sp.paid)}</p>}
         {sp?.settled && <p className="ok small" style={{ marginTop: 0 }}>{t.settledDone(sp.settled)}</p>}
-        {sp?.perr && <p className="alert small" style={{ marginTop: 0 }}>{sp.perr}</p>}
+        {sp?.perr && <p className="alert small" role="alert" style={{ marginTop: 0 }}>{friendlyError(sp.perr)}</p>}
         {issued.length === 0 ? (
           <p className="small muted">{t.noRecent}</p>
         ) : (
@@ -294,7 +301,7 @@ export default async function AdminBilling({ searchParams }) {
                               <ConfirmButton className="btn btn-line" name="mode" value="carry" message={t.confirmCarry}>
                                 {t.modeCarry}
                               </ConfirmButton>
-                              <ConfirmButton className="btn btn-line" name="mode" value="write_off" message={t.confirmWriteOff}>
+                              <ConfirmButton className="btn btn-line" name="mode" value="write_off" message={t.confirmWriteOff} require="note" requireMsg={t.writeOffNoteMissing}>
                                 {t.modeWriteOff}
                               </ConfirmButton>
                             </form>
@@ -319,6 +326,9 @@ export default async function AdminBilling({ searchParams }) {
                               {t.refundFee}
                               <input name="fee" type="number" min="0" defaultValue={0} />
                             </label>
+                            <p className="small muted" style={{ margin: 0, width: '100%' }}>
+                              {t.refundRule(T.yen(yen(i.excess)))}
+                            </p>
                             <label style={{ flex: '1 1 100%' }}>
                               {t.note}
                               <input name="note" type="text" maxLength={300} style={{ width: '100%' }} />

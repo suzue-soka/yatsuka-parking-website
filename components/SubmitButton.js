@@ -15,11 +15,32 @@ const ASK = {
 // form is being sent, so an action (e.g. an invitation email) runs only once.
 // With `confirm`, the first click asks on the page itself (browser pop-ups are blocked in
 // some browsers, including in-app browsers), and only "はい" sends the form.
-export default function SubmitButton({ children, className = 'btn btn-primary', confirm, ...props }) {
+// With `require` (a field name) and `requireMsg`, the button first checks that field is filled in and
+// otherwise shows `requireMsg` right under the button and focuses the field (e.g. the write-off note).
+export default function SubmitButton({ children, className = 'btn btn-primary', confirm, require, requireMsg, ...props }) {
   const { pending } = useFormStatus();
   const lang = useLang();
   const [asking, setAsking] = useState(false);
+  const [missing, setMissing] = useState(false);
   const a = ASK[lang] || ASK.ja;
+
+  // Returns true when the required field is empty (and shows the message).
+  const checkRequired = (e) => {
+    if (!require) return false;
+    const field = e.currentTarget.form?.elements?.namedItem(require);
+    if (field && !String(field.value || '').trim()) {
+      setMissing(true);
+      field.focus();
+      return true;
+    }
+    setMissing(false);
+    return false;
+  };
+  const missingNote = missing && requireMsg ? (
+    <p className="alert small" role="alert" style={{ margin: '6px 0 0', flex: '1 1 100%' }}>
+      {requireMsg}
+    </p>
+  ) : null;
 
   if (pending) {
     return (
@@ -32,9 +53,12 @@ export default function SubmitButton({ children, className = 'btn btn-primary', 
 
   if (confirm && !asking) {
     return (
-      <button type="button" className={className} onClick={() => setAsking(true)}>
-        {children}
-      </button>
+      <>
+        <button type="button" className={className} onClick={(e) => !checkRequired(e) && setAsking(true)}>
+          {children}
+        </button>
+        {missingNote}
+      </>
     );
   }
 
@@ -55,8 +79,11 @@ export default function SubmitButton({ children, className = 'btn btn-primary', 
   }
 
   return (
-    <button type="submit" className={className} {...props}>
-      {children}
-    </button>
+    <>
+      <button type="submit" className={className} {...props} onClick={(e) => checkRequired(e) && e.preventDefault()}>
+        {children}
+      </button>
+      {missingNote}
+    </>
   );
 }
