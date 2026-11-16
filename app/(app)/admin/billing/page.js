@@ -85,7 +85,6 @@ export default async function AdminBilling({ searchParams }) {
           published: t.published(n),
           redone: t.redone(n),
           mail: t.publishedMailErr(n, ''),
-          paid: t.paidDone(sp?.no || ''),
         }}
       />
       <p className="small muted">{t.rule}</p>
@@ -176,13 +175,15 @@ export default async function AdminBilling({ searchParams }) {
         </div>
       ))}
 
-      <div className="card table-wrap">
+      <div id="issued" className="card table-wrap" style={{ scrollMarginTop: 90 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
           <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.recentTitle}</h2>
-          <Link className="chip" href={unpaidOnly ? '/admin/billing' : '/admin/billing?unpaid=1'}>
+          <Link className="chip" href={unpaidOnly ? '/admin/billing#issued' : '/admin/billing?unpaid=1#issued'}>
             {unpaidOnly ? t.showAll : t.unpaidOnly}
           </Link>
         </div>
+        {sp?.paid && <p className="ok small" style={{ marginTop: 0 }}>{t.paidDone(sp.paid)}</p>}
+        {sp?.perr && <p className="alert small" style={{ marginTop: 0 }}>{sp.perr}</p>}
         {(recent || []).length === 0 ? (
           <p className="small muted">{t.noRecent}</p>
         ) : (
