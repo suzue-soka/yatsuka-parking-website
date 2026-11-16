@@ -100,7 +100,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
                 {lang === 'en' ? `¥${yen(r.total)}` : yen(r.total)}
                 {lang !== 'en' && <span className="small">{lang === 'zh' ? '日元' : '円'}</span>}
               </div>
-              {r.free && <div className="small">{t.free}</div>}
+              {r.free && <div className="small">{t.free(r.freeMinutes)}</div>}
             </div>
             <div className="small right">
               {t.duration} <strong>{formatDuration(r.minutes, lang)}</strong>

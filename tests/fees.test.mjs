@@ -62,8 +62,14 @@ test('durations and dates are localised', () => {
 });
 
 // 入庫後20分以内無料 (owner, 2026-11-17)
-test('stays of 20 minutes or less are free; longer stays are charged from the start', () => {
-  assert.equal(fee(['2026-03-02', 10, 0], ['2026-03-02', 10, 20]).total, 0);
-  assert.equal(fee(['2026-03-02', 10, 0], ['2026-03-02', 10, 21]).total, 200);
-  assert.equal(fee(['2026-03-02', 23, 50], ['2026-03-03', 0, 10]).total, 0);
+test('from 2027-02-02 stays of 20 minutes or less are free; longer stays are charged from the start', () => {
+  assert.equal(fee(['2027-03-02', 10, 0], ['2027-03-02', 10, 20]).total, 0);
+  assert.equal(fee(['2027-03-02', 10, 0], ['2027-03-02', 10, 21]).total, 200);
+  assert.equal(fee(['2027-03-02', 23, 50], ['2027-03-03', 0, 10]).total, 0);
+});
+
+test('before 2027-02-02 only 5 minutes are free', () => {
+  assert.equal(fee(['2026-12-02', 10, 0], ['2026-12-02', 10, 5]).total, 0);
+  assert.equal(fee(['2026-12-02', 10, 0], ['2026-12-02', 10, 15]).total, 100);
+  assert.equal(fee(['2027-02-01', 23, 55], ['2027-02-02', 0, 10]).total, 100);
 });
