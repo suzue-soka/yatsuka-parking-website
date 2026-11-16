@@ -14,6 +14,7 @@ import { DISCOUNT_TYPES } from '@/lib/program-data';
 import { jstDateTime, jstToday, yen } from '@/lib/dates';
 import { approveApplication, rejectApplication, resendInvite, confirmPayment, recordShipment, markAmanoOrdered, cancelMachineOrder, decideMachineRequest, resetPartnerMfa } from '../../actions';
 import { CARRIERS } from '@/lib/carriers';
+import PaySubmitButton from '@/components/PaySubmitButton';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -231,7 +232,7 @@ export default async function AdminPartner({ params, searchParams }) {
                   <input id={`amount_${inv.id}`} name="amount" type="number" min="1" required defaultValue={inv.rest} />
                   <label htmlFor={`pnote_${inv.id}`}>{A.note}</label>
                   <input id={`pnote_${inv.id}`} name="note" type="text" maxLength={500} />
-                  <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>
+                  <PaySubmitButton rest={inv.rest}>{A.confirmPay}</PaySubmitButton>
                 </form>
               ))}
             </div>

@@ -5,6 +5,7 @@ import Notice from '@/components/Notice';
 import ConfirmButton from '@/components/ConfirmButton';
 import SubmitButton from '@/components/SubmitButton';
 import SortableTable from '@/components/SortableTable';
+import PaySubmitButton from '@/components/PaySubmitButton';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { onbText } from '@/lib/content/onboarding';
@@ -245,7 +246,7 @@ export default async function AdminBilling({ searchParams }) {
               <thead>
                 <tr>
                   {t.recentTh.map((h, i) => (
-                    <th key={h} scope="col" className={i === 3 ? 'right' : undefined}>
+                    <th key={h} scope="col" className={i === 1 ? 'right' : undefined}>
                       {h}
                     </th>
                   ))}
@@ -257,13 +258,7 @@ export default async function AdminBilling({ searchParams }) {
                     <td className="num">
                       <Link href={`/portal/invoices/${i.id}`}>{i.invoice_no}</Link>
                     </td>
-                    <td>
-                      {i.partners?.partner_code} {i.partners?.name}
-                    </td>
-                    <td className="num">{i.kind === 'balance' ? t.balanceKind : i.period_month?.slice(0, 7)}</td>
                     <td className="right num">{T.yen(yen(i.total_yen))}</td>
-                    <td className="num">{i.issued_on}</td>
-                    <td className="num">{i.due_on}</td>
                     <td className={i.excess > 0 || i.status === 'published' ? 'warn' : i.status === 'paid' ? 'ok' : undefined}>
                       {i.status === 'published' ? (
                         // Unpaid or partly paid: confirm a transfer here; when partly paid, settle the shortfall.
@@ -280,7 +275,7 @@ export default async function AdminBilling({ searchParams }) {
                               {A.amount}
                               <input name="amount" type="number" min="1" required defaultValue={i.rest} />
                             </label>
-                            <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>
+                            <PaySubmitButton rest={i.rest}>{A.confirmPay}</PaySubmitButton>
                           </form>
                           {i.partial && (
                             <form action={settleShortfallAction} className="pay-inline-form settle">
@@ -340,7 +335,8 @@ export default async function AdminBilling({ searchParams }) {
                         O.billing.invStatus[i.status]
                       )}
                     </td>
-                    {/* How a payment difference was settled, in its own column so the status stays on one line (owner, 2026-11-16) */}
+                    {/* How a payment difference was settled, in its own column so the status stays on one line (owner, 2026-11-16).
+                        Column order (owner, 2026-11-16): 請求書番号 | ご請求額 | 状態 | 差額の処理 | 提携店舗 | 対象月 | 発行日 | お支払期限 */}
                     <td className="small muted">
                       {i.settlement && (
                         <>
@@ -349,6 +345,12 @@ export default async function AdminBilling({ searchParams }) {
                         </>
                       )}
                     </td>
+                    <td>
+                      {i.partners?.partner_code} {i.partners?.name}
+                    </td>
+                    <td className="num">{i.kind === 'balance' ? t.balanceKind : i.period_month?.slice(0, 7)}</td>
+                    <td className="num">{i.issued_on}</td>
+                    <td className="num">{i.due_on}</td>
                   </tr>
                 ))}
               </tbody>
