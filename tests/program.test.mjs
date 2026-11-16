@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DISCOUNT_TYPES, VOLUME_TIERS } from '../lib/program-data.js';
 
 test('program figures match the database seed', () => {
-  assert.deepEqual(DISCOUNT_TYPES.map((d) => [d.code, d.yen]), [['1h', 300], ['2h', 600], ['3h', 900], ['4h', 1200], ['24h', 2700]]);
+  assert.deepEqual(DISCOUNT_TYPES.map((d) => [d.code, d.yen]), [['1h', 300], ['2h', 600], ['3h', 900], ['4h', 1200], ['y1400', 1400], ['24h', 2700]]);
   assert.deepEqual(VOLUME_TIERS.map((t) => t.rate), [5, 7, 10, 20]);
 });
 
