@@ -279,6 +279,12 @@ export default function HomeView({ lang = 'ja' }) {
             {lang === 'en' ? ` (${c.support.hours})` : `（${c.support.hours}）`}
           </h3>
           <p>{c.help.intro}</p>
+          <p style={{ fontSize: 20, margin: '8px 0' }}>
+            <span className="small">{c.support.telLabel} </span>
+            <a href={c.support.telHref} style={{ color: 'inherit', fontWeight: 700 }}>
+              {c.support.tel}
+            </a>
+          </p>
           {c.help.langNote && <p className="small">{c.help.langNote}</p>}
           <p className="small">
             {c.help.operatorBy}
