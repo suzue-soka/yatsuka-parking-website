@@ -24,20 +24,29 @@ export async function saveAutoPublish(fd) {
   back(error ? { err: error.message } : { ok: 'autoSaved' });
 }
 
-// Create a month's drafts by hand (normally done automatically at import).
+// Create a month's drafts by hand (normally done automatically at import). Follows the
+// 「自動で公開する」 setting like the import does: when it is on, the drafts are published at once.
 export async function createDraftsNow(fd) {
   const { supabase } = await requireAdmin();
   const month = s(fd, 'month', 10);
   if (!isDate(month)) back({ err: 'month' });
+  await draftAndMaybePublish(supabase, month, 'created');
+}
+
+async function draftAndMaybePublish(supabase, month, okKey) {
   const today = jstToday();
-  const { data, error } = await supabase.rpc('create_monthly_drafts', {
-    p_month: month,
-    p_issued: today,
-    p_due: dueDate(today),
-    p_import_run: null,
-  });
+  const due = dueDate(today);
+  const { data: count, error } = await supabase.rpc('create_monthly_drafts', { p_month: month, p_issued: today, p_due: due, p_import_run: null });
   revalidatePath('/admin');
-  back(error ? { err: error.message } : { ok: data ? 'created' : 'createdNone', n: String(data || 0) });
+  if (error) back({ err: error.message });
+  if (!count) back({ ok: 'createdNone' });
+  const { data: settings } = await supabase.from('billing_settings').select('auto_publish').eq('id', 1).single();
+  if (!settings?.auto_publish) back({ ok: okKey, n: String(count) });
+  const res = await publishAndNotify(supabase, { month, issued: today, due, ids: null, origin: await origin() });
+  revalidatePath('/portal');
+  if (res.error) back({ err: res.error });
+  if (res.mailErrors.length) back({ warn: res.mailErrors.join('、'), n: String(res.published), wk: 'mail' });
+  back({ ok: 'published', n: String(res.published) });
 }
 
 // Publish the ticked drafts of a month: issue date = today, due date = 25th or the closest working day.
@@ -56,20 +65,12 @@ export async function publishDrafts(fd) {
   back({ ok: 'published', n: String(res.published) });
 }
 
-// Delete a month's drafts and create them again from the latest data.
+// Delete a month's drafts and create them again from the latest data (publishing follows the setting).
 export async function redoDrafts(fd) {
   const { supabase } = await requireAdmin();
   const month = s(fd, 'month', 10);
   if (!isDate(month)) back({ err: 'month' });
   const { error: delErr } = await supabase.rpc('discard_monthly_drafts', { p_month: month });
   if (delErr) back({ err: delErr.message });
-  const today = jstToday();
-  const { data, error } = await supabase.rpc('create_monthly_drafts', {
-    p_month: month,
-    p_issued: today,
-    p_due: dueDate(today),
-    p_import_run: null,
-  });
-  revalidatePath('/admin');
-  back(error ? { err: error.message } : { ok: 'redone', n: String(data || 0) });
+  await draftAndMaybePublish(supabase, month, 'redone');
 }
