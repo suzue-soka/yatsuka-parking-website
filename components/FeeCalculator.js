@@ -53,7 +53,8 @@ export default function FeeCalculator({ lang = 'ja' }) {
   const t = c.calc;
   // Fixed initial values so server and browser render the same HTML; today's date is set after load.
   const [arrive, setArrive] = useState({ date: '2026-01-01', hour: '10', minute: '00' });
-  const [leave, setLeave] = useState({ date: '2026-01-01', hour: '13', minute: '30' });
+  // Default stay 10:00–11:00 = 300円 (owner, 2026-11-17).
+  const [leave, setLeave] = useState({ date: '2026-01-01', hour: '11', minute: '00' });
 
   useEffect(() => {
     const d = todayJst();
