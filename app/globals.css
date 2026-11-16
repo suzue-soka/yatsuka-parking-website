@@ -1409,11 +1409,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 
 /* Billed period of a monthly invoice, above the total */
 .doc-period {
+  /* Same text as the total label (ご請求金額（税込）): navy, 17px, regular weight */
   margin: 0 0 26px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   color: var(--doc-navy);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 400;
   background: var(--doc-pale);
   border-left: 4px solid var(--doc-navy);
 }
