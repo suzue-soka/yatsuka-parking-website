@@ -223,7 +223,7 @@ export default async function AdminPartner({ params, searchParams }) {
                   <input type="hidden" name="id" value={p.id} />
                   <input type="hidden" name="invoice" value={inv.id} />
                   <label htmlFor={`paid_on_${inv.id}`}>{A.paidOn}</label>
-                  <input id={`paid_on_${inv.id}`} name="paid_on" type="date" required defaultValue={jstToday()} />
+                  <input id={`paid_on_${inv.id}`} name="paid_on" type="date" required max={jstToday()} defaultValue={jstToday()} />
                   <label htmlFor={`amount_${inv.id}`}>{A.amount}</label>
                   <input id={`amount_${inv.id}`} name="amount" type="number" min="1" required defaultValue={inv.total_yen} />
                   <label htmlFor={`pnote_${inv.id}`}>{A.note}</label>

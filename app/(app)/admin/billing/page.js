@@ -223,7 +223,7 @@ export default async function AdminBilling({ searchParams }) {
                             <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
                             <label>
                               {A.paidOn}
-                              <input name="paid_on" type="date" required defaultValue={today} />
+                              <input name="paid_on" type="date" required max={today} defaultValue={today} />
                             </label>
                             <label>
                               {A.amount}
