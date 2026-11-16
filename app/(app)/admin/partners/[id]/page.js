@@ -56,7 +56,10 @@ export default async function AdminPartner({ params, searchParams }) {
   const hours = (code) => DISCOUNT_TYPES.find((d) => d.code === code)?.hours;
   const label = (code) => (hours(code) ? T.discount(hours(code)) : code);
   // Every invoice waiting for payment (machine and monthly), oldest first.
-  const unpaidList = (invoices || []).filter((i) => i.status === 'published' && ['equipment', 'monthly'].includes(i.kind)).reverse();
+  const unpaidList = (invoices || [])
+    .filter((i) => i.status === 'published' && ['equipment', 'monthly', 'balance'].includes(i.kind))
+    .map((i) => ({ ...i, rest: i.total_yen - (i.payments || []).reduce((a, p) => a + p.amount_yen, 0) }))
+    .reverse();
   const B = O.billing;
   // Paid, numbered machines not shipped yet: shown to Amano (setup request) and in the shipment form.
   const toShip = (machines || []).filter((m) => m.machine_code && !m.shipped_on && !m.cancelled_at);
@@ -225,7 +228,7 @@ export default async function AdminPartner({ params, searchParams }) {
                   <label htmlFor={`paid_on_${inv.id}`}>{A.paidOn}</label>
                   <input id={`paid_on_${inv.id}`} name="paid_on" type="date" required max={jstToday()} defaultValue={jstToday()} />
                   <label htmlFor={`amount_${inv.id}`}>{A.amount}</label>
-                  <input id={`amount_${inv.id}`} name="amount" type="number" min="1" required defaultValue={inv.total_yen} />
+                  <input id={`amount_${inv.id}`} name="amount" type="number" min="1" required defaultValue={inv.rest} />
                   <label htmlFor={`pnote_${inv.id}`}>{A.note}</label>
                   <input id={`pnote_${inv.id}`} name="note" type="text" maxLength={500} />
                   <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>

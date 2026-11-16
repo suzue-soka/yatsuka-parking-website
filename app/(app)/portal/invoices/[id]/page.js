@@ -130,7 +130,11 @@ export default async function Invoice({ params }) {
             ))}
           </tbody>
         </table>
-        <p className="doc-tax">{I.taxLine(Y(inv.total_yen), Y(inv.tax_yen))}</p>
+        {/* Carried differences (前回分の不足額・過入金) are outside the 10% tax base */}
+        {inv.total_yen - (inv.adjust_yen || 0) !== 0 && (
+          <p className="doc-tax">{I.taxLine(Y(inv.total_yen - (inv.adjust_yen || 0)), Y(inv.tax_yen))}</p>
+        )}
+        {(inv.adjust_yen || 0) !== 0 && <p className="doc-tax">{I.exemptLine(Y(inv.adjust_yen))}</p>}
 
         {isCn ? (
           <p className="doc-pay">{I.cancels(orig?.invoice_no || '—', orig?.issued_on || '—')}</p>

@@ -11,11 +11,11 @@ import { onbText } from '@/lib/content/onboarding';
 import { billingText } from '@/lib/content/billing';
 import { adminLinks } from '@/lib/admin-links';
 import { jstToday, yen } from '@/lib/dates';
-import { dueDate, addMonths } from '@/lib/holidays';
+import { dueDate, addMonths, balanceDueDate } from '@/lib/holidays';
 import { billingMonth } from '@/lib/billing';
 import AutoPublishToggle from './AutoPublishToggle';
 import ScrollToHash from '@/components/ScrollToHash';
-import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts, confirmPaymentInline } from './actions';
+import { saveAutoPublish, createDraftsNow, publishDrafts, redoDrafts, confirmPaymentInline, settleShortfallAction, settleExcessAction, publishBalanceAction, discardBalanceAction } from './actions';
 
 export const dynamic = 'force-dynamic';
 export async function generateMetadata() {
@@ -43,14 +43,34 @@ export default async function AdminBilling({ searchParams }) {
       .eq('status', 'draft'),
     supabase
       .from('invoices')
-      .select('id, invoice_no, period_month, total_yen, issued_on, due_on, status, partners(partner_code, name)')
-      .eq('kind', 'monthly')
-      .in('status', unpaidOnly ? ['published'] : ['published', 'paid', 'cancelled'])
+      .select('id, invoice_no, kind, period_month, total_yen, issued_on, due_on, status, settlement, settled_yen, settled_note, settled_ref, partners(partner_code, name), payments(amount_yen)')
+      .in('kind', ['monthly', 'balance'])
+      .in('status', ['published', 'paid', 'cancelled'])
       .order('issued_on', { ascending: false })
-      .limit(200),
+      .limit(300),
     supabase.from('billing_runs').select('month'),
   ]);
   const due = dueDate(today);
+  // Payment state of each issued invoice: paid so far, shortfall (一部入金) or open overpayment (過入金).
+  const allIssued = (recent || []).map((i) => {
+    const paid = (i.payments || []).reduce((a, p) => a + p.amount_yen, 0);
+    const partial = i.status === 'published' && paid > 0 && paid < i.total_yen;
+    const excess = i.status === 'paid' && !i.settlement && paid > i.total_yen ? paid - i.total_yen : 0;
+    return { ...i, paid, rest: i.total_yen - paid, partial, excess };
+  });
+  const noById = Object.fromEntries(allIssued.map((i) => [i.id, i.invoice_no]));
+  // 「未払いのみ表示」 also keeps overpayments that still need settling.
+  const issued = unpaidOnly ? allIssued.filter((i) => i.status === 'published' || i.excess > 0) : allIssued;
+  const { data: balanceDrafts } = await supabase
+    .from('invoices')
+    .select('id, total_yen, balance_of, partners(partner_code, name)')
+    .eq('kind', 'balance')
+    .eq('status', 'draft');
+  const { data: balanceOrigins } = (balanceDrafts || []).length
+    ? await supabase.from('invoices').select('id, invoice_no').in('id', balanceDrafts.map((b) => b.balance_of))
+    : { data: [] };
+  const originNo = Object.fromEntries((balanceOrigins || []).map((o) => [o.id, o.invoice_no]));
+  const balDue = balanceDueDate(today);
   const months = [...new Set((drafts || []).map((d) => d.period_month))].sort();
   const target = billingMonth(today);
   const canCreate = !(runs || []).some((r) => r.month === target) && !months.includes(target);
@@ -85,6 +105,7 @@ export default async function AdminBilling({ searchParams }) {
           createdNone: t.createdNone,
           published: t.published(n),
           redone: t.redone(n),
+          balanceDiscarded: t.balanceDiscarded,
           mail: t.publishedMailErr(n, ''),
         }}
       />
@@ -176,6 +197,35 @@ export default async function AdminBilling({ searchParams }) {
         </div>
       ))}
 
+      {(balanceDrafts || []).length > 0 && (
+        <div className="card" style={{ marginBottom: 16, borderColor: 'var(--orange)' }}>
+          <h2 style={{ marginTop: 0, fontSize: 20 }}>{t.balanceTitle}</h2>
+          <p className="small muted">{t.balanceHint(balDue)}</p>
+          {balanceDrafts.map((b) => (
+            <div key={b.id} style={{ borderTop: '1px solid var(--line)', padding: '10px 0', display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span>
+                {b.partners?.partner_code} {b.partners?.name} · {t.balanceOf(originNo[b.balance_of] || '')} · <strong>{T.yen(yen(b.total_yen))}</strong>
+              </span>
+              <Link href={`/portal/invoices/${b.id}`} target="_blank">
+                {t.preview}
+              </Link>
+              <form action={publishBalanceAction}>
+                <input type="hidden" name="id" value={b.id} />
+                <ConfirmButton className="btn btn-primary" message={t.balancePublishConfirm}>
+                  {t.balancePublish}
+                </ConfirmButton>
+              </form>
+              <form action={discardBalanceAction}>
+                <input type="hidden" name="id" value={b.id} />
+                <ConfirmButton className="btn btn-line" message={t.balanceDiscardConfirm}>
+                  {t.balanceDiscard}
+                </ConfirmButton>
+              </form>
+            </div>
+          ))}
+        </div>
+      )}
+
       <ScrollToHash token={`${sp?.paid || ''}${sp?.perr || ''}${sp?.unpaid || ''}`} />
       <div id="issued" className="card table-wrap" style={{ scrollMarginTop: 90 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
@@ -185,8 +235,9 @@ export default async function AdminBilling({ searchParams }) {
           </Link>
         </div>
         {sp?.paid && <p className="ok small" style={{ marginTop: 0 }}>{t.paidDone(sp.paid)}</p>}
+        {sp?.settled && <p className="ok small" style={{ marginTop: 0 }}>{t.settledDone(sp.settled)}</p>}
         {sp?.perr && <p className="alert small" style={{ marginTop: 0 }}>{sp.perr}</p>}
-        {(recent || []).length === 0 ? (
+        {issued.length === 0 ? (
           <p className="small muted">{t.noRecent}</p>
         ) : (
           <SortableTable initial={0}>
@@ -201,7 +252,7 @@ export default async function AdminBilling({ searchParams }) {
                 </tr>
               </thead>
               <tbody>
-                {recent.map((i) => (
+                {issued.map((i) => (
                   <tr key={i.id}>
                     <td className="num">
                       <Link href={`/portal/invoices/${i.id}`}>{i.invoice_no}</Link>
@@ -209,15 +260,15 @@ export default async function AdminBilling({ searchParams }) {
                     <td>
                       {i.partners?.partner_code} {i.partners?.name}
                     </td>
-                    <td className="num">{i.period_month?.slice(0, 7)}</td>
+                    <td className="num">{i.kind === 'balance' ? t.balanceKind : i.period_month?.slice(0, 7)}</td>
                     <td className="right num">{T.yen(yen(i.total_yen))}</td>
                     <td className="num">{i.issued_on}</td>
                     <td className="num">{i.due_on}</td>
-                    <td className={i.status === 'paid' ? 'ok' : i.status === 'published' ? 'warn' : undefined}>
+                    <td className={i.excess > 0 || i.status === 'published' ? 'warn' : i.status === 'paid' ? 'ok' : undefined}>
                       {i.status === 'published' ? (
-                        // Unpaid: click to confirm the bank transfer right here (date and amount prefilled).
+                        // Unpaid or partly paid: confirm a transfer here; when partly paid, settle the shortfall.
                         <details className="pay-inline">
-                          <summary>{O.billing.invStatus[i.status]}</summary>
+                          <summary>{i.partial ? t.partial(T.yen(yen(i.rest))) : O.billing.invStatus[i.status]}</summary>
                           <form action={confirmPaymentInline} className="pay-inline-form">
                             <input type="hidden" name="invoice" value={i.id} />
                             <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
@@ -227,11 +278,72 @@ export default async function AdminBilling({ searchParams }) {
                             </label>
                             <label>
                               {A.amount}
-                              <input name="amount" type="number" min="1" required defaultValue={i.total_yen} />
+                              <input name="amount" type="number" min="1" required defaultValue={i.rest} />
                             </label>
                             <SubmitButton className="btn btn-primary">{A.confirmPay}</SubmitButton>
                           </form>
+                          {i.partial && (
+                            <form action={settleShortfallAction} className="pay-inline-form settle">
+                              <input type="hidden" name="invoice" value={i.id} />
+                              <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
+                              <p className="small" style={{ margin: 0, width: '100%' }}>
+                                {t.shortfallHint(T.yen(yen(i.rest)))}
+                              </p>
+                              <label style={{ flex: '1 1 100%' }}>
+                                {t.note}
+                                <input name="note" type="text" maxLength={300} style={{ width: '100%' }} />
+                              </label>
+                              <ConfirmButton className="btn btn-line" name="mode" value="invoice" message={t.confirmInvoice}>
+                                {t.modeInvoice}
+                              </ConfirmButton>
+                              <ConfirmButton className="btn btn-line" name="mode" value="carry" message={t.confirmCarry}>
+                                {t.modeCarry}
+                              </ConfirmButton>
+                              <ConfirmButton className="btn btn-line" name="mode" value="write_off" message={t.confirmWriteOff}>
+                                {t.modeWriteOff}
+                              </ConfirmButton>
+                            </form>
+                          )}
                         </details>
+                      ) : i.excess > 0 ? (
+                        // Overpaid: record the refund made outside the site, or deduct it from next month's invoice.
+                        <details className="pay-inline">
+                          <summary>{t.excess(T.yen(yen(i.excess)))}</summary>
+                          <form action={settleExcessAction} className="pay-inline-form settle">
+                            <input type="hidden" name="invoice" value={i.id} />
+                            <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
+                            <label>
+                              {t.refundedOn}
+                              <input name="refunded_on" type="date" max={today} defaultValue={today} />
+                            </label>
+                            <label>
+                              {t.refundAmount}
+                              <input name="amount" type="number" min="1" max={i.excess} defaultValue={i.excess} />
+                            </label>
+                            <label>
+                              {t.refundFee}
+                              <input name="fee" type="number" min="0" defaultValue={0} />
+                            </label>
+                            <label style={{ flex: '1 1 100%' }}>
+                              {t.note}
+                              <input name="note" type="text" maxLength={300} style={{ width: '100%' }} />
+                            </label>
+                            <ConfirmButton className="btn btn-line" name="mode" value="refund" message={t.confirmRefund}>
+                              {t.modeRefund}
+                            </ConfirmButton>
+                            <ConfirmButton className="btn btn-line" name="mode" value="offset" message={t.confirmOffset}>
+                              {t.modeOffset}
+                            </ConfirmButton>
+                          </form>
+                        </details>
+                      ) : i.settlement ? (
+                        <>
+                          {O.billing.invStatus[i.status]}
+                          <div className="small muted" style={{ whiteSpace: 'normal' }}>
+                            {t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
+                            {i.settled_note ? `（${i.settled_note}）` : ''}
+                          </div>
+                        </>
                       ) : (
                         O.billing.invStatus[i.status]
                       )}

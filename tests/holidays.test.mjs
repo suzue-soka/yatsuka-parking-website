@@ -30,3 +30,10 @@ test('working days and month helpers', () => {
   assert.equal(monthEnd('2026-02-01'), '2026-02-28');
   assert.equal(addMonths('2026-12-01', 1), '2027-01-01');
 });
+
+test('shortfall invoice due date: at least 7 days', async () => {
+  const { balanceDueDate } = await import('../lib/holidays.js');
+  assert.equal(balanceDueDate('2026-11-02'), '2026-11-25');
+  assert.equal(balanceDueDate('2026-11-20'), '2026-12-25'); // 25th is only 5 days away
+  assert.equal(balanceDueDate('2026-11-27'), '2026-12-25');
+});
