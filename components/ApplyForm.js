@@ -35,7 +35,10 @@ export function Estimate({ usage, picked, t, yen }) {
       {rows.map(({ d, e }) => (
         <div key={d.code} className="estimate-row">
           <span>
-            {rows.length > 1 ? t.est.onlyType(t.discountLabel(d.hours)) : t.discountLabel(d.hours)}
+            {(() => {
+              const l = d.hours ? t.discountLabel(d.hours) : t.amountLabel(d.yen.toLocaleString('ja-JP'));
+              return rows.length > 1 ? t.est.onlyType(l) : l;
+            })()}
             <span className="small muted" style={{ display: 'block' }}>
               {t.est.calc(yen(d.yen), e.count, yen(e.gross), e.rate)}
             </span>

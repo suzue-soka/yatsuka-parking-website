@@ -91,7 +91,7 @@ export default function PartnersView({ lang = 'ja' }) {
               <tbody>
                 {DISCOUNT_TYPES.map((d) => (
                   <tr key={d.code}>
-                    <td>{t.discountLabel(d.hours)}</td>
+                    <td>{d.hours ? t.discountLabel(d.hours) : t.amountLabel(d.yen.toLocaleString('ja-JP'))}</td>
                     <td className="right num">{c.yen(yenNum(d.yen))}</td>
                   </tr>
                 ))}

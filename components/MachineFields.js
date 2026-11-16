@@ -14,7 +14,7 @@ export default function MachineFields({ labels, defaults = [], onChange, require
   const [count, setCount] = useState(1);
   const [items, setItems] = useState(() => Array.from({ length: 5 }, () => [defaults[0] || '', defaults[1] || '']));
   const yen = (n) => labels.yenFormat.replace('{n}', n.toLocaleString('ja-JP'));
-  const dLabel = (d) => priceLabel(yen(d.yen), labels.discount.replace('{h}', d.hours));
+  const dLabel = (d) => (d.hours ? priceLabel(yen(d.yen), labels.discount.replace('{h}', d.hours)) : yen(d.yen));
 
   const report = (n, list) =>
     onChange?.(list.slice(0, n).map(([a, b]) => ({ discounts: [a, b].filter(Boolean).filter((v, i, x) => x.indexOf(v) === i) })));
