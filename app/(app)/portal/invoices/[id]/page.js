@@ -46,18 +46,17 @@ export default async function Invoice({ params }) {
   return (
     <section className="wrap section" style={{ maxWidth: 860 }}>
       <IdleWatch />
-      <p className="no-print">
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
         <BackButton label={L.back} fallback={backTo} />
         {!isDraft && (
-          <>
-            {' '}
-            <PrintButton label={L.print} />{' '}
+          <span style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <PrintButton label={L.print} />
             <a className="btn btn-line" href={`/portal/invoices/${id}/pdf`} download>
               {L.pdf}
             </a>
-          </>
+          </span>
         )}
-      </p>
+      </div>
       {isDraft && <p className="alert no-print">{L.draftNote}</p>}
       <article className={`doc${isDraft ? ' doc-draft' : ''}`} lang="ja">
         {/* eslint-disable-next-line @next/next/no-img-element */}
