@@ -106,15 +106,15 @@ export default async function Invoice({ params }) {
           </div>
         </div>
 
+        <div className="doc-total">
+          <span>{I.total}</span>
+          <strong>{Y(inv.total_yen)}</strong>
+        </div>
         {inv.period_month && (
           <p className="doc-period">
             {I.periodLine(inv.period_month, periodRange(inv.period_month))}
           </p>
         )}
-        <div className="doc-total">
-          <span>{I.total}</span>
-          <strong>{Y(inv.total_yen)}</strong>
-        </div>
 
         <table className="doc-table">
           <thead>

@@ -1229,11 +1229,14 @@ html {
   justify-content: space-between;
   align-items: center;
   background: var(--doc-pale);
+  border-left: 4px solid var(--doc-navy);
   color: var(--doc-navy);
   padding: 12px 16px;
   margin-bottom: 26px;
   font-size: 17px;
 }
+/* Monthly invoices: the period box follows the total box closely */
+.doc-total:has(+ .doc-period) { margin-bottom: 8px; }
 .doc-total strong {
   font-size: 29px;
   line-height: 1.2;
@@ -1332,6 +1335,7 @@ html {
     background: #fff !important;
   }
   .doc-total,
+  .doc-period,
   .doc-bank,
   .doc-stamp {
     print-color-adjust: exact;
@@ -1405,10 +1409,13 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 
 /* Billed period of a monthly invoice, above the total */
 .doc-period {
-  margin: 0 0 10px;
+  margin: 0 0 26px;
+  padding: 10px 14px;
   color: var(--doc-navy);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
+  background: var(--doc-pale);
+  border-left: 4px solid var(--doc-navy);
 }
 
 /* Unpaid status in the admin invoice list: click to confirm the bank transfer in place */
