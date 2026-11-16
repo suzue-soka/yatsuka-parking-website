@@ -263,7 +263,7 @@ export default async function AdminBilling({ searchParams }) {
                       {i.status === 'published' ? (
                         // Unpaid or partly paid: confirm a transfer here; when partly paid, settle the shortfall.
                         <details className="pay-inline">
-                          <summary>{i.partial ? t.partial(T.yen(yen(i.rest))) : O.billing.invStatus[i.status]}</summary>
+                          <summary title={i.partial ? t.partial(T.yen(yen(i.rest))) : undefined}>{i.partial ? t.partialShort : O.billing.invStatus[i.status]}</summary>
                           <form action={confirmPaymentInline} className="pay-inline-form">
                             <input type="hidden" name="invoice" value={i.id} />
                             <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
@@ -303,7 +303,7 @@ export default async function AdminBilling({ searchParams }) {
                       ) : i.excess > 0 ? (
                         // Overpaid: record the refund made outside the site, or deduct it from next month's invoice.
                         <details className="pay-inline">
-                          <summary>{t.excess(T.yen(yen(i.excess)))}</summary>
+                          <summary title={t.excess(T.yen(yen(i.excess)))}>{t.excessShort}</summary>
                           <form action={settleExcessAction} className="pay-inline-form settle">
                             <input type="hidden" name="invoice" value={i.id} />
                             <input type="hidden" name="unpaid" value={unpaidOnly ? '1' : ''} />
