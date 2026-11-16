@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { createClient, getClaims } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { parseReport } from '@/lib/parkingweb';
+import { parseReport, decodeReport } from '@/lib/parkingweb';
 import { getAppLang } from '@/lib/app-lang';
 import { appText } from '@/lib/content/app';
 import { headers } from 'next/headers';
@@ -28,7 +28,7 @@ export async function importCsv(prevState, formData) {
   if (file.size > MAX_BYTES) return { error: E.tooBig };
   const bytes = Buffer.from(await file.arrayBuffer());
   const sha256 = createHash('sha256').update(bytes).digest('hex');
-  const report = parseReport(new TextDecoder('shift_jis').decode(bytes));
+  const report = parseReport(decodeReport(bytes));
 
   const admin = createAdminClient();
 

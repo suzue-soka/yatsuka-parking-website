@@ -56,3 +56,24 @@ test('helpers', () => {
   assert.equal(toIsoJst('2026/1/5 8:52'), '2026-01-05T08:52:00+09:00');
   assert.equal(toIsoJst('nonsense'), null);
 });
+
+// A copy saved again in Excel (owner, 2026-11-17): UTF-8 and US-style dates.
+test('Excel copy: UTF-8 text and month/day/year dates are accepted', async () => {
+  const { decodeReport } = await import('../lib/parkingweb.js');
+  const excel = SAMPLE.replace(/2026\/1\/(\d{1,2}) /g, '1/$1/2026 ');
+  const r = parseReport(decodeReport(new TextEncoder().encode('﻿' + excel)));
+  assert.deepEqual(r.problems, []);
+  assert.equal(r.rows.length, 4);
+  assert.equal(r.rows[2].paidAt, '2026-01-13T22:20:00+09:00');
+});
+
+test('dates outside the 対象期間 block the import', () => {
+  const r = parseReport(SAMPLE.replace('2026/1/2 12:32', '2026/2/2 12:32'));
+  assert.ok(r.problems.some((p) => p.includes('outside the 対象期間')));
+});
+
+test('US-style and Japanese dates', () => {
+  assert.equal(toIsoJst('3/1/2026 10:53'), '2026-03-01T10:53:00+09:00');
+  assert.equal(toIsoJst('12/31/2026 23:59'), '2026-12-31T23:59:00+09:00');
+  assert.equal(toIsoJst('13/1/2026 10:00'), null);
+});
