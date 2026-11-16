@@ -340,13 +340,24 @@ export default async function AdminBilling({ searchParams }) {
                     {/* Compact: (¥75,400) / INV-2026-000009 — brackets = shortfall; the full sentence and the note show on hover */}
                     <td
                       className="small muted num"
+                      style={{ whiteSpace: 'nowrap' }}
                       title={
                         i.settlement
                           ? `${t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}${i.settled_note ? `（${i.settled_note}）` : ''}`
                           : undefined
                       }
                     >
-                      {i.settlement && t.settledShort[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
+                      {i.settlement &&
+                        (() => {
+                          // Two lines (owner, 2026-11-16): "(¥75,400) /" then "INV-2026-000009", so the column is half as wide
+                          const [a, b] = t.settledShort[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord).split(' / ');
+                          return (
+                            <>
+                              {a} /<br />
+                              {b}
+                            </>
+                          );
+                        })()}
                     </td>
                     <td>
                       {i.partners?.partner_code} {i.partners?.name}
