@@ -336,16 +336,17 @@ export default async function AdminBilling({ searchParams }) {
                             </ConfirmButton>
                           </form>
                         </details>
-                      ) : i.settlement ? (
-                        <>
-                          {O.billing.invStatus[i.status]}
-                          <div className="small muted" style={{ whiteSpace: 'normal' }}>
-                            {t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
-                            {i.settled_note ? `（${i.settled_note}）` : ''}
-                          </div>
-                        </>
                       ) : (
                         O.billing.invStatus[i.status]
+                      )}
+                    </td>
+                    {/* How a payment difference was settled, in its own column so the status stays on one line (owner, 2026-11-16) */}
+                    <td className="small muted">
+                      {i.settlement && (
+                        <>
+                          {t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
+                          {i.settled_note ? `（${i.settled_note}）` : ''}
+                        </>
                       )}
                     </td>
                   </tr>
