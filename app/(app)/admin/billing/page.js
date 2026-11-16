@@ -337,13 +337,16 @@ export default async function AdminBilling({ searchParams }) {
                     </td>
                     {/* How a payment difference was settled, in its own column so the status stays on one line (owner, 2026-11-16).
                         Column order (owner, 2026-11-16): 請求書番号 | ご請求額 | 状態 | 差額の処理 | 提携店舗 | 対象月 | 発行日 | お支払期限 */}
-                    <td className="small muted">
-                      {i.settlement && (
-                        <>
-                          {t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
-                          {i.settled_note ? `（${i.settled_note}）` : ''}
-                        </>
-                      )}
+                    {/* Compact: (¥75,400) / INV-2026-000009 — brackets = shortfall; the full sentence and the note show on hover */}
+                    <td
+                      className="small muted num"
+                      title={
+                        i.settlement
+                          ? `${t.settled[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}${i.settled_note ? `（${i.settled_note}）` : ''}`
+                          : undefined
+                      }
+                    >
+                      {i.settlement && t.settledShort[i.settlement](T.yen(yen(i.settled_yen || 0)), noById[i.settled_ref] || t.draftWord)}
                     </td>
                     <td>
                       {i.partners?.partner_code} {i.partners?.name}
