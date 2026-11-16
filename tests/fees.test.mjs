@@ -6,7 +6,7 @@ const fee = (a, b) => calculateFee(toMinutes(...a), toMinutes(...b));
 
 test('daytime partial units round up', () => {
   assert.equal(fee(['2026-11-20', 10, 0], ['2026-11-20', 13, 30]).total, 1100);
-  assert.equal(fee(['2026-11-20', 10, 0], ['2026-11-20', 10, 1]).total, 100);
+  assert.equal(fee(['2026-11-20', 10, 0], ['2026-11-20', 10, 41]).total, 300);
 });
 
 test('daytime maximum 1,200円', () => {
@@ -14,7 +14,7 @@ test('daytime maximum 1,200円', () => {
 });
 
 test('crossing 22:00 rounds each band separately', () => {
-  const r = fee(['2026-11-20', 21, 50], ['2026-11-20', 22, 10]);
+  const r = fee(['2026-11-20', 21, 50], ['2026-11-20', 22, 25]);
   assert.equal(r.day, 100);
   assert.equal(r.night, 100);
 });
@@ -59,4 +59,11 @@ test('durations and dates are localised', () => {
   assert.equal(formatDateTime(t), '1/15（木）10:05');
   assert.equal(formatDateTime(t, 'en'), 'Thu 1/15 10:05');
   assert.equal(formatDateTime(t, 'zh'), '1/15（周四）10:05');
+});
+
+// 入庫後20分以内無料 (owner, 2026-11-17)
+test('stays of 20 minutes or less are free; longer stays are charged from the start', () => {
+  assert.equal(fee(['2026-03-02', 10, 0], ['2026-03-02', 10, 20]).total, 0);
+  assert.equal(fee(['2026-03-02', 10, 0], ['2026-03-02', 10, 21]).total, 200);
+  assert.equal(fee(['2026-03-02', 23, 50], ['2026-03-03', 0, 10]).total, 0);
 });
