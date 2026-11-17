@@ -151,7 +151,9 @@ export default function HomeView({ lang = 'ja' }) {
         <p>
           <strong>{c.rates.subtitle}</strong>
         </p>
-        <div className="grid">
+        <div className="rates-layout">
+        <div>
+        <div className="grid rate-cards">
           {c.rates.cards.map((r) => (
             <div key={r.key} className={`card rate${r.accent ? ' accent' : ''}`}>
               <div className="row">
@@ -172,8 +174,9 @@ export default function HomeView({ lang = 'ja' }) {
             <span key={n}>{n}</span>
           ))}
         </div>
+        </div>
 
-        <div id="calc" className="card" style={{ marginTop: 24 }} aria-labelledby="calc-h">
+        <div id="calc" className="card rates-calc" aria-labelledby="calc-h">
           <h3 id="calc-h" style={{ margin: 0, fontSize: 20 }}>
             {c.calc.title}
           </h3>
@@ -181,6 +184,7 @@ export default function HomeView({ lang = 'ja' }) {
             {c.calc.intro}
           </p>
           <FeeCalculator lang={lang} />
+        </div>
         </div>
       </section>
 

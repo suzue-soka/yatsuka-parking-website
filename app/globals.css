@@ -1483,3 +1483,27 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   color: var(--orange-text);
   font-weight: 700;
 }
+
+/* ---------- Rates + calculator ---------- */
+/* Phones and tablets: rates, then the calculator below (with its own 料金を計算 menu button).
+   PC (900px+): rates stacked on the left, calculator on the right, one 料金 button (owner, 2026-11-18). */
+.rates-calc {
+  margin-top: 24px;
+}
+@media (min-width: 900px) {
+  .rates-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .rates-layout .rate-cards {
+    grid-template-columns: 1fr;
+  }
+  .rates-calc {
+    margin-top: 0;
+  }
+  .toolbar .nav-calc {
+    display: none;
+  }
+}

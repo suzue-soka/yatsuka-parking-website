@@ -11,7 +11,7 @@ export default function Header({ lang = 'ja', app = false }) {
   const anchor = (id) => `${home}#${id}`;
   const links = [
     { href: anchor('rates'), label: c.nav.rates },
-    { href: anchor('calc'), label: c.nav.calc },
+    { href: anchor('calc'), label: c.nav.calc, cls: 'nav-calc' }, // hidden on PC, where the calculator sits beside the rates
     { href: anchor('access'), label: c.nav.access },
     { href: anchor('monthly'), label: c.nav.monthly },
     { href: href(lang, '/partners'), label: c.nav.partners },
@@ -31,7 +31,7 @@ export default function Header({ lang = 'ja', app = false }) {
     <nav className="toolbar" aria-label={c.nav.mainMenu}>
       <div className="wrap toolbar-inner">
         {links.map((l) => (
-          <Link key={l.href} href={l.href}>
+          <Link key={l.href} href={l.href} className={l.cls}>
             {l.label}
           </Link>
         ))}
