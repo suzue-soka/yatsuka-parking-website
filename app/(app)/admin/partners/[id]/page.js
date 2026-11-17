@@ -120,8 +120,8 @@ export default async function AdminPartner({ params, searchParams }) {
                   </>
                 ) : null}
               </Row>
-              <Row label="A / B">
-                {p.permission_a ? 'A ✓' : 'A —'} {p.permission_b ? 'B ✓' : 'B —'}
+              <Row label={A.listing}>
+                {A.listWeb} {p.permission_a ? '✓' : '—'}　{A.listSign} {p.permission_b ? '✓' : '—'}
               </Row>
               <Row label={A.applied}>{jstDateTime(p.created_at)}</Row>
               <Row label={A.lang}>{p.applied_lang}</Row>

@@ -9,7 +9,7 @@ import { href } from '@/lib/i18n';
 const yenNum = (n) => n.toLocaleString('ja-JP');
 
 // The partner directory is filled from the partner system once each shop has
-// agreed to be listed (Permission A). Until then no shop names are published.
+// agreed to be listed on the website (permission_a). Until then no shop names are published.
 export default function PartnersView({ lang = 'ja' }) {
   const c = getContent(lang);
   const p = c.partnersPage;
