@@ -5,6 +5,7 @@ import { getContent } from '@/lib/content';
 import { programText } from '@/lib/content/program';
 import { DISCOUNT_TYPES, VOLUME_TIERS } from '@/lib/program-data';
 import { href } from '@/lib/i18n';
+import { priceLabel } from '@/lib/price-label';
 
 const yenNum = (n) => n.toLocaleString('ja-JP');
 
@@ -82,17 +83,13 @@ export default function PartnersView({ lang = 'ja' }) {
             <table>
               <thead>
                 <tr>
-                  <th scope="col">{t.thDiscount[0]}</th>
-                  <th scope="col" className="right">
-                    {t.thDiscount[1]}
-                  </th>
+                  <th scope="col">{t.thDiscount}</th>
                 </tr>
               </thead>
               <tbody>
                 {DISCOUNT_TYPES.map((d) => (
                   <tr key={d.code}>
-                    <td>{d.hours ? t.discountLabel(d.hours) : t.amountLabel(d.yen.toLocaleString('ja-JP'))}</td>
-                    <td className="right num">{c.yen(yenNum(d.yen))}</td>
+                    <td className="num">{priceLabel(c.yen(yenNum(d.yen)), d.hours ? t.discountLabel(d.hours) : '')}</td>
                   </tr>
                 ))}
               </tbody>
