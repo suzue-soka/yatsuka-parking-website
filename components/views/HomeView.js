@@ -110,6 +110,25 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
+      <section className="wrap section" aria-labelledby="facility-h">
+        <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
+        <div className="grid compact facility-grid">
+          {c.facility.items.map((a) => (
+            <div key={a.t} className="card facility-item">
+              <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
+              <div>
+                <strong>{a.t}</strong>
+                <div className="small muted">{a.d}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid" style={{ marginTop: 12 }}>
+          <Image src="/images/side.jpg" alt={c.facility.sideAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
+          <Image src="/images/corner.jpg" alt={c.facility.cornerAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
+        </div>
+      </section>
+
       {news.length > 0 && (
         <section className="wrap section" aria-labelledby="news-h">
           <SectionHead kicker="NEWS" title={c.news.title} id="news-h" />
@@ -194,25 +213,6 @@ export default function HomeView({ lang = 'ja' }) {
             </a>
           </div>
           <iframe className="map" title={c.access.mapTitle} src={mapsEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-        </div>
-      </section>
-
-      <section className="wrap section" aria-labelledby="facility-h">
-        <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
-        <div className="grid compact facility-grid">
-          {c.facility.items.map((a) => (
-            <div key={a.t} className="card facility-item">
-              <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
-              <div>
-                <strong>{a.t}</strong>
-                <div className="small muted">{a.d}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="grid" style={{ marginTop: 12 }}>
-          <Image src="/images/side.jpg" alt={c.facility.sideAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
-          <Image src="/images/corner.jpg" alt={c.facility.cornerAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
         </div>
       </section>
 
