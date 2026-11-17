@@ -1444,3 +1444,22 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 .pay-inline-form .btn { padding: 6px 12px; }
 
 .pay-inline-form.settle { border-top: 1px dashed var(--line, #e3e7ed); padding-top: 8px; margin-top: 8px; }
+
+/* ---------- Facility pictograms (施設のご案内) ---------- */
+.facility-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.facility-icon {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--navy);
+  display: grid;
+  place-items: center;
+}
+.grid.compact.facility-grid {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}

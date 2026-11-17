@@ -1,3 +1,4 @@
+import { facilityIconSvg } from '@/lib/facility-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import FeeCalculator from '@/components/FeeCalculator';
@@ -201,11 +202,14 @@ export default function HomeView({ lang = 'ja' }) {
 
       <section className="wrap section" aria-labelledby="facility-h">
         <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
-        <div className="grid compact">
+        <div className="grid compact facility-grid">
           {c.facility.items.map((a) => (
-            <div key={a.t} className="card">
-              <strong>{a.t}</strong>
-              <div className="small muted">{a.d}</div>
+            <div key={a.t} className="card facility-item">
+              <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
+              <div>
+                <strong>{a.t}</strong>
+                <div className="small muted">{a.d}</div>
+              </div>
             </div>
           ))}
         </div>
