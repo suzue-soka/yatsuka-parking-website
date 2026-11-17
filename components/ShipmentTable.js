@@ -44,6 +44,7 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
                 {M.discounts}
               </th>
               <th scope="col">{M.serial}</th>
+              <th scope="col">{M.warranty}</th>
               <th scope="col">{M.deliveryNoteShort}</th>
             </tr>
           </thead>
@@ -58,6 +59,7 @@ export default function ShipmentTable({ machines, storeNotes = {}, lang = 'ja' }
                   {stack(buttons(m), 'text')}
                 </td>
                 <td className="num">{m.serial_no || '—'}</td>
+                <td className="num">{m.warranty_until || '—'}</td>
                 <td>
                   {m.delivery_note_no ? (
                     <a href={`/portal/machines/${m.id}/delivery-note?download=1`} download className="num">
