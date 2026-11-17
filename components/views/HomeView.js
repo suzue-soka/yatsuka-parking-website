@@ -123,10 +123,6 @@ export default function HomeView({ lang = 'ja' }) {
             </div>
           ))}
         </div>
-        <div className="grid" style={{ marginTop: 12 }}>
-          <Image src="/images/side.jpg" alt={c.facility.sideAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
-          <Image src="/images/corner.jpg" alt={c.facility.cornerAlt} width={1600} height={900} sizes="(min-width: 900px) 590px, 100vw" style={{ borderRadius: 16 }} />
-        </div>
       </section>
 
       {news.length > 0 && (
