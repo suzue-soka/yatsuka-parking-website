@@ -243,6 +243,13 @@ export async function closeInquiry(fd) {
   redirect(`/admin/requests?${new URLSearchParams(error ? { err: error.message } : { ok: 'saved' })}`);
 }
 
+export async function confirmMachineReport(fd) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.rpc('confirm_machine_report', { p_id: Number(s(fd, 'report', 20)), p_note: s(fd, 'note', 2000) });
+  revalidatePath('/admin/requests');
+  redirect(`/admin/requests?${new URLSearchParams(error ? { err: error.message } : { ok: 'saved' })}`);
+}
+
 export async function reviewChange(fd) {
   const { supabase } = await requireAdmin();
   const { error } = await supabase.rpc('review_change_request', {

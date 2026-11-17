@@ -1,3 +1,4 @@
+import { guideText } from '@/lib/content/guide';
 import Link from 'next/link';
 import SortableTable from '@/components/SortableTable';
 import { requireAdmin } from '@/lib/admin-guard';
@@ -28,7 +29,7 @@ export default async function AdminHome({ searchParams }) {
   const ym = monthParam(sp?.m);
   const { from } = monthRange(ym);
 
-  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }, { data: unshipped }, { data: pendingRequests }, { count: draftCount }] = await Promise.all([
+  const [{ data: allPartners }, { data: runs }, { count: openInquiries }, { count: pendingChanges }, { data: amanoWaiting }, { data: unpaidMachineInvoices }, { data: unshipped }, { data: pendingRequests }, { count: draftCount }, { count: openReports }] = await Promise.all([
     supabase.from('partners').select('id, partner_code, name, status, store_numbers(store_no, note, discount_types(hours, unit_yen))').order('partner_code'),
     supabase.from('import_runs').select('id, started_at, status, period_from, period_to, rows_in_file, rows_added, rows_already_present, file_total_count, file_total_yen, message').order('id', { ascending: false }).limit(10),
     supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'open'),
@@ -39,6 +40,7 @@ export default async function AdminHome({ searchParams }) {
     supabase.from('machines').select('partner_id').not('machine_code', 'is', null).is('shipped_on', null).is('cancelled_at', null),
     supabase.from('machine_requests').select('partner_id').eq('kind', 'additional').eq('status', 'pending'),
     supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('kind', 'monthly').eq('status', 'draft'),
+    supabase.from('machine_reports').select('id', { count: 'exact', head: true }).eq('status', 'open'),
   ]);
   const toShip = new Set((unshipped || []).map((m) => m.partner_id)).size;
   const awaitingPayment = new Set((unpaidMachineInvoices || []).map((i) => i.partner_id)).size;
@@ -52,6 +54,7 @@ export default async function AdminHome({ searchParams }) {
     { label: o.counts.preparing, n: toShip, href: '/admin/partners?status=preparing' },
     { label: o.counts.inquiries, n: openInquiries ?? 0, href: '/admin/requests' },
     { label: o.counts.changes, n: pendingChanges ?? 0, href: '/admin/requests' },
+    { label: guideText(lang).admin.count, n: openReports ?? 0, href: '/admin/requests' },
   ];
 
   const charges = await Promise.all(

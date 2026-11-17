@@ -84,3 +84,17 @@ export async function sendInquiry(fd) {
   revalidatePath('/portal/inquiries');
   go('/portal/inquiries', error ? { err: error.message } : { ok: 'sent' });
 }
+
+// 約款 第16条: the partner reports a repair or replacement done by the maker.
+export async function reportMachineService(fd) {
+  const { supabase } = await requirePartner('/portal/guide');
+  const { error } = await supabase.rpc('report_machine_service', {
+    p_machine: Number(s(fd, 'machine', 20)),
+    p_kind: s(fd, 'kind', 20),
+    p_on: s(fd, 'on', 10) || null,
+    p_new_serial: s(fd, 'new_serial', 60),
+    p_note: s(fd, 'note', 2000),
+  });
+  revalidatePath('/portal/guide');
+  go('/portal/guide', error ? { err: error.message } : { ok: 'reported' });
+}
