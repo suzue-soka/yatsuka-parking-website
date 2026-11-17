@@ -947,13 +947,29 @@ html {
   margin-top: 0.2em;
 }
 
-/* Two columns: line the photo's top edge up with the top of 谷塚駅すぐの. */
+/* Hero photo. One column: 16:10 box. Two columns: exactly as tall as the text block beside it
+   (eyebrow to lead), cropped to fit (owner, 2026-11-17). */
+.hero-photo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.hero .hero-photo img {
+  aspect-ratio: auto;
+  border-radius: 0;
+  object-fit: cover;
+}
 @media (min-width: 700px) {
   .hero-inner {
     grid-template-columns: 1fr 1fr;
   }
-  .hero-inner > img {
-    margin-top: var(--hero-photo-offset, 47px);
+  .hero-photo {
+    aspect-ratio: auto;
+    align-self: stretch;
+  }
+  .hero p.lead {
+    margin-bottom: 0;
   }
 }
 
