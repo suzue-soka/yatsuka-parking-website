@@ -117,7 +117,7 @@ export default function HomeView({ lang = 'ja' }) {
             <div key={a.t} className="card facility-item">
               <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
               <div>
-                <strong>{a.t}</strong>
+                <strong>{a.href ? <a href={a.href}>{a.t}</a> : a.t}</strong>
                 <div className="small muted">{a.d}</div>
               </div>
             </div>
