@@ -107,11 +107,6 @@ export default function HomeView({ lang = 'ja' }) {
           <div className="hero-photo">
             <Image src="/images/hero.jpg" alt={c.hero.imgAlt} fill priority sizes="(min-width: 700px) 50vw, 100vw" />
           </div>
-          <ul className="hero-facts">
-            {c.hero.facts.flat().map((f) => (
-              <li key={f}>{f}</li>
-            ))}
-          </ul>
         </div>
       </section>
 
