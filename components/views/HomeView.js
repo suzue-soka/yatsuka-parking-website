@@ -45,7 +45,7 @@ function jsonLd(c, lang) {
     description: c.description,
     url: `${SITE.url}${href(lang, '/') === '/' ? '' : href(lang, '/')}`,
     inLanguage: lang === 'zh' ? 'zh-Hans' : lang,
-    image: `${SITE.url}/images/front.jpg`,
+    image: `${SITE.url}/images/hero.jpg`,
     telephone: SITE.telIntl,
     address: {
       '@type': 'PostalAddress',
