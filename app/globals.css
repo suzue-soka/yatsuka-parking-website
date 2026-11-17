@@ -1479,3 +1479,7 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 .grid.compact.facility-grid {
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
 }
+.facility-note {
+  color: var(--orange-text);
+  font-weight: 700;
+}

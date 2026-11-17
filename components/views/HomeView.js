@@ -119,6 +119,7 @@ export default function HomeView({ lang = 'ja' }) {
               <div>
                 <strong>{a.href ? <a href={a.href}>{a.t}</a> : a.t}</strong>
                 <div className="small muted">{a.d}</div>
+                {a.note && <div className="small facility-note">{a.note}</div>}
               </div>
             </div>
           ))}
