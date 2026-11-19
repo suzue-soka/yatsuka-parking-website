@@ -1532,6 +1532,7 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-layout .rate .cap-label {
     font-size: 14px;
     color: var(--grey);
+    margin-right: 12px;
   }
   .rates-layout .rate .cap strong {
     font-size: 30px;
@@ -1541,7 +1542,7 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
     font-size: 14px;
   }
   .rates-layout .rate .price .muted {
-    font-size: 30px;
+    font-size: 20px;
     margin-left: 16px;
   }
   .rates-layout .rate .per-slash {
