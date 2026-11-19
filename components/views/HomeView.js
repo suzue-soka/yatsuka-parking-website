@@ -150,8 +150,12 @@ export default function HomeView({ lang = 'ja' }) {
         <SectionHead kicker="RATES" title={c.rates.title} id="rates-h" />
         <div className="rates-layout">
         <div>
-        <p className="rates-sub">
-          <strong>{c.rates.subtitle}</strong>
+        <p className="rates-sub rates-sub-row">
+          <strong>
+            <span className="rates-mobile">{c.rates.subtitle}</span>
+            <span className="rates-pc">{c.rates.subtitlePc ?? c.rates.subtitle}</span>
+          </strong>
+          <span className="rates-pc rates-tax">{c.rates.notes[0]}</span>
         </p>
         <div className="grid rate-cards">
           {c.rates.cards.map((r) => (
@@ -174,7 +178,7 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
         <div className="notes">
           {c.rates.notes.map((n, i) => (
-            <span key={n} className={i === 1 ? 'note-pay' : undefined}>{n}</span>
+            <span key={n} className={i === 1 ? 'note-pay' : i === 0 ? 'note-tax' : undefined}>{n}</span>
           ))}
         </div>
         </div>

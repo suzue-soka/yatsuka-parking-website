@@ -104,8 +104,10 @@ export default function FeeCalculator({ lang = 'ja' }) {
             </div>
             <div className="small right">
               {t.duration} <strong>{formatDuration(r.minutes, lang)}</strong>
-              <br />
-              {formatDateTime(a, lang)} – {formatDateTime(b, lang)}
+              <span className="total-range">
+                <br />
+                {formatDateTime(a, lang)} – {formatDateTime(b, lang)}
+              </span>
             </div>
           </div>
 

@@ -1515,6 +1515,22 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-pc {
     display: block;
   }
+  span.rates-pc {
+    display: inline;
+  }
+  .rates-sub-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .rates-tax {
+    font-size: 14px;
+    color: var(--grey-2);
+    padding-right: 23px;
+  }
+  .rates-calc .total {
+    align-items: last baseline;
+  }
   .rates-layout .rate {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -1560,6 +1576,8 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-calc .chips {
     display: none;
   }
+  .rates-layout .notes .note-tax,
+  .rates-calc .total-range,
   .rates-layout .notes .note-pay,
   .rates-calc .calc-subtotals,
   .rates-calc .calc-note {
