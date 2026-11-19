@@ -148,11 +148,11 @@ export default function HomeView({ lang = 'ja' }) {
 
       <section id="rates" className="wrap section" aria-labelledby="rates-h">
         <SectionHead kicker="RATES" title={c.rates.title} id="rates-h" />
-        <p>
-          <strong>{c.rates.subtitle}</strong>
-        </p>
         <div className="rates-layout">
         <div>
+        <p className="rates-sub">
+          <strong>{c.rates.subtitle}</strong>
+        </p>
         <div className="grid rate-cards">
           {c.rates.cards.map((r) => (
             <div key={r.key} className={`card rate${r.accent ? ' accent' : ''}`}>
@@ -176,14 +176,16 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
         </div>
 
-        <div id="calc" className="card rates-calc" aria-labelledby="calc-h">
-          <h3 id="calc-h" style={{ margin: 0, fontSize: 20 }}>
-            {c.calc.title}
-          </h3>
-          <p className="small muted" style={{ margin: '4px 0 0' }}>
-            {c.calc.intro}
+        <div id="calc" className="rates-calc" aria-labelledby="calc-h">
+          <p className="rates-sub">
+            <strong id="calc-h">{c.calc.title}</strong>
           </p>
-          <FeeCalculator lang={lang} />
+          <div className="card">
+            <p className="small muted" style={{ margin: 0 }}>
+              {c.calc.intro}
+            </p>
+            <FeeCalculator lang={lang} />
+          </div>
         </div>
         </div>
       </section>

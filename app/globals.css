@@ -1487,8 +1487,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 /* ---------- Rates + calculator ---------- */
 /* Phones and tablets: rates, then the calculator below (with its own 料金を計算 menu button).
    PC (900px+): rates stacked on the left, calculator on the right, one 料金 button (owner, 2026-11-18). */
+.rates-sub {
+  margin: 16px 0;
+}
 .rates-calc {
-  margin-top: 24px;
+  margin-top: 8px;
 }
 @media (min-width: 900px) {
   .rates-layout {
