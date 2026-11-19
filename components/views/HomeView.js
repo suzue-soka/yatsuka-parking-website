@@ -287,6 +287,7 @@ export default function HomeView({ lang = 'ja' }) {
               {c.support.tel}
             </a>
           </p>
+          {c.support.codeNote && <p className="small">{c.support.codeNote}</p>}
           {c.help.langNote && <p className="small">{c.help.langNote}</p>}
           <p className="small">
             {c.help.operatorBy}

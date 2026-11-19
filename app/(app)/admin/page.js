@@ -218,6 +218,7 @@ export default async function AdminHome({ searchParams }) {
           </SortableTable>
         </div>
       </div>
+      <p className="small" style={{ marginTop: 16 }}>{guideText(lang).admin.amsLine}</p>
     </section>
   );
 }
