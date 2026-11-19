@@ -213,7 +213,7 @@ export default function HomeView({ lang = 'ja' }) {
             </p>
             <ul>
               {c.access.items.map((i) => (
-                <li key={i}>{i}</li>
+                <li key={i} className={i.includes('2.10') ? 'rates-mobile' : undefined}>{i}</li>
               ))}
             </ul>
             {c.access.navNote && (
