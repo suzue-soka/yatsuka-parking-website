@@ -1619,6 +1619,13 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-item > div {
     margin-top: -3px;
   }
+  .section[aria-labelledby] {
+    padding-top: 28px;
+    padding-bottom: 12px;
+  }
+  .section[aria-labelledby] .section-head {
+    margin-bottom: 12px;
+  }
   .section-head .kicker {
     line-height: 1.2;
   }
