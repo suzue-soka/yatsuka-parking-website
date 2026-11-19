@@ -164,7 +164,10 @@ export default function HomeView({ lang = 'ja' }) {
                 <Price lang={lang} value={r.price} /> <span className="small muted">/ {r.per}</span>
               </div>
               <div className="cap">
-                {c.rates.max} <strong className="num">{c.yen(r.cap)}</strong>
+                <span className="cap-label">{c.rates.max}</span>{' '}
+                <strong className="num">
+                  <Price lang={lang} value={r.cap} />
+                </strong>
               </div>
             </div>
           ))}

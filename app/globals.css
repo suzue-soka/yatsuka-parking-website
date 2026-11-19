@@ -380,6 +380,9 @@ a {
   border-top: 1px solid #eef1f5;
   padding-top: 8px;
 }
+.rate .cap .small {
+  font-size: inherit;
+}
 .notes {
   display: flex;
   flex-wrap: wrap;
@@ -1511,6 +1514,31 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   }
   .rates-pc {
     display: block;
+  }
+  .rates-layout .rate {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 16px;
+    align-items: baseline;
+  }
+  .rates-layout .rate .row {
+    grid-column: 1 / -1;
+  }
+  .rates-layout .rate .cap {
+    border-top: 0;
+    padding-top: 0;
+    text-align: right;
+  }
+  .rates-layout .rate .cap-label {
+    font-size: 14px;
+    color: var(--grey);
+  }
+  .rates-layout .rate .cap strong {
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .rates-layout .rate .cap .small {
+    font-size: 14px;
   }
   .rates-mobile {
     display: none;
