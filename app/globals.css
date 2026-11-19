@@ -1491,7 +1491,10 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   margin: 16px 0;
 }
 .rates-calc {
-  margin-top: 8px;
+  margin-top: 24px;
+}
+.rates-pc {
+  display: none;
 }
 @media (min-width: 900px) {
   .rates-layout {
@@ -1505,6 +1508,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   }
   .rates-calc {
     margin-top: 0;
+  }
+  .rates-pc {
+    display: block;
+  }
+  .rates-mobile {
+    display: none;
   }
   .toolbar .nav-calc {
     display: none;
