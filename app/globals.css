@@ -1548,6 +1548,9 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-layout .rate .per-slash {
     display: none;
   }
+  .rates-layout .rate .per-unit {
+    font-size: 14px;
+  }
   .rates-calc .chips {
     display: none;
   }
