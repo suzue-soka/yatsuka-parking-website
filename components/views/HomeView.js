@@ -181,9 +181,6 @@ export default function HomeView({ lang = 'ja' }) {
             <strong id="calc-h">{c.calc.title}</strong>
           </p>
           <div className="card">
-            <p className="small muted" style={{ margin: 0 }}>
-              {c.calc.intro}
-            </p>
             <FeeCalculator lang={lang} />
           </div>
         </div>
