@@ -82,6 +82,27 @@ export default function HomeView({ lang = 'ja' }) {
   const mapsDirections = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(SITE.mapsQuery)}&hl=${hl}`;
   const tel = lang === 'ja' ? SITE.tel : SITE.telIntl;
 
+  // News list: phones keep it under the facility cards; PC shows it under MONTHLY (owner, 2026-11-20).
+  const newsSection = (hid, cls) => (
+        <section className={`wrap section ${cls}`} aria-labelledby={hid}>
+          <SectionHead kicker="NEWS" title={c.news.title} id={hid} />
+          <ul className="news-list">
+            {news.map((n) => (
+              <li key={n.slug}>
+                <Link href={href(lang, `/news/${n.slug}`)}>
+                  <span className="num small muted">{formatNewsDate(n.date)}</span>
+                  <span className={`badge ${n.category}`}>{c.news.categories[n.category] || n.category}</span>
+                  <span>{n.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="small">
+            <Link href={href(lang, '/news')}>{c.news.all}</Link>
+          </p>
+        </section>
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(c, lang) }} />
@@ -126,25 +147,7 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
-      {news.length > 0 && (
-        <section className="wrap section" aria-labelledby="news-h">
-          <SectionHead kicker="NEWS" title={c.news.title} id="news-h" />
-          <ul className="news-list">
-            {news.map((n) => (
-              <li key={n.slug}>
-                <Link href={href(lang, `/news/${n.slug}`)}>
-                  <span className="num small muted">{formatNewsDate(n.date)}</span>
-                  <span className={`badge ${n.category}`}>{c.news.categories[n.category] || n.category}</span>
-                  <span>{n.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <p className="small">
-            <Link href={href(lang, '/news')}>{c.news.all}</Link>
-          </p>
-        </section>
-      )}
+      {news.length > 0 && newsSection('news-h', 'rates-mobile')}
 
       <section id="rates" className="wrap section" aria-labelledby="rates-h">
         <SectionHead kicker="RATES" title={c.rates.title} id="rates-h" />
@@ -285,6 +288,8 @@ export default function HomeView({ lang = 'ja' }) {
           </div>
         </div>
       </section>
+
+      {news.length > 0 && newsSection('news-h-pc', 'rates-pc')}
 
       <section id="support" className="wrap section" aria-labelledby="sup-h">
         <SectionHead kicker="SUPPORT" title={c.help.title} id="sup-h" />

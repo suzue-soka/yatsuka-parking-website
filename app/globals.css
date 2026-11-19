@@ -1619,10 +1619,10 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-item > div {
     margin-top: -3px;
   }
-  section[aria-labelledby='facility-h'] .section-head .kicker {
+  .section-head .kicker {
     line-height: 1.2;
   }
-  section[aria-labelledby='facility-h'] .section-head h2 {
+  .section-head h2 {
     margin-top: 0;
     line-height: 1.2;
   }
