@@ -295,17 +295,26 @@ export default function HomeView({ lang = 'ja' }) {
         <SectionHead kicker="SUPPORT" title={c.help.title} id="sup-h" />
         <div className="band">
           <h3 style={{ marginTop: 0 }}>
-            {c.support.name}
-            {lang === 'en' ? ` (${c.support.hours})` : `（${c.support.hours}）`}
+            <span className="rates-mobile">
+              {c.support.name}
+              {lang === 'en' ? ` (${c.support.hours})` : `（${c.support.hours}）`}
+            </span>
+            <span className="rates-pc sup-pc">
+              <a href={c.support.telHref} className="sup-tel">
+                {c.support.tel}
+              </a>
+              <span>{c.support.name}</span>
+              <span>{c.support.hours}</span>
+            </span>
           </h3>
           <p>{c.help.intro}</p>
-          <p style={{ fontSize: 20, margin: '8px 0' }}>
+          <p className="rates-mobile" style={{ fontSize: 20, margin: '8px 0' }}>
             <span className="small">{c.support.telLabel} </span>
             <a href={c.support.telHref} style={{ color: 'inherit', fontWeight: 700 }}>
               {c.support.tel}
             </a>
           </p>
-          {c.support.codeNote && <p className="small">{c.support.codeNote}</p>}
+          {c.support.codeNote && <p className="small sup-code">{c.support.codeNote}</p>}
           {c.help.langNote && <p className="small">{c.help.langNote}</p>}
           <p className="small">
             {c.help.operatorBy}

@@ -1619,6 +1619,22 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-item > div {
     margin-top: -3px;
   }
+  span.rates-pc.sup-pc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 18px;
+  }
+  .sup-tel {
+    font-family: var(--font-num);
+    font-size: 34px;
+    font-weight: 700;
+    color: inherit;
+    text-decoration: none;
+  }
+  .sup-code.small {
+    font-size: inherit;
+  }
   .section[aria-labelledby] {
     padding-top: 28px;
     padding-bottom: 12px;
