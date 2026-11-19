@@ -109,7 +109,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
             </div>
           </div>
 
-          <div className="grid">
+          <div className="grid calc-subtotals">
             <div className="subtotal accent">
               <span>
                 <strong>{t.day}</strong> <span className="small muted">{formatDuration(r.dayMinutes, lang)}</span>
@@ -166,7 +166,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
 
       <ul className="small muted">
         {t.notes.map((n) => (
-          <li key={n}>{n}</li>
+          <li key={n} className="calc-note">{n}</li>
         ))}
         <li>
           {t.monthlyNote[0]}

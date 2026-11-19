@@ -173,8 +173,8 @@ export default function HomeView({ lang = 'ja' }) {
           ))}
         </div>
         <div className="notes">
-          {c.rates.notes.map((n) => (
-            <span key={n}>{n}</span>
+          {c.rates.notes.map((n, i) => (
+            <span key={n} className={i === 1 ? 'note-pay' : undefined}>{n}</span>
           ))}
         </div>
         </div>

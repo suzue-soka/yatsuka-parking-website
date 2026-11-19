@@ -1554,6 +1554,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-calc .chips {
     display: none;
   }
+  .rates-layout .notes .note-pay,
+  .rates-calc .calc-subtotals,
+  .rates-calc .calc-note {
+    display: none;
+  }
   .rates-calc .card > .calc {
     margin-top: 3px;
   }
