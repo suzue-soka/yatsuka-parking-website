@@ -155,7 +155,7 @@ export default function HomeView({ lang = 'ja' }) {
             <span className="rates-mobile">{c.rates.subtitle}</span>
             <span className="rates-pc">{c.rates.subtitlePc ?? c.rates.subtitle}</span>
           </strong>
-          <span className="rates-pc rates-tax">{c.rates.notes[0]}</span>
+          <span className="rates-pc rates-tax">{c.rates.taxPc ?? c.rates.notes[0]}</span>
         </p>
         <div className="grid rate-cards">
           {c.rates.cards.map((r) => (
@@ -184,8 +184,9 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
 
         <div id="calc" className="rates-calc" aria-label={c.calc.title}>
-          <p className="rates-sub rates-pc">
+          <p className="rates-sub rates-sub-row rates-pc">
             <strong>{c.calc.title}</strong>
+            <span className="rates-tax">{c.calc.pcNote}</span>
           </p>
           <div className="card">
             <div className="rates-mobile">

@@ -1515,6 +1515,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-pc {
     display: block;
   }
+  p.rates-sub-row.rates-pc {
+    display: flex;
+  }
+  .rates-calc .calc > ul {
+    display: none;
+  }
   span.rates-pc {
     display: inline;
   }
