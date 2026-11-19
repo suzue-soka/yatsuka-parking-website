@@ -1542,7 +1542,7 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
     font-size: 14px;
   }
   .rates-layout .rate .price .muted {
-    font-size: 20px;
+    font-size: 30px;
     margin-left: 16px;
   }
   .rates-layout .rate .per-slash {
