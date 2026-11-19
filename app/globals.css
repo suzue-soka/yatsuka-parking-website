@@ -1565,8 +1565,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-calc .calc-note {
     display: none;
   }
+  .rates-calc .card {
+    padding-top: 15px;
+  }
   .rates-calc .card > .calc {
-    margin-top: 3px;
+    margin-top: 0;
   }
   .rates-mobile {
     display: none;
