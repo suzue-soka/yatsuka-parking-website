@@ -1546,6 +1546,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-layout .rate .per-slash {
     display: none;
   }
+  .rates-calc .chips {
+    display: none;
+  }
+  .rates-calc .card > .calc {
+    margin-top: 3px;
+  }
   .rates-mobile {
     display: none;
   }
