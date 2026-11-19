@@ -1519,7 +1519,13 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
     display: grid;
     grid-template-columns: 1fr auto;
     column-gap: 16px;
+    row-gap: 0;
     align-items: baseline;
+    padding: 12px 22px;
+  }
+  .rates-layout .rate .price,
+  .rates-layout .rate .cap {
+    line-height: 1.2;
   }
   .rates-layout .rate .row {
     grid-column: 1 / -1;
