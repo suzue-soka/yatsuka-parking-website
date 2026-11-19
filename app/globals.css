@@ -1602,3 +1602,23 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
     display: none;
   }
 }
+
+/* PC only: smaller text and tighter spacing in the facility cards (owner, 2026-11-20). */
+@media (min-width: 900px) {
+  .grid.compact.facility-grid {
+    gap: 8px;
+  }
+  .grid.compact.facility-grid .card {
+    padding: 8px 10px;
+  }
+  .facility-item {
+    gap: 10px;
+    line-height: 1.35;
+  }
+  .facility-item strong {
+    font-size: 14px;
+  }
+  .facility-item .small {
+    font-size: 12px;
+  }
+}
