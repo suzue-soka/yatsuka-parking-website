@@ -1614,6 +1614,10 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-item {
     gap: 10px;
     line-height: 1.35;
+    align-items: flex-start;
+  }
+  .facility-item > div {
+    margin-top: -3px;
   }
   .facility-item strong {
     font-size: 14px;
