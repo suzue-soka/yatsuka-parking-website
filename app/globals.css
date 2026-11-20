@@ -655,6 +655,12 @@ tbody tr {
 }
 /* PC: footer links on one horizontal line under the address blocks */
 @media (min-width: 900px) {
+  /* Address blocks as wide as their text, so no line breaks mid-phrase */
+  .footer-grid {
+    grid-template-columns: auto auto;
+    justify-content: start;
+    column-gap: 64px;
+  }
   .footer ul {
     grid-column: 1 / -1;
     flex-direction: row;
