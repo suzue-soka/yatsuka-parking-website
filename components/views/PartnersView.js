@@ -149,7 +149,7 @@ export default function PartnersView({ lang = 'ja' }) {
         <ApplyForm lang={lang} />
         <p className="small" style={{ marginTop: 16 }}>
           {c.partnerBand.contact}
-          {c.owner.name} <a href={SITE.telHref}>{tel}</a>
+          {c.owner.name} <a href={SITE.telHref}>{tel}</a> {c.footer.telHours}
         </p>
       </div>
     </section>

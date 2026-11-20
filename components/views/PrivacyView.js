@@ -12,6 +12,7 @@ export default function PrivacyView({ lang = 'ja' }) {
       <p>
         {before}
         <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a>
+        {c.footer.telHoursInline}
         {after}
       </p>
     </section>

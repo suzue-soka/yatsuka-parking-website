@@ -1,5 +1,6 @@
 import { SITE } from '@/lib/site';
 import { programText } from '@/lib/content/program';
+import { getContent } from '@/lib/content';
 
 // Placeholder until the lawyer-reviewed 約款 is published.
 export default function PartnerTermsView({ lang = 'ja' }) {
@@ -9,7 +10,7 @@ export default function PartnerTermsView({ lang = 'ja' }) {
       <h1 style={{ fontSize: 28 }}>{t.termsTitle}</h1>
       <p>{t.termsBody}</p>
       <p>
-        TEL <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a>
+        TEL <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a> {getContent(lang).footer.telHours}
       </p>
     </section>
   );

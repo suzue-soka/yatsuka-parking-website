@@ -328,7 +328,7 @@ export default function HomeView({ lang = 'ja' }) {
               <div>
                 {h.value === 'owner' ? (
                   <>
-                    <strong>{c.owner.name}</strong> <a href={SITE.telHref}>{tel}</a>
+                    <strong>{c.owner.name}</strong> <a href={SITE.telHref}>{tel}</a> {c.footer.telHours}
                   </>
                 ) : (
                   <>
@@ -366,7 +366,7 @@ export default function HomeView({ lang = 'ja' }) {
           </p>
           <p style={{ marginBottom: 0 }}>
             {c.partnerBand.contact}
-            {c.owner.name} <a href={SITE.telHref}>{tel}</a>
+            {c.owner.name} <a href={SITE.telHref}>{tel}</a> {c.footer.telHours}
           </p>
         </div>
       </section>
