@@ -56,7 +56,7 @@ export default function Footer({ lang = 'ja' }) {
       </div>
       <div className="wrap">
         {c.footer.official && <p className="small">{c.footer.official}</p>}
-        <p className="small">© {new Date().getFullYear()} {c.owner.name}</p>
+        <p className="small footer-copy">© {new Date().getFullYear()} {c.owner.name}</p>
       </div>
     </footer>
   );

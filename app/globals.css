@@ -663,6 +663,9 @@ tbody tr {
     padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
+  .footer .footer-copy {
+    text-align: center;
+  }
 }
 .prose {
   max-width: 760px;
