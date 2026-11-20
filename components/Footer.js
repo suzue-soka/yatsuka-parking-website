@@ -27,7 +27,7 @@ export default function Footer({ lang = 'ja' }) {
             <br />
             {c.owner.address}
             <br />
-            TEL <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a>
+            TEL <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a> {c.footer.telHours}
           </p>
         </div>
         <ul>
