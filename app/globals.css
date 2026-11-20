@@ -678,7 +678,12 @@ tbody tr {
   /* Address blocks as wide as their text, so no line breaks mid-phrase */
   .footer-grid {
     grid-template-columns: auto 1fr;
+    align-items: start;
     column-gap: 64px;
+  }
+  /* Both address blocks start on the same line: 運営 level with the top of the logo */
+  .footer-grid > div > :first-child {
+    margin-top: 0;
   }
   .footer ul {
     grid-column: 1 / -1;
