@@ -158,6 +158,10 @@ a {
   .brand-logo.logo-pc {
     height: 35px;
   }
+  /* Header keeps its old height (52px logo row); the shorter logo sits centred in it */
+  .brand {
+    min-height: 52px;
+  }
 }
 /* ---------- Toolbar: every menu item always visible ---------- */
 .toolbar {
