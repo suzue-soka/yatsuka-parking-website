@@ -616,6 +616,12 @@ tbody tr {
   border-bottom: 1px solid var(--line);
   text-decoration: none;
 }
+/* PC: tighter news rows */
+@media (min-width: 900px) {
+  .news-list li a {
+    padding: 7px 4px;
+  }
+}
 .badge {
   font-size: 12px;
   font-weight: 700;

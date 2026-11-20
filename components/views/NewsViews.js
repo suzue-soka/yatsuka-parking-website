@@ -33,7 +33,9 @@ export function NewsArticleView({ lang = 'ja', slug }) {
   const item = findNews(slug, lang);
   if (!item) notFound();
   return (
-    <article className="wrap section prose">
+    <article className="wrap section">
+      {/* Text column starts at the same left edge as the news list; .prose only limits the line length */}
+      <div className="prose">
       <p className="small">
         <Link href={href(lang, '/news')}>{c.news.back}</Link>
       </p>
@@ -46,6 +48,7 @@ export function NewsArticleView({ lang = 'ja', slug }) {
         <p key={i}>{p}</p>
       ))}
       {c.news.translationNote && <p className="small muted">{c.news.translationNote}</p>}
+      </div>
     </article>
   );
 }
