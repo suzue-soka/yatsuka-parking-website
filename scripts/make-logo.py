@@ -87,10 +87,13 @@ def outline(paths, w, h, color, line):
 CAR_TOP, CAR_BOTTOM, MARK_W = 188, 400, 290
 LOCKUP_GAP = 90  # space between the mark and the lettering, in mark units
 
-def lockup(color, line=None, word_line=None):
+def lockup(color, line=None, word_line=None, level=False):
     """Mark + lettering side by side. The lettering is as tall as the car (roof to tyres)
-    and its bottom sits on the same line as the bottom of the tyres."""
-    k = (CAR_BOTTOM - CAR_TOP) / (INK[3] - INK[1])
+    and its bottom sits on the same line as the bottom of the tyres.
+    level=True (owner, 2026-11-20): the lettering is as tall as the whole mark (P to tyres).
+    Shown at 2/3 of the height of the classic lockup: PC header and footer, invoices, PDFs.
+    The classic lockup stays on phones until the mobile design pass."""
+    k = ((400 if level else CAR_BOTTOM - CAR_TOP)) / (INK[3] - INK[1])
     tx = MARK_W + LOCKUP_GAP - INK[0] * k
     ty = CAR_BOTTOM - INK[3] * k
     w = MARK_W + LOCKUP_GAP + (INK[2] - INK[0]) * k
@@ -119,6 +122,9 @@ files = {
     'logo-lockup.svg': lockup(NAVY),
     'logo-lockup-white.svg': lockup('#FFFFFF'),
     'logo-lockup-outline.svg': lockup(NAVY, 10, 7),
+    'logo-lockup-level.svg': lockup(NAVY, level=True),
+    'logo-lockup-level-white.svg': lockup('#FFFFFF', level=True),
+    'logo-lockup-level-outline.svg': lockup(NAVY, 10, 7, level=True),
 }
 os.makedirs(OUT, exist_ok=True)
 for name, svg in files.items():

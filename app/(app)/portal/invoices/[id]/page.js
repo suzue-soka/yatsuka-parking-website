@@ -60,7 +60,7 @@ export default async function Invoice({ params }) {
       {isDraft && <p className="alert no-print">{L.draftNote}</p>}
       <article className={`doc${isDraft ? ' doc-draft' : ''}`} lang="ja">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="doc-logo" src="/images/logo-lockup.svg" alt="谷塚駅東口共同駐車場" />
+        <img className="doc-logo" src="/images/logo-lockup-level.svg" alt="谷塚駅東口共同駐車場" />
 
         <div className="doc-head">
           <h1 className="doc-title">

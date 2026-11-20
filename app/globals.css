@@ -143,6 +143,22 @@ a {
     height: 44px;
   }
 }
+/* PC shows the level lockup (name as tall as the mark, 2/3 of the classic height);
+   phones keep the classic lockup until the mobile pass (owner, 2026-11-20). */
+.logo-pc {
+  display: none;
+}
+@media (min-width: 900px) {
+  .logo-sp {
+    display: none;
+  }
+  .logo-pc {
+    display: block;
+  }
+  .brand-logo.logo-pc {
+    height: 35px;
+  }
+}
 /* ---------- Toolbar: every menu item always visible ---------- */
 .toolbar {
   background: var(--white);
@@ -1181,7 +1197,7 @@ html {
 }
 .doc-logo {
   display: block;
-  height: 45px;
+  height: 30px;
   width: auto;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--doc-line);
