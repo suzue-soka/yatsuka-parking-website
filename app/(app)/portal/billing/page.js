@@ -38,7 +38,7 @@ export default async function Billing({ searchParams }) {
   const shippedList = (machines || []).filter((m) => m.machine_code && !m.cancelled_at).sort((a, b) => (a.machine_no ?? 0) - (b.machine_no ?? 0));
   const open = (requests || []).find((r) => ['pending', 'approved'].includes(r.status));
   const lastRejected = !open && requests?.[0]?.status === 'rejected' && requests[0].kind === 'additional' ? requests[0] : null;
-  const unit = price?.unit_yen ?? 40000;
+  const unit = price?.unit_yen ?? 46200;
   const unpaidEquipment = (invoices || []).some((i) => i.kind === 'equipment' && i.status === 'published');
   // Machine orders not completely shipped yet (unpaid ones can be cancelled; paid ones are final).
   const openOrders = (invoices || []).filter(
