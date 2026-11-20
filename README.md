@@ -23,7 +23,7 @@ Run the tests with `npm test`.
 2. In Vercel: **Add New → Project → Import** the repository. Framework: Next.js (detected automatically).
 3. Settings → Functions → Region: **Tokyo (hnd1)**.
 4. Environment variables:
-   - `NEXT_PUBLIC_SITE_URL` = the final address, e.g. `https://parking.example.co.jp` (no trailing slash)
+   - `NEXT_PUBLIC_SITE_URL` is optional: the code defaults to `https://www.yatsuka-parking.jp` in production
    - `ALLOW_INDEXING` = `true` only when the site is ready to appear in Google
 5. Add the domain under Settings → Domains and create the DNS records Vercel shows.
 

@@ -11,7 +11,7 @@ export async function GET(request) {
     return new Response('Unauthorized', { status: 401 });
   }
   try {
-    const origin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://yatsuka-parking-website.vercel.app').replace(/\/$/, '');
+    const origin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.yatsuka-parking.jp').replace(/\/$/, '');
     const result = await runOverdueJob(createAdminClient(), { origin });
     console.log('overdue job', JSON.stringify(result));
     return Response.json(result);
