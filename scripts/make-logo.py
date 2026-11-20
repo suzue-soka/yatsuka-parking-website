@@ -8,7 +8,7 @@ from fontTools.pens.transformPen import TransformPen
 from fontTools.pens.boundsPen import BoundsPen
 import os, sys
 
-NAVY = '#0B3A6E'
+NAVY = '#003870'
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'public/images'
 
 # ---------------------------------------------------------------- mark (viewBox 0 0 290 400)
