@@ -9,9 +9,11 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
-- Do not build in limits, restrictions or business rules the owner did not ask for. If a technical
-  limit seems necessary, ask first and name it as Claude's proposal. When an existing behaviour
-  surprises the owner, say plainly whether the owner asked for it or Claude added it (2026-11-26).
+- Do not build in limits, restrictions or business rules the owner did not ask for. When Claude
+  thinks a change is needed that the owner may not have realised (a limit, a safeguard, an extra
+  feature, a side fix), Claude only proposes it: say what it is, why, and wait for a yes. Do not
+  apply it and report afterwards. When an existing behaviour surprises the owner, say plainly
+  whether the owner asked for it or Claude added it (2026-11-26, extended the same day).
 - Before comparing figures from a web page, confirm the page is ours (name, address, ID). Our
   Park Direct page is PK000187048 (2026-11-23).
 - Do exactly what the owner asked. If an instruction seems to contradict an earlier rule, ask
