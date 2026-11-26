@@ -9,6 +9,10 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Read the Project doc `claude/project-index.md` as well as `claude/lessons.md` before the first
+  answer of a session, and check it again before advising the owner to download, check or ask
+  something. Claude urged a ParkingWeb download three times when the index already recorded that
+  ParkingWeb has had no data since April 2026 (2026-11-26).
 - Do not build in limits, restrictions or business rules the owner did not ask for. When Claude
   thinks a change is needed that the owner may not have realised (a limit, a safeguard, an extra
   feature, a side fix), Claude only proposes it: say what it is, why, and wait for a yes. Do not
