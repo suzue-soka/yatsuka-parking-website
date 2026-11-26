@@ -40,7 +40,16 @@ test('two full days', () => {
 
 test('errors', () => {
   assert.equal(fee(['2026-11-20', 10, 0], ['2026-11-20', 9, 0]).error, 'order');
-  assert.equal(fee(['2026-11-01', 10, 0], ['2026-12-05', 9, 0]).error, 'too_long');
+  // No upper limit (owner, 2026-11-26): any range is calculated; over 48 hours only adds a notice.
+  const month = fee(['2026-11-01', 10, 0], ['2026-12-05', 9, 0]);
+  assert.equal(month.error, undefined);
+  assert.equal(month.long, true);
+  assert.equal(fee(['2026-11-01', 10, 0], ['2026-11-03', 10, 0]).long, false);
+  assert.equal(fee(['2026-11-01', 10, 0], ['2026-11-03', 10, 1]).long, true);
+  const year = fee(['2026-01-01', 0, 0], ['2027-01-01', 0, 0]);
+  assert.equal(year.error, undefined);
+  assert.equal(year.total, 657200); // 365 days x 1,200 + 600 + 364 nights x 600 + 200 (22:00 to 0:00)
+  assert.equal(fee(['0002-11-01', 10, 0], ['2026-11-01', 11, 0]).error, 'invalid');
   assert.equal(calculateFee(toMinutes('', 1, 1), 10).error, 'invalid');
   assert.ok(Number.isNaN(toMinutes('2026-11-20', 24, 0)));
 });

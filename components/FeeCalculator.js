@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { calculateFee, toMinutes, fromMinutes, formatDateTime, formatTime, formatDuration, yen, MAX_DAYS } from '@/lib/fees';
+import { calculateFee, toMinutes, fromMinutes, formatDateTime, formatTime, formatDuration, yen, REPORT_HOURS } from '@/lib/fees';
 import { getContent } from '@/lib/content';
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -56,6 +56,9 @@ export default function FeeCalculator({ lang = 'ja' }) {
   // Default stay 10:00–11:00 = 300円 (owner, 2026-11-17).
   const [leave, setLeave] = useState({ date: '2026-01-01', hour: '11', minute: '00' });
 
+  // The breakdown rows are drawn only while the breakdown is open (a long stay has two rows per day).
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     const d = todayJst();
     setArrive((v) => ({ ...v, date: d }));
@@ -89,7 +92,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
 
       {r.error ? (
         <p className="alert" role="alert">
-          {r.error === 'too_long' ? t.errors.too_long(MAX_DAYS) : t.errors[r.error]}
+          {t.errors[r.error]}
         </p>
       ) : (
         <div aria-live="polite" className="calc">
@@ -111,6 +114,12 @@ export default function FeeCalculator({ lang = 'ja' }) {
             </div>
           </div>
 
+          {r.long && (
+            <p className="alert" role="note">
+              {t.longStay(REPORT_HOURS, c.support.tel)}
+            </p>
+          )}
+
           <div className="grid calc-subtotals">
             <div className="subtotal accent">
               <span>
@@ -126,7 +135,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
             </div>
           </div>
 
-          <details className="breakdown">
+          <details className="breakdown" onToggle={(e) => setOpen(e.currentTarget.open)}>
             <summary>{t.breakdown(r.rows.length)}</summary>
             <div className="table-wrap">
               <table>
@@ -143,7 +152,7 @@ export default function FeeCalculator({ lang = 'ja' }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {r.rows.map((row) => (
+                  {open && r.rows.map((row) => (
                     <tr key={`${row.key}-${row.start}`}>
                       <td>
                         <strong>{t.kinds[row.key]}</strong>
