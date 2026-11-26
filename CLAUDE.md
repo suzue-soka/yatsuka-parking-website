@@ -25,7 +25,10 @@ record the lesson in the same turn: here, and in the Project doc `claude/lessons
 - Write phone numbers and other identifiers in full, every time: 0120-951-365, never "951-365"
   or "0120". Same for site number 04672, document numbers, IDs and amounts (2026-11-21).
 - Before asking the owner for a fact, search what is already on record: project docs, the
-  Amano/AMS email threads, attached files, past chats (2026-11-21).
+  Amano/AMS email threads, attached files, past chats (2026-11-21). The same search comes before
+  writing "not known" in a figure or ending an answer with a question. Claude called Park Direct's
+  fee unknown twice and asked for it; the memory notes and a chat of 2026-11-25 had it (8% of the
+  rent before tax plus tax, 1,320円, paid by the tenant) (2026-11-26).
 - Before saying "no reply yet", read the whole email thread, not only the sent message (2026-11-21).
 - Check before warning: do not state a side effect or risk as fact without looking at the code,
   page or document. If it was not checked, say so (2026-11-20).
