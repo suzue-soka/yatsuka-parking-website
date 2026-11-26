@@ -41,6 +41,8 @@ record the lesson in the same turn: here, and in the Project doc `claude/lessons
 - It calculates any range of dates; no upper limit.
 - A stay over 48 hours is not prohibited. It must be reported to the AMS support centre in
   advance, so the simulator shows a notice and still calculates.
+- Kept by the owner's decision (2026-11-27): a date whose year is still being typed counts as
+  not entered yet, and the breakdown lines are drawn only while the breakdown is open.
 
 # AMS phone numbers (owner, 2026-11-21)
 
