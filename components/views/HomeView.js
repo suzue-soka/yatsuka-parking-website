@@ -109,7 +109,7 @@ export default function HomeView({ lang = 'ja' }) {
   );
 
   return (
-    // .home-flow lets the PC layout put sections in a different order (VEHICLES, RATES, FACILITY)
+    // .home-flow orders the sections: hero, VEHICLES, RATES, FACILITY (every screen size, owner 2026-11-27)
     // without changing the order on phones and tablets.
     <div className="home-flow">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(c, lang) }} />
@@ -163,8 +163,6 @@ export default function HomeView({ lang = 'ja' }) {
           labels={{ showAll: c.facility.showAll(c.facility.items.filter((a) => !PAY_ICONS.includes(a.icon)).length), showLess: c.facility.showLess }}
         />
       </section>
-
-      {news.length > 0 && newsSection('news-h', 'rates-mobile')}
 
       <section id="rates" className="wrap section" aria-labelledby="rates-h">
         <SectionHead kicker="RATES" title={c.rates.title} id="rates-h" />
@@ -281,26 +279,6 @@ export default function HomeView({ lang = 'ja' }) {
           </div>
           <iframe className="map" title={c.access.mapTitle} src={mapsEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
         </div>
-      </section>
-
-      <section id="vehicles-m" className="wrap section sp-only" aria-labelledby="veh-h">
-        <SectionHead kicker="VEHICLES" title={c.vehicles.title} id="veh-h" />
-        <div className="grid">
-          {c.vehicles.ok.map((v) => (
-            <div key={v.name} className="card">
-              <strong>{v.name}</strong>
-              <div className="small">{v.size}</div>
-              <div className="small muted">
-                {c.vehicles.example}
-                {v.ex}
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="small">
-          <strong>{c.vehicles.ngLabel}</strong>
-          {c.vehicles.ng.join(c.vehicles.sep)}
-        </p>
       </section>
 
       <section id="monthly" className="wrap section" aria-labelledby="monthly-h">

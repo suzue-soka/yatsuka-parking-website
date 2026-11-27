@@ -143,25 +143,24 @@ a {
     height: 44px;
   }
 }
-/* PC shows the level lockup (name as tall as the mark, 2/3 of the classic height);
-   phones keep the classic lockup until the mobile pass (owner, 2026-11-20). */
-.logo-pc {
+/* Level lockup (name as tall as the mark) on every screen size (owner, 2026-11-27; was PC only).
+   The classic lockup (.logo-sp) is no longer shown. */
+.logo-sp {
   display: none;
 }
-@media (min-width: 900px) {
-  .logo-sp {
-    display: none;
-  }
-  .logo-pc {
-    display: block;
-  }
-  .brand-logo.logo-pc {
-    height: 35px;
-  }
-  /* Header keeps its old height (52px logo row); the shorter logo sits centred in it */
-  .brand {
-    min-height: 52px;
-  }
+.logo-pc {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.brand-logo.logo-pc {
+  height: 35px;
+  width: auto;
+  max-width: 100%;
+}
+/* Header keeps its old height (52px logo row); the shorter logo sits centred in it */
+.brand {
+  min-height: 52px;
 }
 /* ---------- Toolbar: every menu item always visible ---------- */
 .toolbar {
@@ -679,16 +678,30 @@ tbody tr {
   flex-direction: column;
   gap: 8px;
 }
-/* PC: footer links on one horizontal line under the address blocks */
+/* Footer links on one horizontal line under the address blocks, copyright centred
+   (every screen size, owner 2026-11-27; was PC only) */
+.footer-grid > div > :first-child {
+  margin-top: 0;
+}
+.footer-grid > div > p:last-child {
+  margin-bottom: 0;
+}
+.footer ul {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.footer .footer-copy {
+  text-align: center;
+}
 @media (min-width: 900px) {
-  /* Address blocks as wide as their text, so no line breaks mid-phrase */
+  /* Address blocks side by side, as wide as their text, so no line breaks mid-phrase */
   .footer-grid {
     grid-template-columns: auto 1fr;
     column-gap: 64px;
-  }
-  /* Both address blocks start on the same line: 運営 level with the top of the logo */
-  .footer-grid > div > :first-child {
-    margin-top: 0;
   }
   /* Left block: logo at the top, address pushed down so both blocks end on the same line */
   .footer-grid > div:first-child {
@@ -696,22 +709,8 @@ tbody tr {
     flex-direction: column;
     justify-content: space-between;
   }
-  .footer-grid > div > p:last-child {
-    margin-bottom: 0;
-  }
   .footer-grid > div:first-child > p {
     margin-top: 12px;
-  }
-  .footer ul {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px 28px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
-  }
-  .footer .footer-copy {
-    text-align: center;
   }
 }
 .prose {
@@ -1547,48 +1546,51 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   color: var(--orange-text);
   font-weight: 700;
 }
-/* PC section order on the home page (owner, 2026-11-27): hero, VEHICLES, RATES, FACILITY, then the rest.
-   Phones and tablets keep the order of the page source. */
-@media (min-width: 900px) {
-  .home-flow {
-    display: flex;
-    flex-direction: column;
-  }
-  .home-flow > .wrap {
-    width: 100%;
-  }
-  .home-flow > .hero {
-    order: -3;
-  }
-  .home-flow > #vehicles {
-    order: -2;
-  }
-  .home-flow > #rates {
-    order: -1;
-  }
+/* Section order on the home page: hero, VEHICLES, RATES, FACILITY, then the rest.
+   Every screen size (owner, 2026-11-27; was PC only). */
+.home-flow {
+  display: flex;
+  flex-direction: column;
 }
-/* Shown on PC only / on phones and tablets only */
-.pc-only,
+.home-flow > .wrap {
+  width: 100%;
+}
+.home-flow > .hero {
+  order: -3;
+}
+.home-flow > #vehicles {
+  order: -2;
+}
+.home-flow > #rates {
+  order: -1;
+}
+/* Phones and tablets now show the same content as PC (owner, 2026-11-27):
+   .pc-only is always shown, .sp-only is retired. */
+.pc-only {
+  display: block;
+}
 .pc-only-inline {
+  display: inline;
+}
+.sp-only,
+.sp-only-inline {
   display: none;
 }
-@media (min-width: 900px) {
-  .pc-only {
-    display: block;
-  }
-  .pc-only-inline {
-    display: inline;
-  }
-  .sp-only,
-  .sp-only-inline {
-    display: none;
-  }
-}
-/* Vehicle limits row, as on the entrance sign (PC) */
+/* Vehicle limits row, as on the entrance sign: 2 across on phones, 3 on tablets, 5 on PC */
 .veh-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+@media (min-width: 560px) {
+  .veh-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .veh-strip {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 .veh-tile {
   display: flex;
@@ -1608,23 +1610,79 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 .veh-other {
   margin: 12px 0 0;
 }
-/* Two tiers on PC only (owner, 2026-11-27); phones and tablets show every card and no button. */
-.facility-toggle {
+/* FACILITY in two tiers on every screen size (owner, 2026-11-27) */
+.facility-grid:not(.show-all) .facility-extra {
   display: none;
 }
+/* Payment-method cards are in RATES */
+.facility-grid .facility-pay {
+  display: none;
+}
+.facility-toggle {
+  display: block;
+  margin: 12px 0 0;
+  text-align: center;
+}
+/* Payment methods in RATES: one headed card, one row per method (owner, 2026-11-27) */
+.pay-head {
+  margin: 20px 0 12px;
+}
+.pay-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 22px;
+}
+.pay-items {
+  display: grid;
+  gap: 10px;
+}
+/* Phones: icon, name with its status, and the brands on the line below */
+.pay-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  line-height: 1.3;
+}
+.pay-item strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+.pay-item .facility-icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+.pay-item .facility-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.pay-brands {
+  grid-column: 2;
+  font-size: 13px;
+  color: var(--grey-2);
+}
+/* A brand name never breaks in the middle */
+.pay-brands span {
+  display: inline-block;
+  white-space: pre;
+}
+@media (min-width: 560px) {
+  /* Tablets and PC: icon, name with its status, then the brands on the same row */
+  .pay-items {
+    gap: 6px;
+  }
+  .pay-item {
+    grid-template-columns: auto 8.3em minmax(0, 1fr);
+  }
+  .pay-brands {
+    grid-column: auto;
+  }
+}
 @media (min-width: 900px) {
-  .facility-grid:not(.show-all) .facility-extra {
-    display: none;
-  }
-  /* Payment-method cards are in RATES on PC */
-  .facility-grid .facility-pay {
-    display: none;
-  }
-  /* Payment methods in RATES: one headed card, three columns, status under each name
-     (option A, owner 2026-11-27) */
-  .pay-head {
-    margin: 20px 0 12px;
-  }
   /* The card grows to the bottom of the simulator frame (owner, 2026-11-27). While the
      breakdown is open the simulator is much taller, so the stretch is dropped then. */
   .rates-layout:not(:has(details[open])) {
@@ -1639,46 +1697,6 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .pay-card {
     flex: 1;
   }
-  .pay-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 12px 22px;
-  }
-  .pay-items {
-    display: grid;
-    gap: 6px;
-  }
-  /* One row per method: icon, name with its status, then brands or accepted notes */
-  .pay-item {
-    display: grid;
-    grid-template-columns: auto 8.3em minmax(0, 1fr);
-    align-items: center;
-    column-gap: 10px;
-    line-height: 1.3;
-  }
-  .pay-item strong {
-    font-size: 15px;
-    white-space: nowrap;
-  }
-  .pay-item .facility-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-  }
-  .pay-item .facility-icon svg {
-    width: 22px;
-    height: 22px;
-  }
-  .pay-brands {
-    font-size: 13px;
-    color: var(--grey-2);
-  }
-  /* A brand name never breaks in the middle */
-  .pay-brands span {
-    display: inline-block;
-    white-space: pre;
-  }
   /* If the left column is the taller one, the simulator frame grows to match instead */
   .rates-layout:not(:has(details[open])) .rates-calc {
     display: flex;
@@ -1687,62 +1705,65 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-layout:not(:has(details[open])) .rates-calc > .card {
     flex: 1;
   }
-  .facility-toggle {
-    display: block;
-    margin: 12px 0 0;
-    text-align: center;
-  }
 }
 
 /* ---------- Rates + calculator ---------- */
-/* Phones and tablets: rates, then the calculator below (with its own 料金を計算 menu button).
-   PC (900px+): rates stacked on the left, calculator on the right, one 料金 button (owner, 2026-11-18). */
+/* Same content on every screen size (owner, 2026-11-27). PC (900px+): rates stacked on the left,
+   calculator on the right. Phones and tablets: rates, payment methods, then the calculator below
+   (they keep the 料金を計算 menu button, since the calculator is not beside the rates). */
 .rates-sub {
   margin: 16px 0;
 }
 .rates-calc {
   margin-top: 24px;
 }
+/* .rates-pc content is shown everywhere; .rates-mobile content is retired. */
 .rates-pc {
+  display: block;
+}
+span.rates-pc {
+  display: inline;
+}
+.rates-mobile {
   display: none;
 }
-@media (min-width: 900px) {
-  .rates-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    align-items: start;
-  }
+.rates-sub-row,
+p.rates-sub-row.rates-pc {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.rates-tax {
+  font-size: 14px;
+  color: var(--grey-2);
+}
+.rates-calc .calc > ul,
+.rates-calc .chips,
+.rates-layout .notes .note-tax,
+.rates-calc .total-range,
+.rates-layout .notes .note-pay,
+.rates-calc .calc-subtotals,
+.rates-calc .calc-note {
+  display: none;
+}
+.rates-calc .total {
+  align-items: last baseline;
+}
+.rates-calc .card {
+  padding-top: 15px;
+}
+.rates-calc .card > .calc {
+  margin-top: 0;
+}
+/* Rate cards one per line, price on the left and the maximum on the right (tablets and PC;
+   phones keep the stacked card, which is too narrow for one line) */
+@media (min-width: 560px) {
   .rates-layout .rate-cards {
     grid-template-columns: 1fr;
   }
-  .rates-calc {
-    margin-top: 0;
-  }
-  .rates-pc {
-    display: block;
-  }
-  p.rates-sub-row.rates-pc {
-    display: flex;
-  }
-  .rates-calc .calc > ul {
-    display: none;
-  }
-  span.rates-pc {
-    display: inline;
-  }
-  .rates-sub-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
   .rates-tax {
-    font-size: 14px;
-    color: var(--grey-2);
     padding-right: 23px;
-  }
-  .rates-calc .total {
-    align-items: last baseline;
   }
   .rates-layout .rate {
     display: grid;
@@ -1786,80 +1807,71 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .rates-layout .rate .per-unit {
     font-size: 14px;
   }
-  .rates-calc .chips {
-    display: none;
+}
+@media (min-width: 900px) {
+  .rates-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
   }
-  .rates-layout .notes .note-tax,
-  .rates-calc .total-range,
-  .rates-layout .notes .note-pay,
-  .rates-calc .calc-subtotals,
-  .rates-calc .calc-note {
-    display: none;
-  }
-  .rates-calc .card {
-    padding-top: 15px;
-  }
-  .rates-calc .card > .calc {
+  .rates-calc {
     margin-top: 0;
-  }
-  .rates-mobile {
-    display: none;
   }
   .toolbar .nav-calc {
     display: none;
   }
 }
 
-/* PC only: smaller text and tighter spacing in the facility cards (owner, 2026-11-20). */
-@media (min-width: 900px) {
-  .grid.compact.facility-grid {
-    gap: 8px;
-  }
-  .grid.compact.facility-grid .card {
-    padding: 8px 10px;
-  }
-  .facility-item {
-    gap: 10px;
-    line-height: 1.35;
-    align-items: flex-start;
-  }
-  .facility-item > div {
-    margin-top: -3px;
-  }
-  span.rates-pc.sup-pc {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 18px;
-  }
-  .sup-tel {
-    font-family: var(--font-num);
-    font-size: 34px;
-    font-weight: 700;
-    color: inherit;
-    text-decoration: none;
-  }
-  .sup-code.small {
-    font-size: inherit;
-  }
-  .section[aria-labelledby] {
-    padding-top: 28px;
-    padding-bottom: 12px;
-  }
-  .section[aria-labelledby] .section-head {
-    margin-bottom: 12px;
-  }
-  .section-head .kicker {
-    line-height: 1.2;
-  }
-  .section-head h2 {
-    margin-top: 0;
-    line-height: 1.2;
-  }
-  .facility-item strong {
-    font-size: 14px;
-  }
-  .facility-item .small {
-    font-size: 12px;
-  }
+/* Smaller text and tighter spacing in the facility cards and sections
+   (every screen size, owner 2026-11-27; was PC only since 2026-11-20). */
+.grid.compact.facility-grid {
+  gap: 8px;
+}
+.grid.compact.facility-grid .card {
+  padding: 8px 10px;
+}
+.facility-item {
+  gap: 10px;
+  line-height: 1.35;
+  align-items: flex-start;
+}
+.facility-item > div {
+  margin-top: -3px;
+}
+span.rates-pc.sup-pc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 18px;
+}
+.sup-tel {
+  font-family: var(--font-num);
+  font-size: 34px;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+}
+.sup-code.small {
+  font-size: inherit;
+}
+.section[aria-labelledby] {
+  padding-top: 28px;
+  padding-bottom: 12px;
+}
+.section[aria-labelledby] .section-head {
+  margin-bottom: 12px;
+}
+.section-head .kicker {
+  line-height: 1.2;
+}
+.section-head h2 {
+  margin-top: 0;
+  line-height: 1.2;
+}
+.facility-item strong {
+  font-size: 14px;
+}
+.facility-item .small {
+  font-size: 12px;
 }

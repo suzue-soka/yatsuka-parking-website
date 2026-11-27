@@ -9,6 +9,9 @@ export default function PrivacyView({ lang = 'ja' }) {
     <section className="wrap section prose">
       <h1 style={{ fontSize: 28 }}>{c.privacy.title}</h1>
       <p>{c.privacy.body}</p>
+      {/* Moved here from the home page's SECURITY section (owner, 2026-11-27) */}
+      <h2 style={{ fontSize: 20 }}>{c.privacy.cameraTitle}</h2>
+      <p>{c.privacy.cameraText}</p>
       <p>
         {before}
         <a href={SITE.telHref}>{lang === 'ja' ? SITE.tel : SITE.telIntl}</a>
