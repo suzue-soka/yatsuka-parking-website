@@ -1,4 +1,5 @@
 import { facilityIconSvg } from '@/lib/facility-icons';
+import { partnerIconSvg } from '@/lib/partner-icons';
 import { vehicleLimitIconSvg } from '@/lib/vehicle-limit-icons';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,6 +13,8 @@ import { sortedNews, formatNewsDate } from '@/lib/news';
 import { programText } from '@/lib/content/program';
 
 // Payment-method cards: shown in RATES on PC, in FACILITY on phones and tablets.
+// Icons of the four partner benefits, in the order of c.partnerBand.features
+const PARTNER_ICON_KEYS = ['visit', 'usage', 'invoice', 'machine'];
 const PAY_ICONS = ['card', 'emoney', 'cash'];
 
 function SectionHead({ kicker, title, id }) {
@@ -382,13 +385,17 @@ export default function HomeView({ lang = 'ja' }) {
             {c.partnerBand.title}
           </h2>
           <p>{c.partnerBand.text}</p>
-          <div className="grid">
-            {c.partnerBand.features.map((f) => (
-              <div key={f.t}>
-                <strong>{f.t}</strong>
-                <p className="small" style={{ margin: 0 }}>
-                  {f.d}
-                </p>
+          {/* One icon per benefit, white tile on the navy band (owner, 2026-11-27) */}
+          <div className="grid partner-features">
+            {c.partnerBand.features.map((f, i) => (
+              <div key={f.t} className="partner-feature">
+                <span className="partner-icon" dangerouslySetInnerHTML={{ __html: partnerIconSvg(PARTNER_ICON_KEYS[i]) }} />
+                <div>
+                  <strong>{f.t}</strong>
+                  <p className="small" style={{ margin: 0 }}>
+                    {f.d}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

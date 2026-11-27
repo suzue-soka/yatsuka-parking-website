@@ -2043,3 +2043,19 @@ p.rates-sub-row.rates-pc {
     font-size: 19px;
   }
 }
+
+/* Partner benefits: icon on a white tile, text beside it (owner, 2026-11-27) */
+.partner-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.partner-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: var(--white);
+  display: grid;
+  place-items: center;
+}
