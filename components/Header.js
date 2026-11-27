@@ -12,8 +12,9 @@ export default function Header({ lang = 'ja', app = false }) {
   const links = [
     { href: anchor('rates'), label: c.nav.rates },
     { href: anchor('calc'), label: c.nav.calc, cls: 'nav-calc' }, // hidden on PC, where the calculator sits beside the rates
-    { href: anchor('access'), label: c.nav.access },
+    // Same order as the sections on the page: MONTHLY above ACCESS (owner, 2026-11-27)
     { href: anchor('monthly'), label: c.nav.monthly },
+    { href: anchor('access'), label: c.nav.access },
     { href: href(lang, '/partners'), label: c.nav.partners },
     { href: anchor('support'), label: c.nav.support },
   ];
