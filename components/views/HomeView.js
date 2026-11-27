@@ -61,7 +61,9 @@ function jsonLd(c, lang) {
       closes: '23:59',
     },
     maximumAttendeeCapacity: SITE.capacity,
-    paymentAccepted: 'Cash, Credit Card, IC card (PASMO, Suica)',
+    // Cash only until the new pay machines start on 2027-02-02; then card and transit IC are added
+    // (matches the rates text). Change on 2027-02-02 to 'Cash, Credit Card, Electronic money (transit IC)'.
+    paymentAccepted: 'Cash',
     amenityFeature: [
       { '@type': 'LocationFeatureSpecification', name: 'EV charging', value: true },
       { '@type': 'LocationFeatureSpecification', name: 'Restroom', value: true },
@@ -78,8 +80,10 @@ export default function HomeView({ lang = 'ja' }) {
   const c = getContent(lang);
   const news = sortedNews(lang).slice(0, 3);
   const hl = lang === 'zh' ? 'zh-CN' : lang;
-  const mapsEmbed = `https://www.google.com/maps?q=${encodeURIComponent(SITE.mapsQuery)}&hl=${hl}&output=embed`;
-  const mapsDirections = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(SITE.mapsQuery)}&hl=${hl}`;
+  // Map links point at the front entrance (owner, 2026-11-27); the name and address are the fallback.
+  const mapsPoint = SITE.geo ? `${SITE.geo.lat},${SITE.geo.lng}` : SITE.mapsQuery;
+  const mapsEmbed = `https://www.google.com/maps?q=${encodeURIComponent(mapsPoint)}&hl=${hl}&output=embed`;
+  const mapsDirections = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapsPoint)}&hl=${hl}`;
   const tel = lang === 'ja' ? SITE.tel : SITE.telIntl;
 
   // News list: phones keep it under the facility cards; PC shows it under MONTHLY (owner, 2026-11-20).
