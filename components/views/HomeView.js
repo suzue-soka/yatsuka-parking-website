@@ -328,35 +328,42 @@ export default function HomeView({ lang = 'ja' }) {
 
       {news.length > 0 && newsSection('news-h-pc', 'rates-pc')}
 
+      {/* SUPPORT: same layout as the footer of our entrance sign (owner, 2026-11-27):
+          lead line, AMS support-centre mark, name + hours, phone, site number, operator. */}
       <section id="support" className="wrap section" aria-labelledby="sup-h">
         <SectionHead kicker="SUPPORT" title={c.help.title} id="sup-h" />
-        <div className="band">
-          <h3 style={{ marginTop: 0 }}>
-            <span className="rates-mobile">
-              {c.support.name}
-              {lang === 'en' ? ` (${c.support.hours})` : `（${c.support.hours}）`}
+        <div className="band sup-band">
+          <p className="sup-lead">{c.help.signLead}</p>
+          <div className="sup-row">
+            <span className="sup-mark">
+              <img src="/images/ams-support-center.png" alt={c.support.name} width={640} height={228} />
             </span>
-            <span className="rates-pc sup-pc">
+            <div className="sup-main">
+              <div className="sup-labels">
+                <span>{c.support.name}</span>
+                <span>{c.help.hoursShort}</span>
+              </div>
               <a href={c.support.telHref} className="sup-tel">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                </svg>
                 {c.support.tel}
               </a>
-              <span>{c.support.name}</span>
-              <span>{c.support.hours}</span>
-            </span>
-          </h3>
-          <p>{c.help.intro}</p>
-          <p className="rates-mobile" style={{ fontSize: 20, margin: '8px 0' }}>
-            <span className="small">{c.support.telLabel} </span>
-            <a href={c.support.telHref} style={{ color: 'inherit', fontWeight: 700 }}>
-              {c.support.tel}
-            </a>
-          </p>
-          {c.support.codeNote && <p className="small sup-code">{c.support.codeNote}</p>}
-          {c.help.langNote && <p className="small">{c.help.langNote}</p>}
-          <p className="small">
-            {c.help.operatorBy}
-            {c.support.operator}
-          </p>
+              <div className="sup-operator">
+                {c.help.managedBy}
+                {c.support.operator}
+              </div>
+            </div>
+            <div className="sup-site">
+              <div className="sup-labels">
+                <span>{c.help.siteNoLabel}</span>
+              </div>
+              <div className="sup-siteno">{SITE.amsSiteNo}</div>
+            </div>
+          </div>
+          <p className="small sup-note">{c.help.intro}</p>
+          {c.support.codeNote && <p className="small sup-note">{c.support.codeNote}</p>}
+          {c.help.langNote && <p className="small sup-note">{c.help.langNote}</p>}
         </div>
       </section>
 

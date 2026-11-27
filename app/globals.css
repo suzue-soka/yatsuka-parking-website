@@ -1847,21 +1847,90 @@ p.rates-sub-row.rates-pc {
 .facility-item > div {
   margin-top: -3px;
 }
-span.rates-pc.sup-pc {
+/* SUPPORT band, laid out like the footer of the entrance sign (owner, 2026-11-27) */
+.sup-band {
+  padding: 20px 28px 22px;
+}
+.sup-band .sup-lead {
+  margin: 0 0 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--white);
+}
+.sup-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 18px;
+  align-items: center;
+  gap: 16px 32px;
 }
-.sup-tel {
+.sup-mark {
+  flex: none;
+  display: flex;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.sup-mark img {
+  display: block;
+  height: 84px;
+  width: auto;
+}
+.sup-main,
+.sup-site {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sup-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 28px;
+  font-size: 15px;
+  color: #dce3ee;
+}
+.sup-tel,
+.sup-siteno {
   font-family: var(--font-num);
-  font-size: 34px;
-  font-weight: 700;
-  color: inherit;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--white);
   text-decoration: none;
+  white-space: nowrap;
 }
-.sup-code.small {
-  font-size: inherit;
+.sup-tel svg {
+  width: 34px;
+  height: 34px;
+  margin-right: 8px;
+  vertical-align: -4px;
+  fill: currentColor;
+}
+.sup-operator {
+  font-size: 15px;
+  color: #dce3ee;
+}
+.sup-band .sup-note {
+  margin: 12px 0 0;
+}
+.sup-band .sup-note + .sup-note {
+  margin-top: 4px;
+}
+@media (max-width: 559px) {
+  .sup-band {
+    padding: 18px 16px;
+  }
+  .sup-tel,
+  .sup-siteno {
+    font-size: 32px;
+  }
+  .sup-tel svg {
+    width: 26px;
+    height: 26px;
+  }
+  .sup-mark img {
+    height: 64px;
+  }
 }
 .section[aria-labelledby] {
   padding-top: 28px;
