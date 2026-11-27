@@ -9,6 +9,9 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- A phone number, ID or amount must never break across lines: set `white-space: nowrap` whenever
+  one is added or enlarged, and look at it at phone width (375px) before reporting it done.
+  The Park Direct number 050-3173-9036 broke after "050-3173-" when Claude enlarged it (2026-11-27).
 - Before telling the owner that "another session" or someone else made a change, check who made
   it: the commit's `Claude-Session` trailer and `git reflog` (an entry starting "commit:" was made
   in this workspace). Twice on 2026-11-27 Claude said another session was editing the site; both

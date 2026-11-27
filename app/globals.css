@@ -2026,3 +2026,9 @@ p.rates-sub-row.rates-pc {
   vertical-align: -7px;
   margin-right: 4px;
 }
+.pd-tel {
+  color: #0451a1; /* the blue of Park Direct's logo; used only here */
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 22px;
+}

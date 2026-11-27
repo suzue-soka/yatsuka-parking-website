@@ -277,11 +277,10 @@ export default function HomeView({ lang = 'ja' }) {
             <p className="small" style={{ margin: '14px 0 0' }}>
               {/* Park Direct's logo, supplied by Park Direct with permission to use it on this site (owner, 2026-11-27) */}
               <img className="pd-logo" src="/images/park-direct-logo.png" alt="Park Direct" width={612} height={112} />{' '}
-              {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
-              <a href={SITE.parkDirectTelHref}>
-                <strong className="num" style={{ fontSize: 22 }}>{SITE.parkDirectTel}</strong>
+              {/* No label: logo + number on one line; the number is in the logo's blue and never breaks (owner, 2026-11-27) */}
+              <a className="pd-tel" href={SITE.parkDirectTelHref} aria-label={`Park Direct ${c.monthly.telLabel} ${SITE.parkDirectTel}`}>
+                <strong className="num">{SITE.parkDirectTel}</strong>
               </a>
-              {/* Hours on their own line under the number (owner, 2026-11-27) */}
               <span className="muted" style={{ display: 'block' }}>{c.monthly.telHours}</span>
             </p>
           </div>
