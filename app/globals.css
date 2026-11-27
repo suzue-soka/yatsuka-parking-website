@@ -2032,3 +2032,14 @@ p.rates-sub-row.rates-pc {
   white-space: nowrap;
   font-size: 22px;
 }
+/* Phones: slightly smaller so the logo and the number stay on one line */
+@media (max-width: 559px) {
+  .pd-logo {
+    height: 22px;
+    vertical-align: -5px;
+    margin-right: 2px;
+  }
+  .pd-tel {
+    font-size: 19px;
+  }
+}
