@@ -169,7 +169,7 @@ export default function HomeView({ lang = 'ja' }) {
       <section id="rates" className="wrap section" aria-labelledby="rates-h">
         <SectionHead kicker="RATES" title={c.rates.title} id="rates-h" />
         <div className="rates-layout">
-        <div>
+        <div className="rates-left">
         <p className="rates-sub rates-sub-row">
           <strong>
             <span className="rates-mobile">{c.rates.subtitle}</span>
@@ -202,14 +202,15 @@ export default function HomeView({ lang = 'ja' }) {
           ))}
         </div>
         {/* PC: payment methods live here in one headed card, three columns, each with its status
-            (option A, owner 2026-11-27), instead of in FACILITY. Cash first: the only method in
+            (option A, owner 2026-11-27); the card stretches to the bottom of the simulator frame, instead of in FACILITY. Cash first: the only method in
             use until 2027-02-02. Phones and tablets keep them in FACILITY. */}
-        <div className="pc-only">
+        <div className="pc-only pay-block">
           <p className="rates-sub rates-sub-row pay-head">
             <strong>{c.rates.payTitle}</strong>
             <span className="rates-tax">{c.rates.payAt}</span>
           </p>
           <div className="card pay-card">
+            <div className="pay-items">
             {['cash', 'card', 'emoney']
               .map((k) => c.facility.items.find((a) => a.icon === k))
               .filter(Boolean)
@@ -218,10 +219,17 @@ export default function HomeView({ lang = 'ja' }) {
                   <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
                   <div>
                     <strong>{a.t}</strong>
+                    <div className="small muted">{a.d}</div>
                     <div className={a.note ? 'small facility-note' : 'small muted'}>{a.note || c.rates.payAvailable}</div>
                   </div>
                 </div>
               ))}
+            </div>
+            <ul className="pay-foot small muted">
+              {c.rates.payFoot.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
           </div>
         </div>
         </div>
