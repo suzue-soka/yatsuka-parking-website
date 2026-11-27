@@ -361,8 +361,16 @@ export default function HomeView({ lang = 'ja' }) {
               <div className="sup-siteno">{SITE.amsSiteNo}</div>
             </div>
           </div>
-          <p className="small sup-note">{c.help.intro}</p>
-          {c.support.codeNote && <p className="small sup-note">{c.support.codeNote}</p>}
+          {/* The lead line says when to make contact; these lines say how (owner, 2026-11-27) */}
+          <ul className="small sup-how">
+            {c.help.how.map((h) => (
+              <li key={h.by}>
+                <strong>{h.by}</strong>
+                {lang === 'en' ? ': ' : '：'}
+                {h.do}
+              </li>
+            ))}
+          </ul>
           {c.help.langNote && <p className="small sup-note">{c.help.langNote}</p>}
         </div>
       </section>

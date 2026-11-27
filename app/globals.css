@@ -1913,6 +1913,18 @@ p.rates-sub-row.rates-pc {
   font-size: 15px;
   color: #dce3ee;
 }
+.sup-how {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #dce3ee;
+}
+.sup-how li + li {
+  margin-top: 2px;
+}
+.sup-how strong {
+  color: var(--white);
+}
 .sup-band .sup-note {
   margin: 12px 0 0;
 }
