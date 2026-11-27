@@ -302,7 +302,8 @@ export default function HomeView({ lang = 'ja' }) {
                 <li key={t}>{t}</li>
               ))}
             </ul>
-            <p className="small" style={{ margin: '14px 0 0' }}>
+            <p className="small muted" style={{ margin: '14px 0 0' }}>{c.monthly.note}</p>
+            <p className="small" style={{ margin: '6px 0 0' }}>
               {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
               <a href={SITE.parkDirectTelHref}>
                 <strong className="num">{SITE.parkDirectTel}</strong>
@@ -320,7 +321,6 @@ export default function HomeView({ lang = 'ja' }) {
             <a className="btn btn-primary" href={SITE.parkDirectUrl} target="_blank" rel="noopener noreferrer">
               {c.monthly.cta}
             </a>
-            <p className="small muted">{c.monthly.note}</p>
           </div>
         </div>
       </section>
