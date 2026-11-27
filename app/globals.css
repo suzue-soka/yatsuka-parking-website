@@ -1620,8 +1620,9 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-grid .facility-pay {
     display: none;
   }
+  /* One card per line: three across is too narrow for 「クレジットカード」 */
   .grid.compact.facility-grid.pay-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     margin-top: 16px;
   }
   .facility-toggle {
