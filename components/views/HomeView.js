@@ -253,35 +253,6 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
-      <section id="access" className="wrap section" aria-labelledby="access-h">
-        <SectionHead kicker="ACCESS" title={c.access.title} id="access-h" />
-        <div className="grid" style={{ alignItems: 'start' }}>
-          <div className="card">
-            <p style={{ marginTop: 0 }}>
-              <strong>{c.addressFull}</strong>
-            </p>
-            <ul>
-              {c.access.items.map((i) => (
-                <li key={i} className={i.includes('2.10') ? 'rates-mobile' : undefined}>{i}</li>
-              ))}
-            </ul>
-            {c.access.navNote && (
-              <p className="small">
-                {c.access.navNote}
-                <br />
-                <strong lang="ja">{SITE.addressJa}</strong>
-                <br />
-                TEL <strong className="num">{SITE.tel}</strong>
-              </p>
-            )}
-            <a className="btn btn-primary" href={mapsDirections} target="_blank" rel="noopener noreferrer">
-              {c.access.directions}
-            </a>
-          </div>
-          <iframe className="map" title={c.access.mapTitle} src={mapsEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-        </div>
-      </section>
-
       <section id="monthly" className="wrap section" aria-labelledby="monthly-h">
         <SectionHead kicker="MONTHLY" title={c.monthly.title} id="monthly-h" />
         {/* Everything inside one frame (owner, 2026-11-27) */}
@@ -323,6 +294,35 @@ export default function HomeView({ lang = 'ja' }) {
               {c.monthly.cta}
             </a>
           </div>
+        </div>
+      </section>
+
+      <section id="access" className="wrap section" aria-labelledby="access-h">
+        <SectionHead kicker="ACCESS" title={c.access.title} id="access-h" />
+        <div className="grid" style={{ alignItems: 'start' }}>
+          <div className="card">
+            <p style={{ marginTop: 0 }}>
+              <strong>{c.addressFull}</strong>
+            </p>
+            <ul>
+              {c.access.items.map((i) => (
+                <li key={i} className={i.includes('2.10') ? 'rates-mobile' : undefined}>{i}</li>
+              ))}
+            </ul>
+            {c.access.navNote && (
+              <p className="small">
+                {c.access.navNote}
+                <br />
+                <strong lang="ja">{SITE.addressJa}</strong>
+                <br />
+                TEL <strong className="num">{SITE.tel}</strong>
+              </p>
+            )}
+            <a className="btn btn-primary" href={mapsDirections} target="_blank" rel="noopener noreferrer">
+              {c.access.directions}
+            </a>
+          </div>
+          <iframe className="map" title={c.access.mapTitle} src={mapsEmbed} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
         </div>
       </section>
 
