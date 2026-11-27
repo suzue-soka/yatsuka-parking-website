@@ -275,6 +275,8 @@ export default function HomeView({ lang = 'ja' }) {
               ))}
             </ul>
             <p className="small" style={{ margin: '14px 0 0' }}>
+              {/* Park Direct's logo, supplied by Park Direct with permission to use it on this site (owner, 2026-11-27) */}
+              <img className="pd-logo" src="/images/park-direct-logo.png" alt="Park Direct" width={387} height={112} />{' '}
               {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
               <a href={SITE.parkDirectTelHref}>
                 <strong className="num" style={{ fontSize: 22 }}>{SITE.parkDirectTel}</strong>

@@ -2017,3 +2017,12 @@ p.rates-sub-row.rates-pc {
     font-size: 16px;
   }
 }
+
+/* Park Direct logo beside the enquiry line in MONTHLY: 28px high (owner, 2026-11-27) */
+.pd-logo {
+  display: inline-block;
+  height: 28px;
+  width: auto;
+  vertical-align: -7px;
+  margin-right: 4px;
+}
