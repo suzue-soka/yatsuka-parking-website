@@ -36,10 +36,10 @@ export default function Footer({ lang = 'ja' }) {
             <Link href={`${home}#rates`}>{L.rates}</Link>
           </li>
           <li>
-            <Link href={`${home}#access`}>{L.access}</Link>
+            <Link href={`${home}#monthly`}>{L.monthly}</Link>
           </li>
           <li>
-            <Link href={`${home}#monthly`}>{L.monthly}</Link>
+            <Link href={`${home}#access`}>{L.access}</Link>
           </li>
           <li>
             <Link href={href(lang, '/news')}>{L.news}</Link>
