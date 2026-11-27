@@ -283,8 +283,9 @@ export default function HomeView({ lang = 'ja' }) {
 
       <section id="monthly" className="wrap section" aria-labelledby="monthly-h">
         <SectionHead kicker="MONTHLY" title={c.monthly.title} id="monthly-h" />
-        <div className="grid" style={{ alignItems: 'start' }}>
-          <div className="card">
+        {/* Everything inside one frame (owner, 2026-11-27) */}
+        <div className="card monthly-card">
+          <div>
             <div>
               {c.monthly.fee}{' '}
               <strong className="num" style={{ fontSize: 28 }}>
@@ -302,7 +303,7 @@ export default function HomeView({ lang = 'ja' }) {
               ))}
             </ul>
           </div>
-          <div className="card">
+          <div className="monthly-apply">
             <strong>{c.monthly.stepsTitle}</strong>
             <ol>
               {c.monthly.steps.map((s) => (

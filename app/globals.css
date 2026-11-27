@@ -1875,3 +1875,36 @@ span.rates-pc.sup-pc {
 .facility-item .small {
   font-size: 12px;
 }
+
+/* MONTHLY: fees and the application steps inside one frame (owner, 2026-11-27).
+   Phones: stacked with a line between; tablets and PC: side by side. */
+.monthly-card {
+  display: grid;
+  gap: 16px;
+}
+.monthly-apply {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.monthly-apply ol {
+  margin: 8px 0 12px;
+}
+@media (min-width: 700px) {
+  .monthly-card {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .monthly-apply {
+    border-top: 0;
+    padding-top: 0;
+    border-left: 1px solid var(--line);
+    padding-left: 28px;
+  }
+}
+/* Sub-headings with a note on the right: the note drops to the next line on narrow screens */
+.rates-sub-row {
+  flex-wrap: wrap;
+}
+.rates-sub-row > strong {
+  white-space: nowrap;
+}
