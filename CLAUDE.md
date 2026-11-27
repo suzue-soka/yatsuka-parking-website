@@ -9,6 +9,15 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Before telling the owner that "another session" or someone else made a change, check who made
+  it: the commit's `Claude-Session` trailer and `git reflog` (an entry starting "commit:" was made
+  in this workspace). Twice on 2026-11-27 Claude said another session was editing the site; both
+  commits were this session's own, from a first attempt at the owner's message that was cut off
+  and started again. When work turns out to be half done already, check the reflog before
+  explaining why (2026-11-27).
+- "Check before warning" also covers saying what another document "still says": open it and read
+  the passage before calling it out of date or asking whether to update it (2026-11-27, from the
+  sign chat).
 - Read the Project doc `claude/project-index.md` as well as `claude/lessons.md` before the first
   answer of a session, and check it again before advising the owner to download, check or ask
   something. Claude urged a ParkingWeb download three times when the index already recorded that
