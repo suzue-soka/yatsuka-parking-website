@@ -1596,6 +1596,14 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-grid:not(.show-all) .facility-extra {
     display: none;
   }
+  /* Payment-method cards are in RATES on PC */
+  .facility-grid .facility-pay {
+    display: none;
+  }
+  .grid.compact.facility-grid.pay-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 16px;
+  }
   .facility-toggle {
     display: block;
     margin: 12px 0 0;

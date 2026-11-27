@@ -11,6 +11,9 @@ import { href } from '@/lib/i18n';
 import { sortedNews, formatNewsDate } from '@/lib/news';
 import { programText } from '@/lib/content/program';
 
+// Payment-method cards: shown in RATES on PC, in FACILITY on phones and tablets.
+const PAY_ICONS = ['card', 'emoney', 'cash'];
+
 function SectionHead({ kicker, title, id }) {
   return (
     <div className="section-head">
@@ -155,7 +158,7 @@ export default function HomeView({ lang = 'ja' }) {
         <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
         <FacilityGrid
           items={c.facility.items.map((a) => ({ ...a, svg: facilityIconSvg(a.icon) }))}
-          labels={{ showAll: c.facility.showAll(c.facility.items.length), showLess: c.facility.showLess }}
+          labels={{ showAll: c.facility.showAll(c.facility.items.filter((a) => !PAY_ICONS.includes(a.icon)).length), showLess: c.facility.showLess }}
         />
       </section>
 
@@ -195,6 +198,24 @@ export default function HomeView({ lang = 'ja' }) {
           {c.rates.notes.map((n, i) => (
             <span key={n} className={i === 1 ? 'note-pay' : i === 0 ? 'note-tax' : undefined}>{n}</span>
           ))}
+        </div>
+        {/* PC: the payment-method cards live here, left of the estimate, instead of in FACILITY
+            (owner, 2026-11-27). Phones and tablets keep them in FACILITY. */}
+        <div className="pc-only">
+          <div className="grid compact facility-grid pay-grid">
+            {c.facility.items
+              .filter((a) => PAY_ICONS.includes(a.icon))
+              .map((a) => (
+                <div key={a.t} className="card facility-item">
+                  <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
+                  <div>
+                    <strong>{a.t}</strong>
+                    <div className="small muted">{a.d}</div>
+                    {a.note && <div className="small facility-note">{a.note}</div>}
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
         </div>
 

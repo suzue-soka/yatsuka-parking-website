@@ -4,7 +4,9 @@ import { useState } from 'react';
 
 // Two tiers on PC (owner, 2026-11-27): the eight facts that decide a visit stay visible,
 // the rest open with one button. Phones and tablets show every card, as before.
-const PRIMARY = new Set(['h24', 'capacity', 'size', 'max', 'card', 'wheelchair', 'toiletAccessible', 'ev']);
+const PRIMARY = new Set(['h24', 'capacity', 'size', 'max', 'wheelchair', 'toiletAccessible', 'ev']);
+// On PC the payment-method cards are shown in the RATES section instead (owner, 2026-11-27).
+const PAY = new Set(['card', 'emoney', 'cash']);
 
 export default function FacilityGrid({ items, labels }) {
   const [all, setAll] = useState(false);
@@ -12,7 +14,7 @@ export default function FacilityGrid({ items, labels }) {
     <>
       <div id="facility-grid" className={`grid compact facility-grid${all ? ' show-all' : ''}`}>
         {items.map((a) => (
-          <div key={a.t} className={`card facility-item${PRIMARY.has(a.icon) ? '' : ' facility-extra'}`}>
+          <div key={a.t} className={`card facility-item${PRIMARY.has(a.icon) ? '' : ' facility-extra'}${PAY.has(a.icon) ? ' facility-pay' : ''}`}>
             <span className="facility-icon" dangerouslySetInnerHTML={{ __html: a.svg }} />
             <div>
               <strong>
