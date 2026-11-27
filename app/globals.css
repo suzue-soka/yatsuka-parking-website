@@ -1876,11 +1876,14 @@ p.rates-sub-row.rates-pc {
   height: 84px;
   width: auto;
 }
+/* Both text blocks start at the same height, so the labels share one line and the phone
+   number and the site number share the next (owner, 2026-11-27) */
 .sup-main,
 .sup-site {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  align-self: flex-start;
 }
 .sup-labels {
   display: flex;
