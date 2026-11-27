@@ -358,25 +358,6 @@ export default function HomeView({ lang = 'ja' }) {
             {c.support.operator}
           </p>
         </div>
-        <div className="grid" style={{ marginTop: 12 }}>
-          {c.help.cards.map((h) => (
-            <div key={h.label} className="card">
-              <span className="small muted">{h.label}</span>
-              <div>
-                {h.value === 'owner' ? (
-                  <>
-                    <strong>{c.owner.name}</strong> <a href={SITE.telHref}>{tel}</a> {c.footer.telHours}
-                  </>
-                ) : (
-                  <>
-                    <strong>{h.value}</strong>
-                    {h.extra}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section id="partners" className="wrap section" aria-labelledby="partner-h">
