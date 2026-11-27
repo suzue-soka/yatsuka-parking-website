@@ -9,6 +9,13 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Partner billing: the formula built into this site (count × validation value, volume tiers
+  10/20/30%) is NOT the owner's intended one. Read the Project doc `claude/billing-formula.md`
+  before touching partner prices, the application estimate, invoices or the 約款 (2026-11-28).
+- When records disagree, read the handover notes and the past chats in full before asking the
+  owner which one stands; search snippets are not enough. Claude asked which billing rule was
+  current when `claude/parking-data-analysis.md` and the data chat already showed the owner had
+  tried the fixed-value formula and given it up (2026-11-28).
 - A phone number, ID or amount must never break across lines: set `white-space: nowrap` whenever
   one is added or enlarged, and look at it at phone width (375px) before reporting it done.
   The Park Direct number 050-3173-9036 broke after "050-3173-" when Claude enlarged it (2026-11-27).
