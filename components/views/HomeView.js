@@ -419,18 +419,6 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
-      <section className="wrap section" aria-labelledby="sec-h">
-        <SectionHead kicker="SECURITY" title={c.security.title} id="sec-h" />
-        <div className="grid">
-          {c.security.items.map((s) => (
-            <div key={s.t} className="card">
-              <strong>{s.t}</strong>
-              <div className="small muted">{s.d}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section className="wrap section faq" aria-labelledby="faq-h">
         <SectionHead kicker="FAQ" title={c.faq.title} id="faq-h" />
         {c.faq.items.map((f) => (

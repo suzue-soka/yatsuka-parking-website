@@ -143,6 +143,18 @@ export default function PartnersView({ lang = 'ja' }) {
         </p>
       </div>
 
+      {/* Moved here from the home page (owner, 2026-11-27): the two items that concern partners */}
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ marginTop: 0, fontSize: 20 }}>{c.security.title}</h2>
+        <ul style={{ marginBottom: 0 }}>
+          {c.security.items.map((x) => (
+            <li key={x.t}>
+              <strong>{x.t}</strong>：{x.d}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div id="apply" style={{ marginTop: 40, scrollMarginTop: 80 }}>
         <h2>{t.applyTitle}</h2>
         <p>{t.applyIntro}</p>
