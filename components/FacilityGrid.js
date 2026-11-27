@@ -15,7 +15,19 @@ export default function FacilityGrid({ items, labels }) {
           <div key={a.t} className={`card facility-item${PRIMARY.has(a.icon) ? '' : ' facility-extra'}`}>
             <span className="facility-icon" dangerouslySetInnerHTML={{ __html: a.svg }} />
             <div>
-              <strong>{a.href ? <a href={a.href}>{a.t}</a> : a.t}</strong>
+              <strong>
+                {a.href === '#vehicles' ? (
+                  <>
+                    {/* The vehicles section has a PC and a phone version, each with its own anchor. */}
+                    <a className="pc-only-inline" href="#vehicles">{a.t}</a>
+                    <a className="sp-only-inline" href="#vehicles-m">{a.t}</a>
+                  </>
+                ) : a.href ? (
+                  <a href={a.href}>{a.t}</a>
+                ) : (
+                  a.t
+                )}
+              </strong>
               <div className="small muted">{a.d}</div>
               {a.note && <div className="small facility-note">{a.note}</div>}
             </div>

@@ -1,4 +1,5 @@
 import { facilityIconSvg } from '@/lib/facility-icons';
+import { vehicleLimitIconSvg } from '@/lib/vehicle-limit-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import FeeCalculator from '@/components/FeeCalculator';
@@ -132,6 +133,24 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
+      {/* PC: vehicle limits as on the entrance sign, above FACILITY (owner, 2026-11-27).
+          Phones and tablets keep the earlier section further down until the mobile pass. */}
+      <section id="vehicles" className="wrap section pc-only" aria-labelledby="veh-pc-h">
+        <SectionHead kicker="VEHICLES" title={c.vehicles.limitsTitle} id="veh-pc-h" />
+        <div className="veh-strip">
+          {c.vehicles.limits.map((v) => (
+            <div key={v.icon} className="veh-tile">
+              <span className="facility-icon" dangerouslySetInnerHTML={{ __html: vehicleLimitIconSvg(v.icon) }} />
+              <div>
+                <div className="veh-label">{v.label}</div>
+                <strong className="veh-value">{v.value}</strong>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="small veh-other">{c.vehicles.ng.join(c.vehicles.sep)}</p>
+      </section>
+
       <section className="wrap section" aria-labelledby="facility-h">
         <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
         <FacilityGrid
@@ -226,7 +245,7 @@ export default function HomeView({ lang = 'ja' }) {
         </div>
       </section>
 
-      <section id="vehicles" className="wrap section" aria-labelledby="veh-h">
+      <section id="vehicles-m" className="wrap section sp-only" aria-labelledby="veh-h">
         <SectionHead kicker="VEHICLES" title={c.vehicles.title} id="veh-h" />
         <div className="grid">
           {c.vehicles.ok.map((v) => (

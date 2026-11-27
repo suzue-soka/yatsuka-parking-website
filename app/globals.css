@@ -1547,6 +1547,47 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   color: var(--orange-text);
   font-weight: 700;
 }
+/* Shown on PC only / on phones and tablets only */
+.pc-only,
+.pc-only-inline {
+  display: none;
+}
+@media (min-width: 900px) {
+  .pc-only {
+    display: block;
+  }
+  .pc-only-inline {
+    display: inline;
+  }
+  .sp-only,
+  .sp-only-inline {
+    display: none;
+  }
+}
+/* Vehicle limits row, as on the entrance sign (PC) */
+.veh-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.veh-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.3;
+}
+.veh-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+.veh-value {
+  font-size: 16px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.veh-other {
+  margin: 12px 0 0;
+}
 /* Two tiers on PC only (owner, 2026-11-27); phones and tablets show every card and no button. */
 .facility-toggle {
   display: none;
