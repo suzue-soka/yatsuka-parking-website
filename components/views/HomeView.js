@@ -201,16 +201,25 @@ export default function HomeView({ lang = 'ja' }) {
             <span key={n} className={i === 1 ? 'note-pay' : i === 0 ? 'note-tax' : undefined}>{n}</span>
           ))}
         </div>
-        {/* PC: payment methods live here as one frameless row, icon and name only, like the sign,
-            instead of in FACILITY (owner, 2026-11-27). Phones and tablets keep them in FACILITY. */}
+        {/* PC: payment methods live here in one headed card, three columns, each with its status
+            (option A, owner 2026-11-27), instead of in FACILITY. Cash first: the only method in
+            use until 2027-02-02. Phones and tablets keep them in FACILITY. */}
         <div className="pc-only">
-          <div className="pay-row">
-            {c.facility.items
-              .filter((a) => PAY_ICONS.includes(a.icon))
+          <p className="rates-sub rates-sub-row pay-head">
+            <strong>{c.rates.payTitle}</strong>
+            <span className="rates-tax">{c.rates.payAt}</span>
+          </p>
+          <div className="card pay-card">
+            {['cash', 'card', 'emoney']
+              .map((k) => c.facility.items.find((a) => a.icon === k))
+              .filter(Boolean)
               .map((a) => (
                 <div key={a.t} className="pay-item">
                   <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
-                  <strong>{a.t}</strong>
+                  <div>
+                    <strong>{a.t}</strong>
+                    <div className={a.note ? 'small facility-note' : 'small muted'}>{a.note || c.rates.payAvailable}</div>
+                  </div>
                 </div>
               ))}
           </div>

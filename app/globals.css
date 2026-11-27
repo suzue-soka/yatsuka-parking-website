@@ -1620,19 +1620,27 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-grid .facility-pay {
     display: none;
   }
-  /* One frameless row, icon and name only, like the entrance sign (owner, 2026-11-27) */
-  .pay-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 28px;
-    margin-top: 16px;
+  /* Payment methods in RATES: one headed card, three columns, status under each name
+     (option A, owner 2026-11-27) */
+  .pay-head {
+    margin: 20px 0 12px;
+  }
+  .pay-card {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 22px;
   }
   .pay-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 15px;
+    gap: 10px;
+    line-height: 1.3;
     white-space: nowrap;
+  }
+  .pay-item strong {
+    font-size: 15px;
   }
   .facility-toggle {
     display: block;
