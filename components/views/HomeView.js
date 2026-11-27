@@ -109,7 +109,9 @@ export default function HomeView({ lang = 'ja' }) {
   );
 
   return (
-    <>
+    // .home-flow lets the PC layout put sections in a different order (VEHICLES, RATES, FACILITY)
+    // without changing the order on phones and tablets.
+    <div className="home-flow">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(c, lang) }} />
 
       <section className="hero">
@@ -425,6 +427,6 @@ export default function HomeView({ lang = 'ja' }) {
           </details>
         ))}
       </section>
-    </>
+    </div>
   );
 }

@@ -1547,6 +1547,26 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   color: var(--orange-text);
   font-weight: 700;
 }
+/* PC section order on the home page (owner, 2026-11-27): hero, VEHICLES, RATES, FACILITY, then the rest.
+   Phones and tablets keep the order of the page source. */
+@media (min-width: 900px) {
+  .home-flow {
+    display: flex;
+    flex-direction: column;
+  }
+  .home-flow > .wrap {
+    width: 100%;
+  }
+  .home-flow > .hero {
+    order: -3;
+  }
+  .home-flow > #vehicles {
+    order: -2;
+  }
+  .home-flow > #rates {
+    order: -1;
+  }
+}
 /* Shown on PC only / on phones and tablets only */
 .pc-only,
 .pc-only-inline {
