@@ -1661,6 +1661,15 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
     font-size: 15px;
     white-space: nowrap;
   }
+  .pay-item .facility-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+  }
+  .pay-item .facility-icon svg {
+    width: 22px;
+    height: 22px;
+  }
   .pay-brands {
     font-size: 13px;
     color: var(--grey-2);
