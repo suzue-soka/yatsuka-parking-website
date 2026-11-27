@@ -302,6 +302,13 @@ export default function HomeView({ lang = 'ja' }) {
                 <li key={t}>{t}</li>
               ))}
             </ul>
+            <p className="small" style={{ margin: '14px 0 0' }}>
+              {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
+              <a href={SITE.parkDirectTelHref}>
+                <strong className="num">{SITE.parkDirectTel}</strong>
+              </a>{' '}
+              <span className="muted">{c.monthly.telHours}</span>
+            </p>
           </div>
           <div className="monthly-apply">
             <strong>{c.monthly.stepsTitle}</strong>
@@ -314,13 +321,6 @@ export default function HomeView({ lang = 'ja' }) {
               {c.monthly.cta}
             </a>
             <p className="small muted">{c.monthly.note}</p>
-            <p className="small" style={{ marginBottom: 0 }}>
-              {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
-              <a href={SITE.parkDirectTelHref}>
-                <strong className="num">{SITE.parkDirectTel}</strong>
-              </a>{' '}
-              <span className="muted">{c.monthly.telHours}</span>
-            </p>
           </div>
         </div>
       </section>
