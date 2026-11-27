@@ -1630,7 +1630,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 }
 /* Payment methods in RATES: one headed card, one row per method (owner, 2026-11-27) */
 .pay-head {
-  margin: 20px 0 12px;
+  margin: 14px 0 12px;
+}
+/* The notes under the rate cards are all shown elsewhere now, so the row takes no space */
+.rates-layout .notes {
+  margin-top: 0;
 }
 .pay-card {
   display: flex;
@@ -1638,9 +1642,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   justify-content: center;
   padding: 12px 22px;
 }
+/* The three methods spread over the height of the card (owner, 2026-11-27) */
 .pay-items {
   display: grid;
-  gap: 10px;
+  flex: 1;
+  align-content: space-evenly;
+  gap: 14px;
 }
 /* Each method: icon, then the name with its status or start date on the same row, and the
    accepted brands or notes in grey on the row below (owner, 2026-11-27) */
