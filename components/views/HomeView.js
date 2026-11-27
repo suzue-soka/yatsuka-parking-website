@@ -277,9 +277,10 @@ export default function HomeView({ lang = 'ja' }) {
             <p className="small" style={{ margin: '14px 0 0' }}>
               {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
               <a href={SITE.parkDirectTelHref}>
-                <strong className="num">{SITE.parkDirectTel}</strong>
-              </a>{' '}
-              <span className="muted">{c.monthly.telHours}</span>
+                <strong className="num" style={{ fontSize: 22 }}>{SITE.parkDirectTel}</strong>
+              </a>
+              {/* Hours on their own line under the number (owner, 2026-11-27) */}
+              <span className="muted" style={{ display: 'block' }}>{c.monthly.telHours}</span>
             </p>
           </div>
           <div className="monthly-apply">
