@@ -221,7 +221,14 @@ export default function HomeView({ lang = 'ja' }) {
                     <strong>{a.t}</strong>
                     <div className={a.note ? 'small facility-note' : 'small muted'}>{a.note || c.rates.payAvailable}</div>
                   </div>
-                  <div className="pay-brands">{a.brands ?? a.d}</div>
+                  <div className="pay-brands">
+                    {(a.brands ?? [a.d]).map((b, i, all) => (
+                      <span key={b}>
+                        {b}
+                        {i < all.length - 1 ? (lang === 'en' ? ', ' : lang === 'zh' ? '、' : '・') : ''}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

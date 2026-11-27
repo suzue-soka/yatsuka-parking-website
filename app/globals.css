@@ -1647,12 +1647,12 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   }
   .pay-items {
     display: grid;
-    gap: 8px;
+    gap: 6px;
   }
   /* One row per method: icon, name with its status, then brands or accepted notes */
   .pay-item {
     display: grid;
-    grid-template-columns: auto 9.5em minmax(0, 1fr);
+    grid-template-columns: auto 8.3em minmax(0, 1fr);
     align-items: center;
     column-gap: 10px;
     line-height: 1.3;
@@ -1664,6 +1664,11 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .pay-brands {
     font-size: 13px;
     color: var(--grey-2);
+  }
+  /* A brand name never breaks in the middle */
+  .pay-brands span {
+    display: inline-block;
+    white-space: pre;
   }
   /* If the left column is the taller one, the simulator frame grows to match instead */
   .rates-layout:not(:has(details[open])) .rates-calc {
