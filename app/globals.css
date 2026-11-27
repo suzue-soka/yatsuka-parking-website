@@ -1913,3 +1913,20 @@ span.rates-pc.sup-pc {
 .rates-sub-row > strong {
   white-space: nowrap;
 }
+
+/* Simulator: date, hour and minute stay on one line on phones too (owner, 2026-11-27: phones follow PC) */
+@media (max-width: 559px) {
+  .rates-calc .calc .inputs {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .rates-calc .calc input[type='date'] {
+    flex: 1 1 0;
+    padding: 0 6px;
+    font-size: 16px;
+  }
+  .rates-calc .calc select {
+    padding: 0 6px;
+    font-size: 16px;
+  }
+}
