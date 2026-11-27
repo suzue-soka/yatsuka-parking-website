@@ -201,13 +201,13 @@ export default function HomeView({ lang = 'ja' }) {
             <span key={n} className={i === 1 ? 'note-pay' : i === 0 ? 'note-tax' : undefined}>{n}</span>
           ))}
         </div>
-        {/* PC: payment methods live here in one headed card, three columns, each with its status
+        {/* PC: payment methods live here in one headed card, one row per method: name and status, then the accepted brands or notes (owner, 2026-11-27)
             (option A, owner 2026-11-27); the card stretches to the bottom of the simulator frame, instead of in FACILITY. Cash first: the only method in
             use until 2027-02-02. Phones and tablets keep them in FACILITY. */}
         <div className="pc-only pay-block">
           <p className="rates-sub rates-sub-row pay-head">
             <strong>{c.rates.payTitle}</strong>
-            <span className="rates-tax">{c.rates.payAt}</span>
+            <span className="rates-tax">{[c.rates.payAt, ...c.rates.payFoot].join(lang === 'en' ? ' · ' : '・')}</span>
           </p>
           <div className="card pay-card">
             <div className="pay-items">
@@ -217,19 +217,14 @@ export default function HomeView({ lang = 'ja' }) {
               .map((a) => (
                 <div key={a.t} className="pay-item">
                   <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
-                  <div>
+                  <div className="pay-name">
                     <strong>{a.t}</strong>
-                    <div className="small muted">{a.d}</div>
                     <div className={a.note ? 'small facility-note' : 'small muted'}>{a.note || c.rates.payAvailable}</div>
                   </div>
+                  <div className="pay-brands">{a.brands ?? a.d}</div>
                 </div>
               ))}
             </div>
-            <ul className="pay-foot small muted">
-              {c.rates.payFoot.map((n) => (
-                <li key={n}>{n}</li>
-              ))}
-            </ul>
           </div>
         </div>
         </div>
