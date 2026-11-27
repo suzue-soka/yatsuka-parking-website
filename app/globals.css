@@ -1620,10 +1620,19 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   .facility-grid .facility-pay {
     display: none;
   }
-  /* One card per line: three across is too narrow for 「クレジットカード」 */
-  .grid.compact.facility-grid.pay-grid {
-    grid-template-columns: minmax(0, 1fr);
+  /* One frameless row, icon and name only, like the entrance sign (owner, 2026-11-27) */
+  .pay-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
     margin-top: 16px;
+  }
+  .pay-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    white-space: nowrap;
   }
   .facility-toggle {
     display: block;
