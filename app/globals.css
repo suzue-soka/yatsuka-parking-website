@@ -1547,6 +1547,20 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
   color: var(--orange-text);
   font-weight: 700;
 }
+/* Two tiers on PC only (owner, 2026-11-27); phones and tablets show every card and no button. */
+.facility-toggle {
+  display: none;
+}
+@media (min-width: 900px) {
+  .facility-grid:not(.show-all) .facility-extra {
+    display: none;
+  }
+  .facility-toggle {
+    display: block;
+    margin: 12px 0 0;
+    text-align: center;
+  }
+}
 
 /* ---------- Rates + calculator ---------- */
 /* Phones and tablets: rates, then the calculator below (with its own 料金を計算 menu button).

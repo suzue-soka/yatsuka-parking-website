@@ -2,6 +2,7 @@ import { facilityIconSvg } from '@/lib/facility-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import FeeCalculator from '@/components/FeeCalculator';
+import FacilityGrid from '@/components/FacilityGrid';
 import ValidatorCard from '@/components/ValidatorCard';
 import { SITE } from '@/lib/site';
 import { getContent } from '@/lib/content';
@@ -133,18 +134,10 @@ export default function HomeView({ lang = 'ja' }) {
 
       <section className="wrap section" aria-labelledby="facility-h">
         <SectionHead kicker="FACILITY" title={c.facility.title} id="facility-h" />
-        <div className="grid compact facility-grid">
-          {c.facility.items.map((a) => (
-            <div key={a.t} className="card facility-item">
-              <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
-              <div>
-                <strong>{a.href ? <a href={a.href}>{a.t}</a> : a.t}</strong>
-                <div className="small muted">{a.d}</div>
-                {a.note && <div className="small facility-note">{a.note}</div>}
-              </div>
-            </div>
-          ))}
-        </div>
+        <FacilityGrid
+          items={c.facility.items.map((a) => ({ ...a, svg: facilityIconSvg(a.icon) }))}
+          labels={{ showAll: c.facility.showAll(c.facility.items.length), showLess: c.facility.showLess }}
+        />
       </section>
 
       {news.length > 0 && newsSection('news-h', 'rates-mobile')}
