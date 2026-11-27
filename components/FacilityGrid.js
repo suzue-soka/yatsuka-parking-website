@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 
-// Two tiers on PC (owner, 2026-11-27): the eight facts that decide a visit stay visible,
-// the rest open with one button. Phones and tablets show every card, as before.
+// Two tiers on every screen size (owner, 2026-11-27): the seven facts that decide a visit stay
+// visible, the rest open with one button.
 const PRIMARY = new Set(['h24', 'capacity', 'size', 'max', 'wheelchair', 'toiletAccessible', 'ev']);
-// On PC the payment-method cards are shown in the RATES section instead (owner, 2026-11-27).
+// The payment-method cards are shown in the RATES section instead (owner, 2026-11-27).
 const PAY = new Set(['card', 'emoney', 'cash']);
 
 export default function FacilityGrid({ items, labels }) {
@@ -35,12 +35,14 @@ export default function FacilityGrid({ items, labels }) {
             </div>
           </div>
         ))}
+        {/* The button is a cell of the grid: last place of the second row on PC (7 cards + button),
+            and after the last card once everything is shown (owner, 2026-11-27). */}
+        <div className="facility-toggle">
+          <button type="button" className="btn btn-line" aria-expanded={all} aria-controls="facility-grid" onClick={() => setAll((v) => !v)}>
+            {all ? labels.showLess : labels.showAll}
+          </button>
+        </div>
       </div>
-      <p className="facility-toggle">
-        <button type="button" className="btn btn-line" aria-expanded={all} aria-controls="facility-grid" onClick={() => setAll((v) => !v)}>
-          {all ? labels.showLess : labels.showAll}
-        </button>
-      </p>
     </>
   );
 }

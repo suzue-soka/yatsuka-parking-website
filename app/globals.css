@@ -1618,10 +1618,15 @@ th.sortable[aria-sort='descending']::after { content: ' ▼'; }
 .facility-grid .facility-pay {
   display: none;
 }
+/* The show-all button is the last cell of the grid and fills it */
 .facility-toggle {
-  display: block;
-  margin: 12px 0 0;
-  text-align: center;
+  display: flex;
+}
+.facility-toggle .btn {
+  flex: 1;
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
 }
 /* Payment methods in RATES: one headed card, one row per method (owner, 2026-11-27) */
 .pay-head {
