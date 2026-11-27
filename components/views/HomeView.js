@@ -217,10 +217,11 @@ export default function HomeView({ lang = 'ja' }) {
                   <span className="facility-icon" dangerouslySetInnerHTML={{ __html: facilityIconSvg(a.icon) }} />
                   <div className="pay-name">
                     <strong>{a.t}</strong>
-                    <div className={a.note ? 'small facility-note' : 'small muted'}>{a.note || c.rates.payAvailable}</div>
+                    {a.note && <div className="small facility-note">{a.note}</div>}
                   </div>
                   <div className="pay-brands">
-                    {(a.brands ?? [a.d]).map((b, i, all) => (
+                    {/* Cash has no start date: one sentence, "1,000円札と硬貨のみご利用いただけます。" (owner, 2026-11-27) */}
+                    {(a.icon === 'cash' ? [c.rates.payCash] : a.brands ?? [a.d]).map((b, i, all) => (
                       <span key={b}>
                         {b}
                         {i < all.length - 1 ? (lang === 'en' ? ', ' : lang === 'zh' ? '、' : '・') : ''}
