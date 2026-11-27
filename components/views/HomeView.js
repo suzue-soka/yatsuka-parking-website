@@ -335,6 +335,13 @@ export default function HomeView({ lang = 'ja' }) {
               {c.monthly.cta}
             </a>
             <p className="small muted">{c.monthly.note}</p>
+            <p className="small" style={{ marginBottom: 0 }}>
+              {c.monthly.telLabel}{lang === 'en' ? ': ' : '：'}
+              <a href={SITE.parkDirectTelHref}>
+                <strong className="num">{SITE.parkDirectTel}</strong>
+              </a>{' '}
+              <span className="muted">{c.monthly.telHours}</span>
+            </p>
           </div>
         </div>
       </section>
