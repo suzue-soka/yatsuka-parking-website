@@ -9,6 +9,10 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Simulations: a shop's validation value is the time it offers multiplied by the unit price of
+  the simulated rate, with no cap applied (at 200円 per 30 minutes: 1 hour 400円, 3 hours 1,200円).
+  Check that the rule gives today's values at today's rate (300円, 900円, 1,200円) before using
+  it. Claude capped ドコモショップ谷塚's 3 hours at 900円 and the owner corrected it (2026-11-28).
 - Do not fill a gap with what seems likely. When Claude does not know something, it finds the
   information (data, documents, mail, past chats) or asks the owner. A sentence in an answer is
   either checked, with its source named, or it is a question to the owner. Owner: "You still
