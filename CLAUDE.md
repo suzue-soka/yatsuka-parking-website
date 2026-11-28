@@ -9,6 +9,12 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Say what the source shows, not what a machine or system "does", unless that was checked.
+  Claude wrote "the pay machines record all paper tickets as one line" after seeing one line
+  (サービス券A) on the FY2025 GT合計 slips; how the machines store them was never checked
+  (2026-11-28).
+- Simulation results: one row per shop, never one total for the "サービス券 shops"; that service
+  ends in January 2027 (owner, 2026-11-28).
 - Partner billing: the formula built into this site (count × validation value, volume tiers
   10/20/30%) is NOT the owner's intended one. Read the Project doc `claude/billing-formula.md`
   before touching partner prices, the application estimate, invoices or the 約款 (2026-11-28).
