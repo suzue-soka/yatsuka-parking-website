@@ -9,6 +9,10 @@ Every time Claude tells the owner "I should not have…" (or admits a mistake in
 record the lesson in the same turn: here, and in the Project doc `claude/lessons.md`
 (the full table with what went wrong is there). Tell the owner it was recorded.
 
+- Do not fill a gap with what seems likely. When Claude does not know something, it finds the
+  information (data, documents, mail, past chats) or asks the owner. A sentence in an answer is
+  either checked, with its source named, or it is a question to the owner. Owner: "You still
+  making assumptions please stop. Find information or Ask if you don't know." (2026-11-28).
 - Say what the source shows, not what a machine or system "does", unless that was checked.
   Claude wrote "the pay machines record all paper tickets as one line" after seeing one line
   (サービス券A) on the FY2025 GT合計 slips; how the machines store them was never checked
