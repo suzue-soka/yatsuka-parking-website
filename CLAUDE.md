@@ -19,6 +19,11 @@ record the lesson in the same turn: here, and in the Project doc `claude/lessons
   (2026-11-28).
 - Simulation results: one row per shop, never one total for the "サービス券 shops"; that service
   ends in January 2027 (owner, 2026-11-28).
+- E-money brands accepted from 2027-02-02 (Amano's e-payment application, photo from the owner
+  2026-11-28): 交通系 (transit operator PASMO（東武）), nanaco, 楽天Edy, WAON, iD, QUICPay, PiTaPa.
+  Take a list from the row that states it, every item, nothing added or dropped. A first attempt
+  at the owner's message removed nanaco and left out PiTaPa although the 電子マネーブランド row
+  lists both; found in `git reflog` and corrected the same hour (2026-11-28).
 - Partner billing: the formula built into this site (count × validation value, volume tiers
   10/20/30%) is NOT the owner's intended one. Read the Project doc `claude/billing-formula.md`
   before touching partner prices, the application estimate, invoices or the 約款 (2026-11-28).
